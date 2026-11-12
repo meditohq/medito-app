@@ -57,7 +57,7 @@ class _TagViewState extends ConsumerState<TagView> {
               return Center(
                 child: Text(
                   AppLocalizations.of(context)!.tagNoTracks,
-                  style: Theme.of(context).textTheme.bodyLarge,
+                  style: context.text.bodySmall,
                 ),
               );
             }

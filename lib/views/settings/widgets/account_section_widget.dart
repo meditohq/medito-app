@@ -52,7 +52,7 @@ class AccountSectionWidget extends ConsumerWidget {
             ),
             child: Text(
               email,
-              style: Theme.of(context).textTheme.titleMedium?.copyWith(
+              style: context.text.label.copyWith(
                 color: Theme.of(context).colorScheme.onSurface,
               ),
             ),
@@ -64,7 +64,7 @@ class AccountSectionWidget extends ConsumerWidget {
               size: 24,
             ),
             title: AppLocalizations.of(context)!.signOutButtonText,
-            titleStyle: Theme.of(context).textTheme.labelMedium?.copyWith(
+            titleStyle: context.text.subtitle.copyWith(
               color: Theme.of(context).colorScheme.onSurface,
             ),
             hasUnderline: true,
@@ -109,7 +109,7 @@ class AccountSectionWidget extends ConsumerWidget {
               size: 24,
             ),
             title: AppLocalizations.of(context)!.deleteAccountButtonText,
-            titleStyle: Theme.of(context).textTheme.labelMedium?.copyWith(
+            titleStyle: context.text.subtitle.copyWith(
               color: Theme.of(context).colorScheme.onSurface,
             ),
             hasUnderline: !inCard,
@@ -131,7 +131,7 @@ class AccountSectionWidget extends ConsumerWidget {
             size: 24,
           ),
           title: AppLocalizations.of(context)!.signInSignUp,
-          titleStyle: Theme.of(context).textTheme.labelMedium?.copyWith(
+          titleStyle: context.text.subtitle.copyWith(
             color: Theme.of(context).colorScheme.onSurface,
           ),
           hasUnderline: !inCard,

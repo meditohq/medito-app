@@ -13,6 +13,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/widget_previews.dart';
 import 'package:medito/views/previews/preview_support.dart';
 import 'package:medito/widgets/inputs/medito_text_field.dart';
+import 'package:medito/constants/theme/medito_text.dart';
 
 const previewSize = Size(390, 940);
 
@@ -30,12 +31,9 @@ Widget _labelled(String label, Widget field) {
       children: [
         Text(
           label,
-          style: const TextStyle(
-            fontSize: 12,
-            fontWeight: FontWeight.w600,
-            letterSpacing: 0.4,
-            color: Color(0xFF9E9E9E),
-          ),
+          style: MeditoText.forBrightness(
+            Brightness.dark,
+          ).on(const Color(0xFF9E9E9E)).caption,
         ),
         const SizedBox(height: 6),
         field,
@@ -150,10 +148,7 @@ Widget meditoTextFieldFocused() => Scaffold(
   body: SafeArea(
     child: Padding(
       padding: const EdgeInsets.all(16),
-      child: const MeditoTextField(
-        hintText: 'Focused field',
-        autofocus: true,
-      ),
+      child: const MeditoTextField(hintText: 'Focused field', autofocus: true),
     ),
   ),
 );

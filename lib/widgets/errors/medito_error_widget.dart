@@ -68,7 +68,7 @@ class MeditoErrorWidget extends ConsumerWidget {
         ),
       ),
     );
-    var textStyle = Theme.of(context).textTheme.headlineMedium;
+    var textStyle = context.text.subtitle;
 
     var mainBody = _mainBody(
       context,

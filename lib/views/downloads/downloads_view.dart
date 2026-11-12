@@ -21,6 +21,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../bottom_navigation/bottom_navigation_bar_view.dart';
 import '../player/player_view.dart';
+import 'package:medito/constants/theme/medito_text.dart';
 
 class DownloadsView extends ConsumerStatefulWidget {
   const DownloadsView({super.key, this.isRoot = false});
@@ -118,12 +119,12 @@ class _DownloadsViewState extends ConsumerState<DownloadsView>
                 Icon(
                   Icons.offline_pin_outlined,
                   size: 20,
-                  color: Theme.of(context).textTheme.titleMedium?.color,
+                  color: context.text.muted.bodySmall.color,
                 ),
                 const SizedBox(width: 8),
                 Text(
                   AppLocalizations.of(context)!.tracks,
-                  style: Theme.of(context).textTheme.titleMedium,
+                  style: context.text.muted.bodySmall,
                 ),
                 const Spacer(),
                 Container(
@@ -137,7 +138,7 @@ class _DownloadsViewState extends ConsumerState<DownloadsView>
                   ),
                   child: Text(
                     '${visible.length}',
-                    style: Theme.of(context).textTheme.bodySmall,
+                    style: context.text.muted.caption,
                   ),
                 ),
               ],
@@ -184,7 +185,7 @@ class _DownloadsViewState extends ConsumerState<DownloadsView>
           Text(
             AppLocalizations.of(context)!.emptyDownloadsMessage,
             textAlign: TextAlign.center,
-            style: Theme.of(context).textTheme.titleMedium,
+            style: context.text.muted.bodySmall,
           ),
         ],
       ),

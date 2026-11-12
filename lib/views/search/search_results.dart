@@ -115,9 +115,8 @@ class _SearchResultsState extends ConsumerState<SearchResults> {
               Text(
                 AppLocalizations.of(context)!.searchEmptyHint,
                 textAlign: TextAlign.center,
-                style: theme.textTheme.bodyMedium?.copyWith(
+                style: context.text.body.copyWith(
                   color: theme.colorScheme.onSurface.withOpacityValue(0.6),
-                  height: 1.4,
                 ),
               ),
             ],
@@ -228,7 +227,7 @@ class _SearchResultsState extends ConsumerState<SearchResults> {
                   child: Text(
                     l10n.noResultsFound,
                     textAlign: TextAlign.center,
-                    style: theme.textTheme.bodyMedium?.copyWith(
+                    style: context.text.body.copyWith(
                       color: theme.colorScheme.onSurface.withOpacityValue(0.7),
                     ),
                   ),
@@ -332,13 +331,7 @@ class _FilterTab extends StatelessWidget {
           child: Row(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              Text(
-                label,
-                style: theme.textTheme.bodyMedium?.copyWith(
-                  color: textColor,
-                  fontWeight: selected ? FontWeight.w600 : FontWeight.w500,
-                ),
-              ),
+              Text(label, style: context.text.label.copyWith(color: textColor)),
               if (count != null) ...[
                 const SizedBox(width: 6),
                 Container(
@@ -354,9 +347,8 @@ class _FilterTab extends StatelessWidget {
                   ),
                   child: Text(
                     '$count',
-                    style: theme.textTheme.labelSmall?.copyWith(
+                    style: context.text.label.copyWith(
                       color: selected ? primary : textColor,
-                      fontWeight: FontWeight.w600,
                     ),
                   ),
                 ),

@@ -64,12 +64,9 @@ class EmailTypoHint extends StatelessWidget {
                     heightFactor: 1,
                     child: Text.rich(
                       emailSuggestionSpan(l10n, value.text, suggestion),
-                      style: TextStyle(
-                        fontFamily: googleSans,
-                        fontSize: 13,
-                        fontWeight: FontWeight.w400,
-                        decoration: TextDecoration.underline,
+                      style: context.text.bodySmall.copyWith(
                         color: color ?? Theme.of(context).colorScheme.primary,
+                        decoration: TextDecoration.underline,
                       ),
                     ),
                   ),

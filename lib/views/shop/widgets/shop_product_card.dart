@@ -4,6 +4,7 @@ import 'package:medito/models/shop/shop_models.dart';
 import 'package:medito/views/home/home_styles.dart';
 import 'package:medito/views/home/widgets/home_gradient_border.dart';
 import 'package:medito/views/shop/widgets/shop_photo.dart';
+import 'package:medito/constants/theme/medito_text.dart';
 
 /// Product photos are all shot 3:4.
 const kShopPhotoAspect = 3 / 4;
@@ -103,18 +104,14 @@ class ShopProductCard extends StatelessWidget {
                       product.name,
                       maxLines: 2,
                       overflow: TextOverflow.ellipsis,
-                      style: theme.textTheme.titleSmall?.copyWith(
-                        color: onSurface,
-                        height: 1.3,
-                      ),
+                      style: context.text.label.copyWith(color: onSurface),
                     ),
                     const SizedBox(height: 2),
                     Text(
                       priceLabel,
                       maxLines: 1,
-                      style: theme.textTheme.titleSmall?.copyWith(
+                      style: context.text.label.copyWith(
                         color: onSurface.withValues(alpha: 0.6),
-                        fontWeight: FontWeight.w600,
                       ),
                     ),
                   ],
@@ -153,9 +150,8 @@ class ShopPill extends StatelessWidget {
         padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
         child: Text(
           label,
-          style: theme.textTheme.bodySmall?.copyWith(
+          style: context.text.caption.copyWith(
             color: theme.colorScheme.onSurface,
-            letterSpacing: 0.4,
           ),
         ),
       ),

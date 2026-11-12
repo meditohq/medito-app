@@ -342,8 +342,7 @@ class _EndScreenViewState extends ConsumerState<EndScreenView>
       child: Text(
         text,
         textAlign: TextAlign.center,
-        style: Theme.of(context).textTheme.bodyLarge?.copyWith(
-          fontFamily: googleSans,
+        style: context.text.bodySmall.copyWith(
           color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.7),
         ),
       ),
@@ -378,11 +377,7 @@ class _EndScreenViewState extends ConsumerState<EndScreenView>
               ),
               child: Text(
                 AppLocalizations.of(context)!.endScreenDone,
-                style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                  fontFamily: googleSans,
-                  fontWeight: FontWeight.w500,
-                  color: onSurface,
-                ),
+                style: context.text.label.copyWith(color: onSurface),
               ),
             ),
           ),
@@ -433,12 +428,7 @@ class _EndScreenViewState extends ConsumerState<EndScreenView>
         // The number animates from the prior streak; say the current one
         // straight away rather than the old value for the first 700 ms.
         final spokenStreak = statsAsyncValue.value?.streakCurrent ?? streak;
-        final numberStyle = Theme.of(context).textTheme.headlineSmall!.copyWith(
-          fontFamily: googleSans,
-          fontSize: 56,
-          height: 1,
-          fontWeight: FontWeight.w400,
-        );
+        final numberStyle = context.text.hero;
         // Reserve the larger of the before/after numbers for the entire
         // transition, including when the outgoing switcher child disappears.
         final numberSize =
@@ -516,15 +506,7 @@ class _EndScreenViewState extends ConsumerState<EndScreenView>
                         ),
                       ),
                     ),
-                    Text(
-                      l10n.dayStreak,
-                      style: Theme.of(context).textTheme.titleLarge?.copyWith(
-                        fontFamily: googleSans,
-                        fontSize: 24,
-                        fontWeight: FontWeight.w400,
-                        height: 1.2,
-                      ),
-                    ),
+                    Text(l10n.dayStreak, style: context.text.headline),
                   ],
                 ),
               ),
@@ -539,11 +521,7 @@ class _EndScreenViewState extends ConsumerState<EndScreenView>
                 child: Text(
                   l10n.dailyPracticeMessage,
                   textAlign: TextAlign.center,
-                  style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                    fontFamily: googleSans,
-                    fontSize: 14,
-                    fontWeight: FontWeight.w400,
-                    height: 1.45,
+                  style: context.text.bodySmall.copyWith(
                     color: Theme.of(
                       context,
                     ).colorScheme.onSurface.withValues(alpha: 0.7),
@@ -605,12 +583,7 @@ class _EndScreenViewState extends ConsumerState<EndScreenView>
               children: [
                 Text(
                   labels[day.weekday - 1],
-                  style: Theme.of(context).textTheme.titleSmall?.copyWith(
-                    fontFamily: googleSans,
-                    fontSize: 14,
-                    fontWeight: type != null
-                        ? FontWeight.w600
-                        : FontWeight.w500,
+                  style: context.text.label.copyWith(
                     color: Theme.of(context).colorScheme.onSurface.withValues(
                       alpha: type != null ? 1 : 0.5,
                     ),

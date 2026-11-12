@@ -68,14 +68,7 @@ class _MeditoAppBarLargeState extends State<MeditoAppBarLarge> {
     // FlexibleSpaceBar names the route but doesn't mark its title a heading.
     return Semantics(
       header: true,
-      child: Text(
-        title,
-        style: Theme.of(context).primaryTextTheme.titleLarge?.copyWith(
-          fontFamily: googleSans,
-          fontWeight: FontWeight.w700,
-          color: ColorConstants.white,
-        ),
-      ),
+      child: Text(title, style: context.text.on(ColorConstants.white).title),
     );
   }
 

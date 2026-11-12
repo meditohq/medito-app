@@ -69,12 +69,7 @@ class BackgroundSoundVolumeTrackShapeWidget
       TextPainter label(String text) => TextPainter(
         text: TextSpan(
           text: text,
-          style: TextStyle(
-            fontSize: 18,
-            fontWeight: FontWeight.w500,
-            color: color,
-            fontFamily: googleSans,
-          ),
+          style: MeditoText.forBrightness(Brightness.dark).on(color).subtitle,
         ),
         textDirection: textDirection,
         maxLines: 1,

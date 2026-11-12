@@ -9,6 +9,7 @@ import 'package:medito/widgets/onboarding/onboarding_option_button.dart';
 import 'package:medito/widgets/onboarding/onboarding_step_title.dart';
 import 'package:medito/l10n/app_localizations.dart';
 import 'package:medito/widgets/widgets.dart';
+import 'package:medito/constants/theme/medito_text.dart';
 
 /// A single question screen in the onboarding question flow.
 ///
@@ -141,26 +142,21 @@ class _OnboardingQuestionScreenState extends State<OnboardingQuestionScreen> {
                       widget.stepLabel!.isNotEmpty) ...[
                     Text(
                       widget.stepLabel!,
-                      style: theme.textTheme.bodySmall?.copyWith(
+                      style: context.text.caption.copyWith(
                         color: theme.colorScheme.onSurface.withAlpha(120),
-                        letterSpacing: 0.8,
                       ),
                     ),
                     const SizedBox(height: padding16),
                   ],
                   OnboardingStepTitle(
                     widget.question,
-                    style: theme.textTheme.headlineMedium?.copyWith(
-                      fontWeight: FontWeight.w600,
-                      height: 1.25,
-                    ),
+                    style: context.text.headline,
                   ),
                   const SizedBox(height: 8),
                   Text(
                     widget.subtext,
-                    style: theme.textTheme.bodyMedium?.copyWith(
+                    style: context.text.body.copyWith(
                       color: theme.colorScheme.onSurface.withAlpha(160),
-                      height: 1.4,
                     ),
                   ),
                   const SizedBox(height: 32),
@@ -198,9 +194,8 @@ class _OnboardingQuestionScreenState extends State<OnboardingQuestionScreen> {
           if (widget.freeTextLabel != null) ...[
             Text(
               widget.freeTextLabel!,
-              style: theme.textTheme.bodySmall?.copyWith(
+              style: context.text.caption.copyWith(
                 color: theme.colorScheme.onSurface.withAlpha(160),
-                letterSpacing: 0.4,
               ),
             ),
             const SizedBox(height: 8),

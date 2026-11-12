@@ -6,6 +6,7 @@ import 'package:medito/views/home/widgets/bottom_sheet/row_item_widget.dart';
 import 'package:medito/views/settings/widgets/announce_setting.dart';
 import 'package:medito/widgets/radio_option_card.dart';
 import 'package:medito/widgets/snackbar_widget.dart';
+import 'package:medito/constants/theme/medito_text.dart';
 
 /// Settings row for Zen Mode: shows On / Off and opens [ZenModeSheet] on tap.
 class ZenModeTile extends ConsumerWidget {
@@ -86,10 +87,7 @@ class ZenModeSheet extends ConsumerWidget {
               header: true,
               child: Text(
                 l10n.zenMode,
-                style: theme.textTheme.titleMedium?.copyWith(
-                  color: onSurface,
-                  fontWeight: FontWeight.w600,
-                ),
+                style: context.text.label.copyWith(color: onSurface),
               ),
             ),
             const SizedBox(height: 16),
@@ -109,8 +107,7 @@ class ZenModeSheet extends ConsumerWidget {
             const SizedBox(height: 12),
             Text(
               l10n.zenModeFootnote,
-              style: theme.textTheme.bodySmall?.copyWith(
-                fontWeight: FontWeight.w400,
+              style: context.text.caption.copyWith(
                 color: onSurface.withValues(alpha: 0.6),
               ),
             ),

@@ -13,7 +13,6 @@ class StopwatchElapsedWidget extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final positionMs = ref.watch(audioStateProvider.select((s) => s.position));
-    final textTheme = Theme.of(context).textTheme;
     final l10n = AppLocalizations.of(context)!;
     final elapsed = Duration(milliseconds: positionMs);
     // One label ("12 minutes 34 seconds elapsed"), not the clock and caption
@@ -27,22 +26,16 @@ class StopwatchElapsedWidget extends ConsumerWidget {
         children: [
           Text(
             formatTimerClock(elapsed),
-            style: textTheme.displayMedium?.copyWith(
-              color: ColorConstants.white,
-              fontFamily: googleSans,
-              fontSize: 44,
-              fontWeight: FontWeight.w300,
-              height: 1,
-              fontFeatures: const [FontFeature.tabularFigures()],
-            ),
+            style: context.text
+                .on(ColorConstants.white)
+                .hero
+                .copyWith(fontFeatures: const [FontFeature.tabularFigures()]),
           ),
           const SizedBox(height: 6),
           Text(
             l10n.timerElapsed,
-            style: textTheme.titleSmall?.copyWith(
+            style: context.text.caption.copyWith(
               color: ColorConstants.white.withValues(alpha: 0.7),
-              fontFamily: googleSans,
-              fontSize: 12,
             ),
           ),
         ],

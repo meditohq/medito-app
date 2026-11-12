@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:medito/utils/utils.dart';
+import 'package:medito/constants/theme/medito_text.dart';
 
 class BottomActions extends StatelessWidget {
   final String title;
@@ -36,11 +37,7 @@ class BottomActions extends StatelessWidget {
           Expanded(
             child: Text(
               title,
-              style: const TextStyle(
-                color: Colors.white,
-                fontSize: 16,
-                fontWeight: FontWeight.w500,
-              ),
+              style: context.text.on(Colors.white).subtitle,
               maxLines: 1,
               overflow: TextOverflow.ellipsis,
             ),

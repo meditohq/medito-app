@@ -6,6 +6,7 @@ import 'package:flutter/services.dart';
 import 'package:medito/l10n/app_localizations.dart';
 import 'package:medito/models/timer/timer_session.dart';
 import 'package:medito/views/home/widgets/home_gradient_border.dart';
+import 'package:medito/constants/theme/medito_text.dart';
 
 /// Hours and minutes as two scroll wheels on cards, the Timer's main control.
 /// Minutes loop, so 59 → 0 is one flick. Reports the total in minutes.
@@ -25,7 +26,9 @@ class TimerDurationWheels extends StatefulWidget {
 
   static TextStyle digitStyle(BuildContext context) {
     final theme = Theme.of(context);
-    return theme.textTheme.displayLarge!.copyWith(
+    // A special case outside the type scale: the wheels are the screen's main
+    // control, so the digits are larger and lighter than `hero`.
+    return context.text.hero.copyWith(
       fontSize: 64,
       height: 1,
       fontWeight: FontWeight.w400,
@@ -251,7 +254,7 @@ class _Wheel extends StatelessWidget {
         const SizedBox(height: 10),
         Text(
           label,
-          style: theme.textTheme.bodyMedium?.copyWith(
+          style: context.text.body.copyWith(
             color: theme.colorScheme.onSurface.withValues(alpha: 0.6),
           ),
         ),

@@ -12,6 +12,7 @@ import 'package:medito/models/home/home_model.dart';
 import 'package:medito/providers/providers.dart';
 import 'package:medito/views/home/widgets/quote/quote_share_sheet.dart';
 import 'package:medito/widgets/medito_icon.dart';
+import 'package:medito/constants/theme/medito_text.dart';
 
 class QuoteWidget extends ConsumerStatefulWidget {
   const QuoteWidget({super.key, required this.data});
@@ -80,10 +81,7 @@ class QuoteWidgetState extends ConsumerState<QuoteWidget> {
           Text(
             widget.data!.quote,
             textAlign: TextAlign.center,
-            style: TextStyle(
-              fontWeight: FontWeight.w300,
-              fontSize: 18,
-              height: 1.4,
+            style: context.text.body.copyWith(
               color: Theme.of(context).colorScheme.onSurface,
               fontStyle: FontStyle.italic,
             ),
@@ -101,9 +99,7 @@ class QuoteWidgetState extends ConsumerState<QuoteWidget> {
                 child: Text(
                   '— ${widget.data!.author}',
                   textAlign: TextAlign.center,
-                  style: TextStyle(
-                    fontSize: 14,
-                    fontWeight: FontWeight.w400,
+                  style: context.text.bodySmall.copyWith(
                     color: Theme.of(context).colorScheme.onSurface,
                   ),
                 ),

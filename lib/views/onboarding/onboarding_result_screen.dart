@@ -19,6 +19,7 @@ import 'package:medito/utils/utils.dart';
 import 'package:medito/widgets/medito_icon.dart';
 import 'package:medito/widgets/onboarding/onboarding_header_image.dart';
 import 'package:medito/widgets/onboarding/onboarding_step_title.dart';
+import 'package:medito/constants/theme/medito_text.dart';
 
 /// The three possible outcome states for the onboarding result screen.
 enum OnboardingResultState {
@@ -266,13 +267,7 @@ class _OnboardingResultScreenState
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  OnboardingStepTitle(
-                    heading,
-                    style: theme.textTheme.headlineMedium?.copyWith(
-                      fontWeight: FontWeight.w600,
-                      height: 1.25,
-                    ),
-                  ),
+                  OnboardingStepTitle(heading, style: context.text.headline),
                   // When the meditation card is shown the screen leads with action, not
                   // reading, so the longer personalised body is dropped — the card's
                   // own one-liner carries the reassurance.
@@ -280,9 +275,8 @@ class _OnboardingResultScreenState
                     const SizedBox(height: 12),
                     Text(
                       body,
-                      style: theme.textTheme.bodyMedium?.copyWith(
+                      style: context.text.body.copyWith(
                         color: theme.colorScheme.onSurface.withAlpha(160),
-                        height: 1.5,
                       ),
                     ),
                   ],
@@ -308,9 +302,8 @@ class _OnboardingResultScreenState
                           _started
                               ? l10n.onboardingFirstMeditationSkipShort
                               : l10n.onboardingFirstMeditationSkip,
-                          style: theme.textTheme.bodyMedium?.copyWith(
+                          style: context.text.subtitle.copyWith(
                             color: onSurface.withOpacityValue(0.55),
-                            fontWeight: FontWeight.w500,
                           ),
                         ),
                       ),
@@ -353,9 +346,7 @@ class _OnboardingResultScreenState
         if (_useBeginnerPresentation) ...[
           Text(
             l10n.onboardingFirstMeditationTitle,
-            style: Theme.of(
-              context,
-            ).textTheme.titleLarge?.copyWith(fontWeight: FontWeight.w600),
+            style: context.text.subtitle,
             textAlign: TextAlign.center,
           ),
           const SizedBox(height: 12),
@@ -374,8 +365,7 @@ class _OnboardingResultScreenState
               const SizedBox(width: 5),
               Text(
                 l10n.onboardingFirstMeditationDuration,
-                style: Theme.of(context).textTheme.labelMedium?.copyWith(
-                  fontWeight: FontWeight.w600,
+                style: context.text.subtitle.copyWith(
                   color: onSurface.withOpacityValue(0.7),
                 ),
               ),
@@ -385,9 +375,8 @@ class _OnboardingResultScreenState
         ],
         Text(
           l10n.onboardingFirstMeditationSubtitle,
-          style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+          style: context.text.body.copyWith(
             color: onSurface.withOpacityValue(0.85),
-            height: 1.4,
           ),
           textAlign: TextAlign.center,
         ),
@@ -487,10 +476,7 @@ class _OnboardingResultScreenState
           liveRegion: true,
           child: Text(
             l10n.onboardingFirstMeditationDone,
-            style: Theme.of(context).textTheme.titleMedium?.copyWith(
-              fontWeight: FontWeight.w600,
-              color: onSurface,
-            ),
+            style: context.text.label.copyWith(color: onSurface),
             textAlign: TextAlign.center,
           ),
         ),
@@ -520,11 +506,7 @@ class _OnboardingResultScreenState
                     const SizedBox(width: 10),
                     Text(
                       '${value.round()}',
-                      style: Theme.of(context).textTheme.displayLarge?.copyWith(
-                        fontSize: 48,
-                        fontWeight: FontWeight.w700,
-                        color: onSurface,
-                      ),
+                      style: context.text.hero.copyWith(color: onSurface),
                     ),
                   ],
                 ),
@@ -532,7 +514,7 @@ class _OnboardingResultScreenState
               const SizedBox(height: 4),
               Text(
                 l10n.dayStreak,
-                style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                style: context.text.label.copyWith(
                   color: onSurface.withOpacityValue(0.9),
                 ),
               ),
@@ -658,11 +640,7 @@ class _GetStartedButtonState extends State<_GetStartedButton>
                     Center(
                       child: Text(
                         widget.label,
-                        style: const TextStyle(
-                          color: Colors.white,
-                          fontSize: 16,
-                          fontWeight: FontWeight.w700,
-                        ),
+                        style: context.text.on(Colors.white).subtitle,
                       ),
                     ),
                   ],

@@ -26,6 +26,7 @@ import 'package:medito/utils/receipt_email.dart';
 import 'package:medito/utils/utils.dart';
 import 'package:medito/widgets/medito_icon.dart';
 import 'package:medito/widgets/inputs/email_typo_hint.dart';
+import 'package:medito/constants/theme/medito_text.dart';
 
 enum _Frequency {
   oneTime('oneTime', 'one_time'),
@@ -555,12 +556,7 @@ class _NativeDonationPageState extends ConsumerState<NativeDonationPage> {
       children: [
         Text(
           eyebrow.toUpperCase(),
-          style: TextStyle(
-            color: context.brandAccent,
-            fontSize: 14,
-            fontWeight: FontWeight.w500,
-            letterSpacing: 1.3,
-          ),
+          style: context.text.label.copyWith(color: context.brandAccent),
           textAlign: TextAlign.center,
         ),
         const SizedBox(height: 16),
@@ -569,22 +565,15 @@ class _NativeDonationPageState extends ConsumerState<NativeDonationPage> {
           header: true,
           child: Text(
             heading,
-            style: TextStyle(
-              color: onSurface,
-              fontSize: 24,
-              fontWeight: FontWeight.w600,
-              height: 1.2,
-            ),
+            style: context.text.headline.copyWith(color: onSurface),
             textAlign: TextAlign.center,
           ),
         ),
         const SizedBox(height: 12),
         Text(
           subcopy,
-          style: TextStyle(
+          style: context.text.body.copyWith(
             color: onSurface.withValues(alpha: 0.7),
-            fontSize: 16,
-            height: 1.5,
           ),
           textAlign: TextAlign.center,
         ),
@@ -631,14 +620,10 @@ class _NativeDonationPageState extends ConsumerState<NativeDonationPage> {
                   ),
                   child: Text(
                     frequency.label(l10n),
-                    style: TextStyle(
+                    style: context.text.label.copyWith(
                       color: isSelected
                           ? onSurface
                           : onSurface.withValues(alpha: 0.6),
-                      fontSize: 14,
-                      fontWeight: isSelected
-                          ? FontWeight.w600
-                          : FontWeight.w500,
                     ),
                     textAlign: TextAlign.center,
                   ),
@@ -747,10 +732,8 @@ class _NativeDonationPageState extends ConsumerState<NativeDonationPage> {
                   label,
                   maxLines: 1,
                   softWrap: false,
-                  style: TextStyle(
+                  style: context.text.subtitle.copyWith(
                     color: isSelected ? context.onBrandAccent : onSurface,
-                    fontSize: 16,
-                    fontWeight: FontWeight.w500,
                   ),
                 ),
               ),
@@ -772,11 +755,7 @@ class _NativeDonationPageState extends ConsumerState<NativeDonationPage> {
                     ),
                     child: Text(
                       mostPopular,
-                      style: TextStyle(
-                        color: accent,
-                        fontSize: 12,
-                        fontWeight: FontWeight.w600,
-                      ),
+                      style: context.text.caption.copyWith(color: accent),
                     ),
                   ),
                 ),
@@ -903,29 +882,14 @@ class _NativeDonationPageState extends ConsumerState<NativeDonationPage> {
                   children: [
                     Text(
                       l10n.donateWithApplePayPrefix,
-                      style: const TextStyle(
-                        fontSize: 16,
-                        fontWeight: FontWeight.w500,
-                      ),
+                      style: context.text.inherited.subtitle,
                     ),
                     const SizedBox(width: 6),
                     // U+F8FF (Apple logo), drawn by the iOS system font — this
                     // button is iOS-only.
-                    const Text(
-                      '',
-                      style: TextStyle(
-                        fontSize: 20,
-                        fontWeight: FontWeight.w500,
-                      ),
-                    ),
+                    const Text('', style: TextStyle(fontSize: 20)),
                     const SizedBox(width: 3),
-                    const Text(
-                      'Pay',
-                      style: TextStyle(
-                        fontSize: 16,
-                        fontWeight: FontWeight.w500,
-                      ),
-                    ),
+                    Text('Pay', style: context.text.inherited.subtitle),
                   ],
                 ),
               ),
@@ -977,10 +941,7 @@ class _NativeDonationPageState extends ConsumerState<NativeDonationPage> {
                   )
                 : Text(
                     hasApplePay ? l10n.donateWithCard : l10n.donateTitle,
-                    style: const TextStyle(
-                      fontSize: 16,
-                      fontWeight: FontWeight.w500,
-                    ),
+                    style: context.text.inherited.subtitle,
                   ),
           ),
         ),
@@ -996,7 +957,7 @@ class _NativeDonationPageState extends ConsumerState<NativeDonationPage> {
       children: [
         Text(
           '${l10n.donationDisclosure}\n$_registrationCopy',
-          style: TextStyle(color: faint, fontSize: 12, height: 1.5),
+          style: context.text.caption.copyWith(color: faint),
           textAlign: TextAlign.center,
         ),
         const SizedBox(height: 8),
@@ -1010,7 +971,7 @@ class _NativeDonationPageState extends ConsumerState<NativeDonationPage> {
             Flexible(
               child: Text(
                 l10n.donationStripeTrust,
-                style: TextStyle(color: faint, fontSize: 12),
+                style: context.text.caption.copyWith(color: faint),
                 textAlign: TextAlign.center,
               ),
             ),
@@ -1039,9 +1000,8 @@ class _NativeDonationPageState extends ConsumerState<NativeDonationPage> {
               heightFactor: 1,
               child: Text(
                 AppLocalizations.of(context)!.donateNotNow,
-                style: TextStyle(
+                style: context.text.caption.copyWith(
                   color: faint,
-                  fontSize: 12,
                   decoration: TextDecoration.underline,
                   decorationColor: faint,
                 ),

@@ -4,11 +4,6 @@ import 'package:medito/utils/utils.dart';
 
 const double _buttonHeight = 48;
 const double _buttonRadius = 12;
-const TextStyle _buttonTextStyle = TextStyle(
-  fontFamily: googleSans,
-  fontSize: 16,
-  fontWeight: FontWeight.w600,
-);
 
 /// Filled primary action used in a Medito dialog. Defaults to the brand accent
 /// but can be overridden (e.g. for destructive flows). Use
@@ -48,7 +43,7 @@ class MeditoDialogPrimaryButton extends StatelessWidget {
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(_buttonRadius),
         ),
-        textStyle: _buttonTextStyle,
+        textStyle: context.text.inherited.subtitle,
       ),
       child: isLoading
           ? SizedBox(
@@ -95,7 +90,7 @@ class MeditoDialogSecondaryButton extends StatelessWidget {
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(_buttonRadius),
         ),
-        textStyle: _buttonTextStyle,
+        textStyle: context.text.inherited.subtitle,
       ),
       child: Text(
         label,

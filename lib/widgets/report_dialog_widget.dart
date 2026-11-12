@@ -28,7 +28,6 @@ class ReportDialogWidget extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final theme = Theme.of(context);
     final l10n = AppLocalizations.of(context)!;
 
     return MeditoDialog(
@@ -61,7 +60,7 @@ class ReportDialogWidget extends ConsumerWidget {
                       widthFactor: 1,
                       child: Text(
                         l10n.reportDialogHelpLink,
-                        style: theme.textTheme.bodyMedium?.copyWith(
+                        style: context.text.body.copyWith(
                           color: context.brandAccent,
                           decoration: TextDecoration.underline,
                         ),

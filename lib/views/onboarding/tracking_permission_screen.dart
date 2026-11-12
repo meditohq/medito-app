@@ -13,6 +13,7 @@ import 'package:medito/constants/icons/medito_icons.dart';
 import 'package:medito/utils/utils.dart';
 import 'package:medito/widgets/onboarding/onboarding_header_image.dart';
 import 'package:medito/widgets/onboarding/onboarding_step_title.dart';
+import 'package:medito/constants/theme/medito_text.dart';
 
 class TrackingPermissionScreen extends ConsumerWidget {
   const TrackingPermissionScreen({super.key, this.headerImage, this.onNext});
@@ -101,25 +102,17 @@ class TrackingPermissionScreen extends ConsumerWidget {
                                 const SizedBox(height: 20),
                                 OnboardingStepTitle(
                                   l10n.trackingPermissionTitle,
-                                  style: Theme.of(context)
-                                      .textTheme
-                                      .displayLarge
-                                      ?.copyWith(
-                                        fontSize: 24,
-                                        fontWeight: FontWeight.w600,
-                                        color: onSurface,
-                                      ),
+                                  style: context.text.headline.copyWith(
+                                    color: onSurface,
+                                  ),
                                   textAlign: TextAlign.center,
                                 ),
                                 const SizedBox(height: 16),
                                 Text(
                                   l10n.trackingPermissionBody,
-                                  style: Theme.of(context).textTheme.bodyMedium
-                                      ?.copyWith(
-                                        fontSize: 16,
-                                        height: 1.5,
-                                        color: onSurface.withOpacityValue(0.9),
-                                      ),
+                                  style: context.text.body.copyWith(
+                                    color: onSurface.withOpacityValue(0.9),
+                                  ),
                                   textAlign: TextAlign.center,
                                 ),
                                 const SizedBox(height: 12),
@@ -160,9 +153,7 @@ class TrackingPermissionScreen extends ConsumerWidget {
         Expanded(
           child: Text(
             l10n.trackingPermissionPrivacyNote,
-            style: Theme.of(context).textTheme.bodySmall?.copyWith(
-              fontSize: 14,
-              height: 1.3,
+            style: context.text.label.copyWith(
               color: onSurface.withOpacityValue(0.85),
             ),
           ),

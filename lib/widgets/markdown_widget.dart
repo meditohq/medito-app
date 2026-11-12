@@ -12,8 +12,6 @@ class MarkdownWidget extends StatelessWidget {
     this.p,
     this.a,
     this.textAlign,
-    this.pFontSize = 16,
-    this.aFontSize = 13,
     this.selectable = false,
   });
 
@@ -21,13 +19,11 @@ class MarkdownWidget extends StatelessWidget {
   final void Function(String, String?, String)? onTapLink;
   final TextStyle? p, a;
   final WrapAlignment? textAlign;
-  final double pFontSize;
-  final double aFontSize;
   final bool selectable;
 
   @override
   Widget build(BuildContext context) {
-    var titleMedium = Theme.of(context).textTheme.titleMedium;
+    final text = context.text;
     var walterWhite = ColorConstants.white.withOpacityValue(0.9);
 
     return Markdown(
@@ -39,23 +35,14 @@ class MarkdownWidget extends StatelessWidget {
       selectable: selectable,
       sizedImageBuilder: _image,
       styleSheet: buildMarkdownStyleSheet(context).copyWith(
-        p:
-            p ??
-            titleMedium?.copyWith(
-              fontFamily: googleSans,
-              fontSize: pFontSize,
-              letterSpacing: 0,
-              color: walterWhite,
-            ),
+        p: p ?? text.on(walterWhite).body,
         textAlign: textAlign ?? WrapAlignment.center,
         a:
             a ??
-            titleMedium?.copyWith(
-              fontFamily: googleSans,
-              color: walterWhite,
-              fontSize: aFontSize,
-              fontWeight: FontWeight.w600,
-            ),
+            text
+                .on(walterWhite)
+                .body
+                .copyWith(decoration: TextDecoration.underline),
       ),
     );
   }

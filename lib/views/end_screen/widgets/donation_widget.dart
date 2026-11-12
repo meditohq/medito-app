@@ -368,14 +368,9 @@ class DonationWidgetState extends ConsumerState<DonationWidget>
                         donationPageModel.title ??
                             AppLocalizations.of(context)!.supportMedito,
                         textAlign: TextAlign.left,
-                        style: Theme.of(context).textTheme.headlineSmall
-                            ?.copyWith(
-                              fontFamily: googleSans,
-                              fontSize: 22,
-                              fontWeight: FontWeight.w400,
-                              height: 1.2,
-                              color: context.onBrandAccent,
-                            ),
+                        style: context.text.headline.copyWith(
+                          color: context.onBrandAccent,
+                        ),
                       ),
                     ),
                   ),
@@ -397,13 +392,11 @@ class DonationWidgetState extends ConsumerState<DonationWidget>
             const SizedBox(height: 10),
             Text(
               donationPageModel.text ??
-                  AppLocalizations.of(context)!
-                      .meditoReliesOnYourDonationsToSurvive,
+                  AppLocalizations.of(
+                    context,
+                  )!.meditoReliesOnYourDonationsToSurvive,
               textAlign: TextAlign.left,
-              style: Theme.of(context).textTheme.headlineMedium?.copyWith(
-                fontSize: 16,
-                fontWeight: FontWeight.w400,
-                height: 1.4,
+              style: context.text.body.copyWith(
                 color: context.onBrandAccent.withValues(alpha: 0.9),
               ),
             ),
@@ -420,12 +413,7 @@ class DonationWidgetState extends ConsumerState<DonationWidget>
                 child: Text(
                   donationPageModel.footerText!,
                   textAlign: TextAlign.center,
-                  style: Theme.of(context).textTheme.titleSmall?.copyWith(
-                    fontSize: 14,
-                    fontWeight: FontWeight.w500,
-                    height: 1.4,
-                    color: footerColor,
-                  ),
+                  style: context.text.label.copyWith(color: footerColor),
                 ),
               ),
           ],
@@ -604,11 +592,7 @@ class DonationWidgetState extends ConsumerState<DonationWidget>
               ),
               child: Text(
                 button.title ?? AppLocalizations.of(context)!.donateNow,
-                style: Theme.of(context).textTheme.headlineMedium?.copyWith(
-                  fontSize: 18,
-                  fontWeight: FontWeight.w700,
-                  color: context.brandAccent,
-                ),
+                style: context.text.title.copyWith(color: context.brandAccent),
               ),
             ),
           ),

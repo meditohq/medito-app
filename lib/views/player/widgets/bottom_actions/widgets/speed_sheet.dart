@@ -105,10 +105,7 @@ class _SpeedSheetState extends State<SpeedSheet> {
                     header: true,
                     child: Text(
                       l10n.playbackSpeed,
-                      style: theme.textTheme.titleMedium?.copyWith(
-                        color: onSurface,
-                        fontWeight: FontWeight.w600,
-                      ),
+                      style: context.text.label.copyWith(color: onSurface),
                     ),
                   ),
                 ),
@@ -122,9 +119,7 @@ class _SpeedSheetState extends State<SpeedSheet> {
                     onPressed: () => _commit(playbackSpeedOptions.length - 1),
                     child: Text(
                       l10n.speedReset,
-                      style: theme.textTheme.titleSmall?.copyWith(
-                        fontSize: 14,
-                        fontWeight: FontWeight.w500,
+                      style: context.text.label.copyWith(
                         color: onSurface.withValues(alpha: 0.7),
                       ),
                     ),
@@ -138,12 +133,7 @@ class _SpeedSheetState extends State<SpeedSheet> {
               child: Center(
                 child: Text(
                   formatSpeed(_speed),
-                  style: theme.textTheme.headlineSmall?.copyWith(
-                    fontFamily: googleSans,
-                    fontSize: 40,
-                    fontWeight: FontWeight.w400,
-                    color: onSurface,
-                  ),
+                  style: context.text.hero.copyWith(color: onSurface),
                 ),
               ),
             ),
@@ -204,11 +194,7 @@ class _SpeedSheetState extends State<SpeedSheet> {
                         padding: const EdgeInsets.symmetric(horizontal: 8),
                         child: Text(
                           formatSpeed(playbackSpeedOptions[i]),
-                          style: theme.textTheme.titleSmall?.copyWith(
-                            fontSize: 14,
-                            fontWeight: i == _index
-                                ? FontWeight.w600
-                                : FontWeight.w500,
+                          style: context.text.label.copyWith(
                             color: onSurface.withValues(
                               alpha: i == _index ? 1 : 0.6,
                             ),

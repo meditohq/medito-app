@@ -19,6 +19,7 @@ import 'package:share_plus/share_plus.dart';
 
 import 'animated_favourite_icon.dart';
 import 'bottom_action_bar.dart';
+import 'package:medito/constants/theme/medito_text.dart';
 
 class PackViewBottomBar extends ConsumerStatefulWidget {
   final String packId;
@@ -92,13 +93,11 @@ class _PackViewBottomBarState extends ConsumerState<PackViewBottomBar> {
                             batchState.completed,
                             batchState.total,
                           ),
-                          style: Theme.of(consumerContext).textTheme.titleLarge
-                              ?.copyWith(
-                                color: Theme.of(
-                                  consumerContext,
-                                ).colorScheme.onSurface,
-                                fontWeight: FontWeight.w600,
-                              ),
+                          style: consumerContext.text.subtitle.copyWith(
+                            color: Theme.of(
+                              consumerContext,
+                            ).colorScheme.onSurface,
+                          ),
                         ),
                       ),
                       _buildBottomSheetTile(
@@ -126,13 +125,11 @@ class _PackViewBottomBarState extends ConsumerState<PackViewBottomBar> {
                         ),
                         title: Text(
                           l10n.allDownloaded,
-                          style: Theme.of(consumerContext).textTheme.titleLarge
-                              ?.copyWith(
-                                color: Theme.of(
-                                  consumerContext,
-                                ).colorScheme.onSurface,
-                                fontWeight: FontWeight.w500,
-                              ),
+                          style: consumerContext.text.subtitle.copyWith(
+                            color: Theme.of(
+                              consumerContext,
+                            ).colorScheme.onSurface,
+                          ),
                         ),
                       ),
                       _buildBottomSheetTile(
@@ -224,13 +221,11 @@ class _PackViewBottomBarState extends ConsumerState<PackViewBottomBar> {
               : null),
       title: Text(
         title,
-        style: Theme.of(
-          context,
-        ).textTheme.titleLarge?.copyWith(color: textColor ?? defaultColor),
+        style: context.text.subtitle.copyWith(color: textColor ?? defaultColor),
       ),
       subtitle: subtitle == null
           ? null
-          : Text(subtitle, style: Theme.of(context).textTheme.titleMedium),
+          : Text(subtitle, style: context.text.muted.bodySmall),
       onTap: onTap,
     );
   }

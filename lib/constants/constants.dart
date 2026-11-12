@@ -4,5 +4,6 @@ export 'strings/asset_constants.dart';
 export 'strings/shared_preference_constants.dart';
 export 'config_constants.dart';
 export 'styles/widget_styles.dart';
+export 'theme/medito_text.dart';
 export 'theme/text_theme.dart';
 export 'types/type_constants.dart';

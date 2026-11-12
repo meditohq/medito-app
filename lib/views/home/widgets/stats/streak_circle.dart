@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:medito/constants/icons/medito_icons.dart';
-import 'package:medito/constants/styles/widget_styles.dart';
+import 'package:medito/constants/theme/medito_text.dart';
 import 'package:medito/providers/stats_provider.dart';
 import 'package:medito/providers/streak_circle_display_provider.dart';
 import 'package:medito/providers/settings/settings_providers.dart';
@@ -255,17 +255,11 @@ class StreakCircleState extends ConsumerState<StreakCircle>
                           const SizedBox(width: 8),
                           Text(
                             displayValue + (showConsistencyScore ? '%' : ''),
-                            style: TextStyle(
+                            style: context.text.subtitle.copyWith(
                               color: Theme.of(context).colorScheme.onSurface,
-                              fontSize: StreakCircleConstants.fontSize,
-                              fontWeight: isStreakDoneToday
-                                  ? FontWeight.w700
-                                  : FontWeight.w500,
-                              fontFamily: googleSans,
                               fontFeatures: const [
                                 FontFeature.tabularFigures(),
                               ],
-                              letterSpacing: -0.2,
                               height: StreakCircleConstants.lineHeight,
                             ),
                           ),

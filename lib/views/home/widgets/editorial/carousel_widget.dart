@@ -15,9 +15,9 @@ import 'package:medito/l10n/app_localizations.dart';
 import 'package:medito/widgets/network_image_widget.dart';
 import '../../home_styles.dart';
 import '../home_gradient_border.dart';
+import 'package:medito/constants/theme/medito_text.dart';
 
 const _kCardBorderRadius = kHomeCardRadius;
-const _kChipFontSize = 12.0;
 const _kCarouselHeight = 180.0;
 
 class CarouselWidget extends ConsumerStatefulWidget {
@@ -98,10 +98,7 @@ class _CarouselWidgetState extends ConsumerState<CarouselWidget> {
             header: true,
             child: Text(
               AppLocalizations.of(context)!.carouselTitle,
-              style: Theme.of(context).textTheme.labelLarge?.copyWith(
-                fontSize: 20,
-                fontWeight: FontWeight.w400,
-                height: 28 / 24,
+              style: context.text.title.copyWith(
                 color: Theme.of(context).colorScheme.onSurface,
               ),
             ),
@@ -282,12 +279,7 @@ class _CarouselWidgetState extends ConsumerState<CarouselWidget> {
                 ),
                 child: Text(
                   item.title,
-                  style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                    fontSize: 14,
-                    fontWeight: FontWeight.w500,
-                    height: 1.2,
-                    color: Colors.white,
-                  ),
+                  style: context.text.on(Colors.white).label,
                   maxLines: 1,
                   overflow: TextOverflow.ellipsis,
                 ),
@@ -322,10 +314,7 @@ class _CarouselWidgetState extends ConsumerState<CarouselWidget> {
               ),
               child: Text(
                 item.bannerLabel ?? AppLocalizations.of(context)!.neww,
-                style: TextStyle(
-                  fontSize: _kChipFontSize,
-                  fontWeight: FontWeight.w600,
-                  height: 1.2,
+                style: context.text.caption.copyWith(
                   color: parseColor(item.bannerLabelColor),
                 ),
               ),

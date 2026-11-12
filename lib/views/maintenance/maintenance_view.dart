@@ -6,6 +6,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../constants/colors/color_constants.dart';
 import 'package:medito/l10n/app_localizations.dart';
+import 'package:medito/constants/theme/medito_text.dart';
 
 class MaintenanceView extends ConsumerStatefulWidget {
   const MaintenanceView({
@@ -24,11 +25,7 @@ class MaintenanceView extends ConsumerStatefulWidget {
 class _MaintenanceViewState extends ConsumerState<MaintenanceView> {
   @override
   Widget build(BuildContext context) {
-    var markDownTheme = Theme.of(context).textTheme.bodyMedium?.copyWith(
-      color: ColorConstants.white,
-      fontSize: 16,
-      fontWeight: FontWeight.w400,
-    );
+    var markDownTheme = context.text.on(ColorConstants.white).body;
 
     return Scaffold(
       backgroundColor: ColorConstants.ebony,
@@ -54,27 +51,17 @@ class _MaintenanceViewState extends ConsumerState<MaintenanceView> {
                           excludeSemantics: true,
                           child: Text(
                             AppLocalizations.of(context)!.hey,
-                            style: const TextStyle(
-                              color: Colors.white,
-                              fontSize: 24,
-                              fontWeight: FontWeight.w600,
-                            ),
+                            style: context.text.on(Colors.white).headline,
                           ),
                         ),
                         const SizedBox(height: 12),
                         MarkdownWidget(
                           body: widget.maintenanceModel.message ?? '',
                           textAlign: WrapAlignment.start,
-                          a: markDownTheme?.copyWith(
+                          a: markDownTheme.copyWith(
                             decoration: TextDecoration.underline,
-                            fontWeight: FontWeight.w700,
                           ),
-                          p: markDownTheme?.copyWith(
-                            fontWeight: FontWeight.w500,
-                            color: Colors.white70,
-                            fontSize: 16,
-                            height: 1.5,
-                          ),
+                          p: context.text.on(Colors.white70).body,
                         ),
                         const SizedBox(height: 24),
                         if (widget.maintenanceModel.ctaLabel != null &&

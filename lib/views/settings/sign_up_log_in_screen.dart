@@ -584,11 +584,7 @@ class SignUpLogInFormState extends ConsumerState<SignUpLogInForm> {
         Text(
           AppLocalizations.of(context)!.emailVerificationText,
           textAlign: TextAlign.center,
-          style: Theme.of(context).textTheme.bodySmall?.copyWith(
-            fontSize: 14,
-            height: 1.5,
-            fontWeight: FontWeight.normal,
-          ),
+          style: context.text.muted.bodySmall,
         ),
         height16,
         _buildEmailField(inputTextStyle),
@@ -637,19 +633,13 @@ class SignUpLogInFormState extends ConsumerState<SignUpLogInForm> {
             children: [
               TextSpan(
                 text: '${AppLocalizations.of(context)!.otpInstructions}\n',
-                style: Theme.of(context).textTheme.headlineMedium?.copyWith(
-                  fontSize: 18,
-                  height: 1.5,
-                  fontWeight: FontWeight.normal,
+                style: context.text.body.copyWith(
                   color: Theme.of(context).colorScheme.onSurface,
                 ),
               ),
               TextSpan(
                 text: _emailController.text,
-                style: Theme.of(context).textTheme.headlineMedium?.copyWith(
-                  fontSize: 18,
-                  height: 1.5,
-                  fontWeight: FontWeight.bold,
+                style: context.text.title.copyWith(
                   color: Theme.of(context).colorScheme.onSurface,
                 ),
               ),
@@ -694,16 +684,13 @@ class SignUpLogInFormState extends ConsumerState<SignUpLogInForm> {
                     context,
                   )!.resendCodeInSecondsSpoken(_retryAfterSeconds)
                 : null,
-            style: Theme.of(context).textTheme.bodySmall?.copyWith(
+            style: context.text.label.copyWith(
               color: _isLoading || _isRateLimited
-                  ? Theme.of(
-                      context,
-                    ).textTheme.bodySmall?.color?.withOpacityValue(0.38)
+                  ? context.text.muted.color?.withOpacityValue(0.38)
                   : Theme.of(context).colorScheme.onSurface,
               decoration: _isLoading || _isRateLimited
                   ? null
                   : TextDecoration.underline,
-              fontSize: 14,
             ),
           ),
         ),
@@ -784,11 +771,8 @@ class SignUpLogInFormState extends ConsumerState<SignUpLogInForm> {
         child: Text.rich(
           TextSpan(
             text: AppLocalizations.of(context)!.byContinuingAgreeTo,
-            style: Theme.of(context).textTheme.bodySmall?.copyWith(
-              color: Theme.of(
-                context,
-              ).textTheme.bodySmall?.color?.withOpacityValue(0.7),
-              fontSize: 12,
+            style: context.text.caption.copyWith(
+              color: context.text.muted.color?.withOpacityValue(0.7),
             ),
             children: [
               TextSpan(
@@ -839,14 +823,6 @@ class SignUpLogInFormState extends ConsumerState<SignUpLogInForm> {
   }
 
   Widget _buildBenefitsText(String text) {
-    return Text(
-      text,
-      textAlign: TextAlign.start,
-      style: Theme.of(context).textTheme.headlineSmall?.copyWith(
-        fontSize: 20,
-        height: 1.5,
-        fontWeight: FontWeight.w500,
-      ),
-    );
+    return Text(text, textAlign: TextAlign.start, style: context.text.title);
   }
 }

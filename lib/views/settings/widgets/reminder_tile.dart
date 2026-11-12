@@ -17,6 +17,7 @@ import 'package:medito/views/home/widgets/home_gradient_border.dart';
 import 'package:medito/views/settings/widgets/announce_setting.dart';
 import 'package:medito/widgets/medito_icon.dart';
 import 'package:permission_handler/permission_handler.dart';
+import 'package:medito/constants/theme/medito_text.dart';
 
 /// What the user picked in [ReminderOptionsSheet].
 sealed class ReminderChoice {
@@ -337,10 +338,7 @@ class ReminderOptionsSheet extends StatelessWidget {
                 header: true,
                 child: Text(
                   l10n.reminderChipsQuestion,
-                  style: theme.textTheme.titleMedium?.copyWith(
-                    color: onSurface,
-                    fontWeight: FontWeight.w600,
-                  ),
+                  style: context.text.label.copyWith(color: onSurface),
                 ),
               ),
             ),

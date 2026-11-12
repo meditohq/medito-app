@@ -30,6 +30,7 @@ import 'package:medito/utils/receipt_email.dart';
 import 'package:medito/providers/donation/donation_snooze_provider.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:webview_flutter/webview_flutter.dart';
+import 'package:medito/constants/theme/medito_text.dart';
 
 /// In-app paywall hosted in a webview, loading the paywall site at
 /// [paywallFormUrl] (env-specific — `paywall.*` for prod, `test.*` for
@@ -623,18 +624,14 @@ class _WebViewDonationScreenState extends ConsumerState<WebViewDonationScreen> {
             liveRegion: true,
             child: Text(
               title,
-              style: const TextStyle(
-                fontSize: 20,
-                fontWeight: FontWeight.w600,
-                color: Color(0xFF1A1A17),
-              ),
+              style: context.text.title.copyWith(color: Color(0xFF1A1A17)),
               textAlign: TextAlign.center,
             ),
           ),
           const SizedBox(height: 8),
           Text(
             body,
-            style: const TextStyle(fontSize: 14, color: _mutedTextColor),
+            style: context.text.bodySmall.copyWith(color: _mutedTextColor),
             textAlign: TextAlign.center,
           ),
           const SizedBox(height: 24),

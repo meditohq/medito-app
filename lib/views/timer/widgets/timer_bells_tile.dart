@@ -5,6 +5,7 @@ import 'package:medito/l10n/app_localizations.dart';
 import 'package:medito/models/background_sounds/session_bell_pattern.dart';
 import 'package:medito/providers/timer/timer_bell_settings_provider.dart';
 import 'package:medito/widgets/medito_icon.dart';
+import 'package:medito/constants/theme/medito_text.dart';
 
 /// A compact summary on setup; the choices live in its bottom sheet.
 ///
@@ -43,13 +44,11 @@ class TimerBellsTile extends ConsumerWidget {
           size: 20,
         ),
         title: Text(l10n.sessionBells),
-        titleTextStyle: theme.textTheme.bodyMedium?.copyWith(
-          fontWeight: FontWeight.w400,
+        titleTextStyle: context.text.body.copyWith(
           color: theme.colorScheme.onSurface.withValues(alpha: 0.8),
         ),
         subtitle: Text(summary),
-        subtitleTextStyle: theme.textTheme.bodyLarge?.copyWith(
-          fontWeight: FontWeight.w400,
+        subtitleTextStyle: context.text.bodySmall.copyWith(
           color: theme.colorScheme.onSurface.withValues(alpha: 0.55),
         ),
         trailing: Icon(
@@ -99,8 +98,7 @@ class TimerBellsSheet extends ConsumerWidget {
                 header: true,
                 child: Text(
                   l10n.sessionBells,
-                  style: theme.textTheme.titleMedium?.copyWith(
-                    fontWeight: FontWeight.w600,
+                  style: context.text.label.copyWith(
                     color: theme.colorScheme.onSurface,
                   ),
                 ),
@@ -138,8 +136,7 @@ class TimerBellsSheet extends ConsumerWidget {
               padding: const EdgeInsets.fromLTRB(16, 0, 16, 10),
               child: Text(
                 l10n.sessionBellEveryXMinutes,
-                style: theme.textTheme.titleSmall?.copyWith(
-                  fontWeight: FontWeight.w600,
+                style: context.text.label.copyWith(
                   color: theme.colorScheme.onSurface,
                 ),
               ),
@@ -205,10 +202,7 @@ class _IntervalChip extends StatelessWidget {
           padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
           child: Text(
             label,
-            style: theme.textTheme.bodyMedium?.copyWith(
-              color: foreground,
-              fontWeight: selected ? FontWeight.w600 : FontWeight.w400,
-            ),
+            style: context.text.label.copyWith(color: foreground),
           ),
         ),
       ),

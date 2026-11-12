@@ -2,8 +2,8 @@ import 'dart:math';
 import 'dart:ui';
 
 import 'package:flutter/material.dart';
-import 'package:medito/constants/styles/widget_styles.dart';
 import 'package:medito/l10n/app_localizations.dart';
+import 'package:medito/constants/theme/medito_text.dart';
 
 class ZenModeAnimation extends StatefulWidget {
   const ZenModeAnimation({super.key});
@@ -96,12 +96,7 @@ class _ZenModeAnimationState extends State<ZenModeAnimation>
               opacity: _opacityAnimation.value,
               child: Text(
                 message,
-                style: Theme.of(context).textTheme.headlineMedium?.copyWith(
-                  fontFamily: googleSans,
-                  fontSize: 28,
-                  fontWeight: FontWeight.w400,
-                  height: 1.25,
-                ),
+                style: context.text.display,
                 textAlign: TextAlign.center,
               ),
             ),

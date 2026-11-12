@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:medito/constants/colors/color_constants.dart';
+import 'package:medito/constants/theme/medito_text.dart';
 
 /// One option in an [OptionPillGroup].
 class PillOption {
@@ -36,10 +37,7 @@ class OptionPillGroup extends StatelessWidget {
           header: true,
           child: Text(
             label.toUpperCase(),
-            style: theme.textTheme.bodySmall?.copyWith(
-              fontSize: 13,
-              fontWeight: FontWeight.w600,
-              letterSpacing: 1.2,
+            style: context.text.label.copyWith(
               color: theme.colorScheme.onSurface.withValues(alpha: 0.7),
             ),
           ),
@@ -86,10 +84,8 @@ class _OptionPill extends StatelessWidget {
             padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 10),
             child: Text(
               option.text,
-              style: theme.textTheme.bodyLarge?.copyWith(
-                fontSize: 16,
+              style: context.text.subtitle.copyWith(
                 color: selected ? context.onBrandAccent : onSurface,
-                fontWeight: FontWeight.w600,
               ),
             ),
           ),

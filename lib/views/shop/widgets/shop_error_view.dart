@@ -5,6 +5,7 @@ import 'package:medito/exceptions/app_error.dart';
 import 'package:medito/l10n/app_localizations.dart';
 import 'package:medito/providers/providers.dart';
 import 'package:medito/views/shop/shop_navigation.dart';
+import 'package:medito/constants/theme/medito_text.dart';
 
 /// Load failure with a retry and a way out to the web shop.
 class ShopErrorView extends ConsumerStatefulWidget {
@@ -69,7 +70,7 @@ class _ShopErrorViewState extends ConsumerState<ShopErrorView> {
           Text(
             l10n.shopLoadError,
             textAlign: TextAlign.center,
-            style: theme.textTheme.titleLarge?.copyWith(
+            style: context.text.subtitle.copyWith(
               color: theme.colorScheme.onSurface,
             ),
           ),
@@ -78,11 +79,7 @@ class _ShopErrorViewState extends ConsumerState<ShopErrorView> {
           const SizedBox(height: 4),
           TextButton(
             onPressed: () => openShopInBrowser(slug: widget.productSlug),
-            style: TextButton.styleFrom(
-              textStyle: theme.textTheme.titleSmall?.copyWith(
-                fontWeight: FontWeight.w600,
-              ),
-            ),
+            style: TextButton.styleFrom(textStyle: context.text.label),
             child: Text(l10n.shopOpenInBrowser),
           ),
         ],

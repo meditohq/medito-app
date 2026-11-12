@@ -219,7 +219,7 @@ class _StatsScreenState extends ConsumerState<StatsScreen>
           Text(
             l10n.statsLoadError,
             textAlign: TextAlign.center,
-            style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+            style: context.text.body.copyWith(
               color: Theme.of(context).colorScheme.onSurface,
             ),
           ),
@@ -258,11 +258,7 @@ class _StatsScreenState extends ConsumerState<StatsScreen>
         isTrailingIcon: onTap != null,
         trailingIcon: Icons.info_outline,
         onTap: onTap,
-        titleStyle: Theme.of(context).textTheme.labelMedium?.copyWith(
-          fontSize: 20,
-          fontWeight: FontWeight.w600,
-          fontFamily: googleSans,
-        ),
+        titleStyle: context.text.title,
       ),
     );
   }
@@ -349,7 +345,7 @@ class _StatsScreenState extends ConsumerState<StatsScreen>
               ),
               label: Text(
                 AppLocalizations.of(context)!.share,
-                style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                style: context.text.label.copyWith(
                   color: Theme.of(context).colorScheme.onPrimary,
                 ),
               ),
@@ -380,7 +376,7 @@ class _StatsScreenState extends ConsumerState<StatsScreen>
             ),
             label: Text(
               AppLocalizations.of(context)!.restorePreviousStats,
-              style: Theme.of(context).textTheme.bodySmall?.copyWith(
+              style: context.text.caption.copyWith(
                 color: Theme.of(
                   context,
                 ).colorScheme.onSurface.withOpacityValue(0.7),
@@ -462,11 +458,7 @@ class _StatsScreenState extends ConsumerState<StatsScreen>
                             AppLocalizations.of(
                               context,
                             )!.alwaysShowStreakOnHomepage,
-                            style: Theme.of(context).textTheme.bodyMedium
-                                ?.copyWith(
-                                  fontSize: 14,
-                                  fontFamily: googleSans,
-                                ),
+                            style: context.text.muted.bodySmall,
                           ),
                         ),
                       ],

@@ -12,7 +12,6 @@ const padding14 = 14.0;
 const padding16 = 16.0;
 const padding20 = 20.0;
 const padding24 = 24.0;
-const fontSize16 = 16.0;
 const width4 = SizedBox(width: 4);
 const width8 = SizedBox(width: 8);
 const width12 = SizedBox(width: 12);

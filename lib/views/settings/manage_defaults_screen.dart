@@ -12,6 +12,7 @@ import 'package:medito/providers/meditation/track_provider.dart';
 import 'package:medito/utils/utils.dart';
 import 'package:medito/widgets/inputs/option_pills.dart';
 import 'package:medito/widgets/snackbar_widget.dart' show showSnackBar;
+import 'package:medito/constants/theme/medito_text.dart';
 
 class ManageDefaultsScreen extends ConsumerWidget {
   const ManageDefaultsScreen({super.key});
@@ -75,8 +76,7 @@ class ManageDefaultsScreen extends ConsumerWidget {
         delegate: SliverChildListDelegate([
           Text(
             l10n.defaultsNote,
-            style: theme.textTheme.bodyMedium?.copyWith(
-              fontSize: 15,
+            style: context.text.body.copyWith(
               color: onSurface.withValues(alpha: 0.7),
             ),
           ),
@@ -98,8 +98,7 @@ class ManageDefaultsScreen extends ConsumerWidget {
           if (guides.isEmpty)
             Text(
               l10n.notSet,
-              style: theme.textTheme.bodyMedium?.copyWith(
-                fontSize: 15,
+              style: context.text.body.copyWith(
                 color: onSurface.withValues(alpha: 0.7),
               ),
             ),
@@ -135,9 +134,7 @@ class ManageDefaultsScreen extends ConsumerWidget {
                 },
                 child: Text(
                   l10n.clearDefaults,
-                  style: theme.textTheme.bodyMedium?.copyWith(
-                    fontSize: 15,
-                    fontWeight: FontWeight.w600,
+                  style: context.text.muted.subtitle.copyWith(
                     decoration: TextDecoration.underline,
                   ),
                 ),

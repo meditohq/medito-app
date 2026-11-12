@@ -62,12 +62,7 @@ class SoftAskCard extends StatelessWidget {
                       header: true,
                       child: Text(
                         title,
-                        style: theme.textTheme.titleMedium?.copyWith(
-                          fontSize: 18,
-                          fontWeight: FontWeight.w600,
-                          height: 1.3,
-                          color: onSurface,
-                        ),
+                        style: context.text.title.copyWith(color: onSurface),
                       ),
                     ),
                   ),
@@ -96,10 +91,7 @@ class SoftAskCard extends StatelessWidget {
                     const SizedBox(height: 6),
                     Text(
                       body,
-                      style: theme.textTheme.headlineMedium?.copyWith(
-                        fontSize: 16,
-                        fontWeight: FontWeight.w400,
-                        height: 1.4,
+                      style: context.text.body.copyWith(
                         color: onSurface.withValues(alpha: 0.8),
                       ),
                     ),
@@ -114,9 +106,7 @@ class SoftAskCard extends StatelessWidget {
                         child: Text(
                           ctaLabel,
                           textAlign: TextAlign.center,
-                          style: theme.textTheme.headlineMedium?.copyWith(
-                            fontSize: 16,
-                            fontWeight: FontWeight.w600,
+                          style: context.text.subtitle.copyWith(
                             color: context.onBrandAccent,
                           ),
                         ),
@@ -128,9 +118,7 @@ class SoftAskCard extends StatelessWidget {
                         onPressed: onSnooze,
                         child: Text(
                           AppLocalizations.of(context)!.notNow,
-                          style: theme.textTheme.titleSmall?.copyWith(
-                            fontSize: 14,
-                            fontWeight: FontWeight.w500,
+                          style: context.text.label.copyWith(
                             color: onSurface.withValues(alpha: 0.7),
                           ),
                         ),

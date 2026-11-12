@@ -9,6 +9,7 @@ import 'package:medito/l10n/app_localizations.dart';
 import 'package:medito/widgets/medito_icon.dart';
 import 'package:medito/widgets/onboarding/onboarding_header_image.dart';
 import 'package:medito/widgets/onboarding/onboarding_step_title.dart';
+import 'package:medito/constants/theme/medito_text.dart';
 
 class BatteryOptimizationScreen extends StatefulWidget {
   const BatteryOptimizationScreen({super.key, this.headerImage, this.onNext});
@@ -111,20 +112,13 @@ class _BatteryOptimizationScreenState extends State<BatteryOptimizationScreen>
                                 const SizedBox(height: 20),
                                 OnboardingStepTitle(
                                   l10n.onboardingBatteryTitle,
-                                  style: Theme.of(context)
-                                      .textTheme
-                                      .displayLarge
-                                      ?.copyWith(
-                                        fontSize: 24,
-                                        fontWeight: FontWeight.w600,
-                                      ),
+                                  style: context.text.headline,
                                   textAlign: TextAlign.center,
                                 ),
                                 const SizedBox(height: 16),
                                 Text(
                                   l10n.onboardingBatteryBody,
-                                  style: Theme.of(context).textTheme.bodyMedium
-                                      ?.copyWith(fontSize: 16, height: 1.5),
+                                  style: context.text.muted.body,
                                   textAlign: TextAlign.center,
                                 ),
                               ],

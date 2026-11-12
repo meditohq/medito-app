@@ -178,14 +178,7 @@ class _DurationIndicatorWidgetState
   }
 
   Text _durationLabel(BuildContext context, String label) {
-    return Text(
-      label,
-      style: Theme.of(context).textTheme.titleSmall?.copyWith(
-        color: ColorConstants.white,
-        fontFamily: googleSans,
-        fontSize: 12,
-      ),
-    );
+    return Text(label, style: context.text.on(ColorConstants.white).caption);
   }
 }
 

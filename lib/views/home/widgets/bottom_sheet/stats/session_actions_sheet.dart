@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:medito/l10n/app_localizations.dart';
+import 'package:medito/constants/theme/medito_text.dart';
 
 enum SessionAction { open, edit, delete }
 
@@ -26,12 +27,12 @@ Future<SessionAction?> showSessionActionsSheet(
           children: [
             Semantics(
               header: true,
-              child: Text(title, style: Theme.of(context).textTheme.titleLarge),
+              child: Text(title, style: context.text.subtitle),
             ),
             const SizedBox(height: 8),
             Text(
               '${DateFormat.yMMMd(Localizations.localeOf(context).toString()).format(date)} · ${TimeOfDay.fromDateTime(date).format(context)}',
-              style: Theme.of(context).textTheme.bodyMedium,
+              style: context.text.muted.body,
             ),
             const SizedBox(height: 20),
             if (canOpen)

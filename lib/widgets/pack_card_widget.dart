@@ -29,7 +29,6 @@ class PackCardWidget extends StatefulWidget {
 class _PackCardWidgetState extends State<PackCardWidget> {
   @override
   Widget build(BuildContext context) {
-    var textTheme = Theme.of(context).textTheme;
     final theme = Theme.of(context);
 
     final backgroundColor = theme.cardColor;
@@ -54,13 +53,9 @@ class _PackCardWidgetState extends State<PackCardWidget> {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 mainAxisSize: MainAxisSize.min,
                 children: [
-                  _title(textTheme, title: widget.title, color: titleColor),
+                  _title(title: widget.title, color: titleColor),
                   if (widget.subTitle != null) const SizedBox(height: 4),
-                  _description(
-                    textTheme,
-                    subtitle: widget.subTitle,
-                    color: subtitleColor,
-                  ),
+                  _description(subtitle: widget.subTitle, color: subtitleColor),
                 ],
               ),
             ),
@@ -92,35 +87,15 @@ class _PackCardWidgetState extends State<PackCardWidget> {
     );
   }
 
-  Text _title(
-    TextTheme textTheme, {
-    required String title,
-    required Color color,
-  }) {
-    return Text(
-      title,
-      style: textTheme.displayLarge?.copyWith(
-        fontFamily: googleSans,
-        height: 1.2,
-        color: color,
-      ),
-    );
+  Text _title({required String title, required Color color}) {
+    return Text(title, style: context.text.title.copyWith(color: color));
   }
 
-  Widget _description(
-    TextTheme textTheme, {
-    String? subtitle,
-    required Color color,
-  }) {
+  Widget _description({String? subtitle, required Color color}) {
     if (subtitle != null) {
       return Text(
         subtitle,
-        style: textTheme.titleMedium?.copyWith(
-          letterSpacing: 0,
-          color: color,
-          fontSize: 14,
-          height: 1.4,
-        ),
+        style: context.text.bodySmall.copyWith(color: color),
       );
     }
 

@@ -45,11 +45,7 @@ class FeedbackWidgetState extends ConsumerState<FeedbackWidget> {
           child: Text(
             AppLocalizations.of(context)!.howDoYouFeel,
             textAlign: TextAlign.center,
-            style: Theme.of(context).textTheme.headlineSmall?.copyWith(
-              fontFamily: googleSans,
-              fontSize: 22,
-              fontWeight: FontWeight.normal,
-            ),
+            style: context.text.headline,
           ),
         ),
         _showThankYouMessage
@@ -109,10 +105,7 @@ class FeedbackWidgetState extends ConsumerState<FeedbackWidget> {
           l10n.thanksForSharing,
           semanticsLabel: l10n.thanksForSharingSpoken,
           textAlign: TextAlign.center,
-          style: Theme.of(context).textTheme.headlineMedium?.copyWith(
-            fontSize: 18,
-            fontWeight: FontWeight.w500,
-          ),
+          style: context.text.title,
         ),
       ),
     );

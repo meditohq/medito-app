@@ -15,6 +15,7 @@ import 'package:medito/views/shop/widgets/shop_product_card.dart';
 import 'package:medito/widgets/adaptive/adaptive_page_body.dart';
 import 'package:medito/widgets/medito_icon.dart';
 import 'package:medito/widgets/shimmers/widgets/box_shimmer_widget.dart';
+import 'package:medito/constants/theme/medito_text.dart';
 
 /// Native storefront for shop.medito.app: collection filter, product grid,
 /// bag. Checkout hands off to Fourthwall.
@@ -153,7 +154,7 @@ class _ShopScreenState extends ConsumerState<ShopScreen> {
                   sliver: SliverToBoxAdapter(
                     child: Text(
                       l10n.shopSubtitle,
-                      style: theme.textTheme.titleMedium,
+                      style: context.text.muted.bodySmall,
                     ),
                   ),
                 ),
@@ -438,11 +439,8 @@ class ShopChoicePill extends StatelessWidget {
                     widthFactor: 1,
                     child: Text(
                       label,
-                      style: theme.textTheme.titleSmall?.copyWith(
+                      style: context.text.label.copyWith(
                         color: foreground,
-                        fontWeight: selected
-                            ? FontWeight.w600
-                            : FontWeight.w500,
                         decoration: enabled ? null : TextDecoration.lineThrough,
                         decorationColor: foreground,
                       ),

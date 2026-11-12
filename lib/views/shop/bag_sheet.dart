@@ -14,6 +14,7 @@ import 'package:medito/views/shop/shop_navigation.dart';
 import 'package:medito/views/shop/widgets/shop_photo.dart';
 import 'package:medito/views/shop/widgets/shop_product_card.dart';
 import 'package:medito/widgets/medito_icon.dart';
+import 'package:medito/constants/theme/medito_text.dart';
 
 /// Opens the bag. [onBrowse] backs the empty state's "Browse the shop"
 /// button; leave it null where the shop is already underneath.
@@ -127,16 +128,14 @@ class _ShopBagSheetState extends ConsumerState<ShopBagSheet> {
                   header: true,
                   child: Text(
                     l10n.shopBagTitle,
-                    style: theme.textTheme.headlineSmall?.copyWith(
-                      color: onSurface,
-                    ),
+                    style: context.text.title.copyWith(color: onSurface),
                   ),
                 ),
                 if (!bag.isEmpty) ...[
                   const SizedBox(height: 2),
                   Text(
                     l10n.shopBagItemCount(bag.quantity),
-                    style: theme.textTheme.titleMedium?.copyWith(color: muted),
+                    style: context.text.label.copyWith(color: muted),
                   ),
                 ],
               ],
@@ -210,26 +209,20 @@ class _BagLine extends ConsumerWidget {
                         item.productName,
                         maxLines: 2,
                         overflow: TextOverflow.ellipsis,
-                        style: theme.textTheme.titleSmall?.copyWith(
-                          color: onSurface,
-                          fontWeight: FontWeight.w600,
-                        ),
+                        style: context.text.label.copyWith(color: onSurface),
                       ),
                     ),
                     const SizedBox(width: 12),
                     Text(
                       item.total.format(),
-                      style: theme.textTheme.titleSmall?.copyWith(
-                        color: onSurface,
-                        fontWeight: FontWeight.w600,
-                      ),
+                      style: context.text.label.copyWith(color: onSurface),
                     ),
                   ],
                 ),
                 if (item.variantLabel.isNotEmpty)
                   Text(
                     item.variantLabel,
-                    style: theme.textTheme.titleMedium?.copyWith(
+                    style: context.text.label.copyWith(
                       color: onSurface.withValues(alpha: 0.6),
                     ),
                   ),
@@ -330,10 +323,7 @@ class _QuantityStepper extends StatelessWidget {
               // Read as "Quantity: 2", not a bare "2" between two buttons.
               semanticsLabel: l10n.shopQuantity(quantity),
               textAlign: TextAlign.center,
-              style: theme.textTheme.titleSmall?.copyWith(
-                color: onSurface,
-                fontWeight: FontWeight.w600,
-              ),
+              style: context.text.label.copyWith(color: onSurface),
             ),
           ),
           button(
@@ -387,7 +377,7 @@ class _CheckoutReturnCardState extends ConsumerState<_CheckoutReturnCard> {
               Expanded(
                 child: Text(
                   l10n.shopCheckoutPrompt,
-                  style: theme.textTheme.titleSmall?.copyWith(
+                  style: context.text.label.copyWith(
                     color: theme.colorScheme.onSurface,
                   ),
                 ),
@@ -405,11 +395,7 @@ class _CheckoutReturnCardState extends ConsumerState<_CheckoutReturnCard> {
                       );
                   ref.read(shopBagProvider.notifier).clear();
                 },
-                style: TextButton.styleFrom(
-                  textStyle: theme.textTheme.titleSmall?.copyWith(
-                    fontWeight: FontWeight.w600,
-                  ),
-                ),
+                style: TextButton.styleFrom(textStyle: context.text.label),
                 child: Text(l10n.shopClearBag),
               ),
             ],
@@ -468,24 +454,19 @@ class _BagFooterState extends ConsumerState<_BagFooter> {
                   Expanded(
                     child: Text(
                       l10n.shopSubtotal,
-                      style: theme.textTheme.titleLarge?.copyWith(
-                        color: onSurface,
-                      ),
+                      style: context.text.subtitle.copyWith(color: onSurface),
                     ),
                   ),
                   Text(
                     bag.subtotal?.format() ?? '',
-                    style: theme.textTheme.titleLarge?.copyWith(
-                      color: onSurface,
-                      fontWeight: FontWeight.w700,
-                    ),
+                    style: context.text.subtitle.copyWith(color: onSurface),
                   ),
                 ],
               ),
               const SizedBox(height: 4),
               Text(
                 l10n.shopShippingNote,
-                style: theme.textTheme.titleMedium?.copyWith(
+                style: context.text.label.copyWith(
                   color: onSurface.withValues(alpha: 0.6),
                 ),
               ),
@@ -557,16 +538,13 @@ class _EmptyBag extends StatelessWidget {
             Text(
               l10n.shopBagEmpty,
               textAlign: TextAlign.center,
-              style: theme.textTheme.titleLarge?.copyWith(
-                color: onSurface,
-                fontWeight: FontWeight.w600,
-              ),
+              style: context.text.subtitle.copyWith(color: onSurface),
             ),
             const SizedBox(height: 6),
             Text(
               l10n.shopBagEmptyBody,
               textAlign: TextAlign.center,
-              style: theme.textTheme.titleMedium?.copyWith(
+              style: context.text.label.copyWith(
                 color: onSurface.withValues(alpha: 0.6),
               ),
             ),
@@ -625,10 +603,7 @@ class _AddOns extends ConsumerWidget {
         children: [
           Text(
             l10n.shopAddOnsTitle,
-            style: theme.textTheme.titleSmall?.copyWith(
-              color: onSurface,
-              fontWeight: FontWeight.w600,
-            ),
+            style: context.text.label.copyWith(color: onSurface),
           ),
           const SizedBox(height: 10),
           // A Row (not a fixed-height ListView) so the strip sizes to the
@@ -672,18 +647,14 @@ class _AddOns extends ConsumerWidget {
                               product.name,
                               maxLines: 1,
                               overflow: TextOverflow.ellipsis,
-                              style: theme.textTheme.bodySmall?.copyWith(
+                              style: context.text.caption.copyWith(
                                 color: onSurface,
-                                letterSpacing: 0.2,
-                                fontWeight: FontWeight.w500,
                               ),
                             ),
                             if (product.fromPrice case final price?)
                               Text(
                                 price.format(),
-                                style: theme.textTheme.bodySmall?.copyWith(
-                                  letterSpacing: 0.2,
-                                ),
+                                style: context.text.muted.caption,
                               ),
                           ],
                         ),

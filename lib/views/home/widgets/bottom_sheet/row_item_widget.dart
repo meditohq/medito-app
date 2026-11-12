@@ -84,19 +84,11 @@ class RowItemWidget extends StatelessWidget {
                         Expanded(
                           child: Text.rich(
                             TextSpan(
-                              style: const TextStyle(fontSize: 18),
+                              style: context.text.inherited.body,
                               children: [
                                 TextSpan(
                                   text: title,
-                                  style:
-                                      titleStyle ??
-                                      Theme.of(
-                                        context,
-                                      ).textTheme.labelMedium?.copyWith(
-                                        color: Theme.of(
-                                          context,
-                                        ).colorScheme.onSurface,
-                                      ),
+                                  style: titleStyle ?? context.text.subtitle,
                                 ),
                                 if (subTitle != null) _subtitle(context),
                               ],
@@ -142,10 +134,8 @@ class RowItemWidget extends StatelessWidget {
   TextSpan _subtitle(BuildContext context) {
     return TextSpan(
       text: subTitle != null ? '\n$subTitle' : '',
-      style: Theme.of(context).textTheme.titleSmall?.copyWith(
+      style: context.text.label.copyWith(
         color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.7),
-        letterSpacing: 0,
-        height: 1.7,
       ),
     );
   }

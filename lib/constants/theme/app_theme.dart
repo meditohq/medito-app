@@ -4,14 +4,18 @@ import 'package:flutter/services.dart';
 import 'package:medito/constants/theme/text_theme.dart';
 
 import '../colors/color_constants.dart';
-import '../styles/widget_styles.dart';
 import 'input_theme.dart';
+import 'package:medito/constants/theme/medito_text.dart';
 
 ThemeData appTheme(BuildContext context, [ThemeMode? themeMode]) {
   final brightness = MediaQuery.of(context).platformBrightness;
   final isDark =
       themeMode == ThemeMode.dark ||
       (themeMode == ThemeMode.system && brightness == Brightness.dark);
+
+  final text = MeditoText.forBrightness(
+    isDark ? Brightness.dark : Brightness.light,
+  );
 
   return ThemeData(
     useMaterial3: true,
@@ -117,11 +121,7 @@ ThemeData appTheme(BuildContext context, [ThemeMode? themeMode]) {
             : ColorConstants.onAccentLight,
         elevation: 0,
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
-        textStyle: const TextStyle(
-          fontSize: 16,
-          fontWeight: FontWeight.w600,
-          fontFamily: googleSans,
-        ),
+        textStyle: text.inherited.subtitle,
       ),
     ),
     outlinedButtonTheme: OutlinedButtonThemeData(
@@ -136,11 +136,7 @@ ThemeData appTheme(BuildContext context, [ThemeMode? themeMode]) {
               : ColorConstants.lightPrimary,
         ),
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
-        textStyle: const TextStyle(
-          fontSize: 16,
-          fontWeight: FontWeight.w600,
-          fontFamily: googleSans,
-        ),
+        textStyle: text.inherited.subtitle,
       ),
     ),
     textButtonTheme: TextButtonThemeData(
@@ -149,11 +145,7 @@ ThemeData appTheme(BuildContext context, [ThemeMode? themeMode]) {
             ? ColorConstants.accentDark
             : ColorConstants.lightPrimary,
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
-        textStyle: const TextStyle(
-          fontSize: 12,
-          fontWeight: FontWeight.w600,
-          fontFamily: googleSans,
-        ),
+        textStyle: text.inherited.label,
       ),
     ),
     // Dialog theme
@@ -161,18 +153,8 @@ ThemeData appTheme(BuildContext context, [ThemeMode? themeMode]) {
       backgroundColor: isDark
           ? ColorConstants.ebony
           : ColorConstants.lightSurface,
-      titleTextStyle: TextStyle(
-        color: isDark ? ColorConstants.white : ColorConstants.lightOnSurface,
-        fontSize: 18,
-        fontWeight: FontWeight.w600,
-        fontFamily: googleSans,
-      ),
-      contentTextStyle: TextStyle(
-        color: isDark ? ColorConstants.white : ColorConstants.lightOnSurface,
-        fontSize: 14,
-        fontWeight: FontWeight.w400,
-        fontFamily: googleSans,
-      ),
+      titleTextStyle: text.title,
+      contentTextStyle: text.bodySmall,
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
     ),
     // Bottom sheet theme

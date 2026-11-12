@@ -58,6 +58,7 @@ import 'package:medito/mock/mock_auth_api_service.dart';
 import 'package:medito/mock/mock_donation_api_service.dart';
 import 'package:medito/providers/stripe/payment_providers.dart';
 import 'package:medito/providers/stripe/payment_service_provider.dart';
+import 'package:medito/constants/theme/medito_text.dart';
 
 // Completer used as both the guard and the barrier for duplicate main() calls.
 // It is set synchronously before any await, so a second call always finds it non-null.
@@ -362,7 +363,7 @@ class _ParentWidgetState extends ConsumerState<ParentWidget>
                     Text(
                       '$error',
                       textAlign: TextAlign.center,
-                      style: Theme.of(context).textTheme.bodySmall,
+                      style: context.text.muted.caption,
                     ),
                   ],
                 ),

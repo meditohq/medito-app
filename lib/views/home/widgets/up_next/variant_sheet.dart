@@ -7,6 +7,7 @@ import 'package:medito/providers/guide_name_preference_provider.dart';
 import 'package:medito/utils/track_variant_selector.dart';
 import 'package:medito/utils/utils.dart';
 import 'package:medito/widgets/inputs/option_pills.dart';
+import 'package:medito/constants/theme/medito_text.dart';
 
 /// Whether [track] offers any choice of voice or length worth showing.
 bool trackHasVariants(Track track) =>
@@ -61,18 +62,13 @@ class VariantSheet extends ConsumerWidget {
                 l10n.variantSheetTitle,
                 // Explicit sizes: the theme's titleMedium (14) is smaller than
                 // its bodyMedium (16), which put the title under the note.
-                style: theme.textTheme.titleMedium?.copyWith(
-                  fontSize: 20,
-                  color: onSurface,
-                  fontWeight: FontWeight.w700,
-                ),
+                style: context.text.title.copyWith(color: onSurface),
               ),
             ),
             const SizedBox(height: 4),
             Text(
               l10n.variantSheetNote,
-              style: theme.textTheme.bodyMedium?.copyWith(
-                fontSize: 15,
+              style: context.text.body.copyWith(
                 color: onSurface.withValues(alpha: 0.7),
               ),
             ),

@@ -458,9 +458,8 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
         header: true,
         child: Text(
           title,
-          style: Theme.of(context).textTheme.titleMedium?.copyWith(
+          style: context.text.label.copyWith(
             color: Theme.of(context).colorScheme.onSurface,
-            fontWeight: FontWeight.w600,
           ),
         ),
       ),

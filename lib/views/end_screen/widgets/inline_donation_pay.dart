@@ -9,6 +9,7 @@ import 'package:medito/models/stripe/payment_method_model.dart'
     as payment_models;
 import 'package:medito/utils/currency.dart';
 import 'package:medito/widgets/inputs/email_typo_hint.dart';
+import 'package:medito/constants/theme/medito_text.dart';
 
 /// Stable handles for tests.
 @visibleForTesting
@@ -209,10 +210,8 @@ class _InlineDonationPayState extends State<InlineDonationPay> {
             Expanded(
               child: Text(
                 l10n.donateMonthlyDisclosure,
-                style: TextStyle(
+                style: context.text.caption.copyWith(
                   color: fg.withValues(alpha: 0.7),
-                  fontSize: 12,
-                  height: 1.3,
                 ),
               ),
             ),
@@ -234,10 +233,8 @@ class _InlineDonationPayState extends State<InlineDonationPay> {
                       padding: const EdgeInsets.symmetric(vertical: 4),
                       child: Text(
                         l10n.donateOtherAmount,
-                        style: TextStyle(
+                        style: context.text.caption.copyWith(
                           color: fg,
-                          fontSize: 12,
-                          fontWeight: FontWeight.w500,
                           decoration: TextDecoration.underline,
                           decorationColor: fg,
                         ),
@@ -319,12 +316,7 @@ class _InlineDonationPayState extends State<InlineDonationPay> {
                         badge,
                         maxLines: 1,
                         softWrap: false,
-                        style: TextStyle(
-                          color: fg,
-                          fontSize: 12,
-                          fontWeight: FontWeight.w600,
-                          letterSpacing: 0.2,
-                        ),
+                        style: context.text.caption.copyWith(color: fg),
                       ),
                     )
                   : null,
@@ -348,10 +340,8 @@ class _InlineDonationPayState extends State<InlineDonationPay> {
                   label,
                   maxLines: 1,
                   softWrap: false,
-                  style: TextStyle(
+                  style: context.text.subtitle.copyWith(
                     color: isSelected ? context.brandAccent : fg,
-                    fontSize: 16,
-                    fontWeight: FontWeight.w600,
                   ),
                 ),
               ),
@@ -454,25 +444,13 @@ class _InlineDonationPayState extends State<InlineDonationPay> {
                     children: [
                       Text(
                         '${l10n.donateWithApplePayPrefix} ',
-                        style: const TextStyle(
-                          fontSize: 16,
-                          fontWeight: FontWeight.w500,
-                        ),
+                        style: context.text.inherited.subtitle,
                       ),
-                      const Text(
-                        '',
-                        style: TextStyle(
-                          fontSize: 18,
-                          fontWeight: FontWeight.w500,
-                        ),
-                      ),
+                      const Text('', style: TextStyle(fontSize: 18)),
                       const SizedBox(width: 2),
                       Text(
                         'Pay · $_amountLabel',
-                        style: const TextStyle(
-                          fontSize: 16,
-                          fontWeight: FontWeight.w500,
-                        ),
+                        style: context.text.inherited.subtitle,
                       ),
                     ],
                   ),
@@ -506,10 +484,7 @@ class _InlineDonationPayState extends State<InlineDonationPay> {
                 semanticsLabel: _asksForEmail && _emailRevealed
                     ? null
                     : l10n.donateAmountPerMonthSpoken(_spokenAmountLabel),
-                style: const TextStyle(
-                  fontSize: 16,
-                  fontWeight: FontWeight.w600,
-                ),
+                style: context.text.inherited.subtitle,
               ),
       ),
     );

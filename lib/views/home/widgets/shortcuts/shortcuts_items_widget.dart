@@ -140,8 +140,7 @@ class ShortcutsItemsWidget extends ConsumerWidget {
                 padding: const EdgeInsets.only(top: 8),
                 child: _ShortcutTitle(
                   title: e.title ?? '',
-                  style: Theme.of(context).textTheme.titleSmall?.copyWith(
-                    fontWeight: FontWeight.w600,
+                  style: context.text.label.copyWith(
                     color: textColor.withOpacityValue(0.9),
                   ),
                 ),

@@ -84,9 +84,7 @@ class _DayBoundaryOffsetDialogState extends State<DayBoundaryOffsetDialog> {
                   Expanded(
                     child: Text(
                       l10n.dayStartsExperimentalNote,
-                      style: theme.textTheme.bodySmall?.copyWith(
-                        fontFamily: googleSans,
-                        height: 1.4,
+                      style: context.text.caption.copyWith(
                         color: onSurface.withOpacityValue(0.75),
                       ),
                     ),
@@ -150,11 +148,8 @@ class _OffsetOptionTile extends StatelessWidget {
               Expanded(
                 child: Text(
                   label,
-                  style: theme.textTheme.labelMedium?.copyWith(
-                    fontFamily: googleSans,
-                    color: onSurface,
-                    fontWeight: selected ? FontWeight.w600 : FontWeight.w400,
-                  ),
+                  style: (selected ? context.text.subtitle : context.text.body)
+                      .copyWith(color: onSurface),
                 ),
               ),
             ],

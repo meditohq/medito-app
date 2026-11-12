@@ -68,7 +68,7 @@ class _RestoreStatsScreenState extends ConsumerState<RestoreStatsScreen> {
                   padding: const EdgeInsets.fromLTRB(16, 8, 16, 16),
                   child: Text(
                     l10n.restorePreviousStatsExplainer,
-                    style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                    style: context.text.body.copyWith(
                       color: Theme.of(context).colorScheme.onSurfaceVariant,
                     ),
                   ),
@@ -97,7 +97,7 @@ class _RestoreStatsScreenState extends ConsumerState<RestoreStatsScreen> {
                           child: Text(
                             l10n.noBackupsAvailable,
                             textAlign: TextAlign.center,
-                            style: Theme.of(context).textTheme.bodyMedium,
+                            style: context.text.muted.body,
                           ),
                         ),
                       ),
@@ -172,11 +172,9 @@ class _BackupRow extends ConsumerWidget {
                       children: [
                         Text(
                           _formatDate(context, when),
-                          style: Theme.of(context).textTheme.labelLarge
-                              ?.copyWith(
-                                color: Theme.of(context).colorScheme.onSurface,
-                                fontWeight: FontWeight.w600,
-                              ),
+                          style: context.text.title.copyWith(
+                            color: Theme.of(context).colorScheme.onSurface,
+                          ),
                         ),
                         const SizedBox(height: 4),
                         Text(
@@ -185,12 +183,11 @@ class _BackupRow extends ConsumerWidget {
                             sessionCount,
                             minutes,
                           ),
-                          style: Theme.of(context).textTheme.bodySmall
-                              ?.copyWith(
-                                color: Theme.of(
-                                  context,
-                                ).colorScheme.onSurfaceVariant,
-                              ),
+                          style: context.text.caption.copyWith(
+                            color: Theme.of(
+                              context,
+                            ).colorScheme.onSurfaceVariant,
+                          ),
                         ),
                       ],
                     ),

@@ -9,6 +9,7 @@ import '../../providers/background_sounds/background_sounds_notifier.dart';
 import 'widgets/sound_listtile_widget.dart';
 import 'widgets/session_bell_checkboxes.dart';
 import 'widgets/volume_slider_widget.dart';
+import 'package:medito/constants/theme/medito_text.dart';
 
 /// Opens the background-sound picker as a draggable bottom sheet over the
 /// player, so the session stays in view instead of being pushed off-screen.
@@ -139,10 +140,7 @@ class _SoundSectionHeading extends StatelessWidget {
         header: true,
         child: Text(
           label,
-          style: theme.textTheme.bodySmall?.copyWith(
-            fontSize: 14,
-            fontWeight: FontWeight.w500,
-            letterSpacing: 0,
+          style: context.text.label.copyWith(
             color: theme.colorScheme.onSurface.withValues(alpha: 0.6),
           ),
         ),

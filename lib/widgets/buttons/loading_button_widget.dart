@@ -12,8 +12,6 @@ class LoadingButtonWidget extends StatelessWidget {
     this.textColor = ColorConstants.white,
     this.isLoading = false,
     this.elevation = 0,
-    this.fontWeight = FontWeight.w700,
-    this.fontSize = 16,
     this.borderRadius = 8,
   });
 
@@ -23,8 +21,6 @@ class LoadingButtonWidget extends StatelessWidget {
   final Color textColor;
   final bool isLoading;
   final double elevation;
-  final FontWeight fontWeight;
-  final double fontSize;
   final double borderRadius;
 
   @override
@@ -56,10 +52,8 @@ class LoadingButtonWidget extends StatelessWidget {
                   child: Text(
                     btnText,
                     textAlign: TextAlign.center,
-                    style: TextStyle(
+                    style: context.text.subtitle.copyWith(
                       color: isLoading ? Colors.transparent : textColor,
-                      fontSize: fontSize,
-                      fontWeight: fontWeight,
                     ),
                   ),
                 ),

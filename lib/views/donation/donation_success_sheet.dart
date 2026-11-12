@@ -3,6 +3,7 @@ import 'package:medito/constants/colors/color_constants.dart';
 import 'package:medito/l10n/app_localizations.dart';
 import 'package:medito/utils/currency.dart';
 import 'package:medito/widgets/dialogs/medito_dialog_buttons.dart';
+import 'package:medito/constants/theme/medito_text.dart';
 
 /// A persistent acknowledgement shared by every native donation entry point.
 /// Web checkout keeps its own confirmation page instead of showing both.
@@ -42,9 +43,7 @@ Future<void> showDonationSuccessSheet(
                 child: Text(
                   l10n.thankYouForYourSupport,
                   textAlign: TextAlign.center,
-                  style: theme.textTheme.headlineSmall?.copyWith(
-                    fontWeight: FontWeight.w600,
-                  ),
+                  style: context.text.title,
                 ),
               ),
               const SizedBox(height: 16),
@@ -54,16 +53,13 @@ Future<void> showDonationSuccessSheet(
                   currency.toUpperCase(),
                 ),
                 textAlign: TextAlign.center,
-                style: theme.textTheme.bodyMedium?.copyWith(
-                  color: onSurface,
-                  height: 1.5,
-                ),
+                style: context.text.body.copyWith(color: onSurface),
               ),
               const SizedBox(height: 12),
               Text(
                 l10n.donorSupportMessage,
                 textAlign: TextAlign.center,
-                style: theme.textTheme.bodyLarge?.copyWith(
+                style: context.text.bodySmall.copyWith(
                   color: onSurface.withValues(alpha: 0.7),
                 ),
               ),

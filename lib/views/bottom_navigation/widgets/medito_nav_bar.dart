@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:medito/constants/styles/widget_styles.dart';
+import 'package:medito/constants/theme/medito_text.dart';
 import 'package:medito/widgets/medito_icon.dart';
 
 class MeditoNavItem {
@@ -189,13 +189,7 @@ class _NavTab extends StatelessWidget {
                 item.label,
                 maxLines: 1,
                 overflow: TextOverflow.ellipsis,
-                style: TextStyle(
-                  fontFamily: googleSans,
-                  fontSize: 12,
-                  fontWeight: selected ? FontWeight.w600 : FontWeight.w500,
-                  height: 1.1,
-                  color: color,
-                ),
+                style: context.text.caption.copyWith(color: color),
               ),
             ],
           ),

@@ -93,13 +93,7 @@ class SplashWelcomeLayout extends StatelessWidget {
                                 const SizedBox(width: 16),
                                 Text(
                                   AppLocalizations.of(context)!.appName,
-                                  style: Theme.of(context)
-                                      .textTheme
-                                      .displayLarge
-                                      ?.copyWith(
-                                        fontSize: 24,
-                                        color: Colors.white,
-                                      ),
+                                  style: context.text.on(Colors.white).headline,
                                 ),
                               ],
                             ),
@@ -118,15 +112,7 @@ class SplashWelcomeLayout extends StatelessWidget {
                                     textAlign: constraints.maxWidth >= 700
                                         ? TextAlign.center
                                         : TextAlign.start,
-                                    style: Theme.of(context)
-                                        .textTheme
-                                        .displayLarge
-                                        ?.copyWith(
-                                          fontSize: 40,
-                                          fontWeight: FontWeight.bold,
-                                          height: 1.2,
-                                          color: Colors.white,
-                                        ),
+                                    style: context.text.on(Colors.white).hero,
                                   ),
                                 ),
                                 const SizedBox(height: 16),
@@ -141,17 +127,11 @@ class SplashWelcomeLayout extends StatelessWidget {
                                     textAlign: constraints.maxWidth >= 700
                                         ? TextAlign.center
                                         : TextAlign.start,
-                                    style: Theme.of(context)
-                                        .textTheme
-                                        .titleMedium
-                                        ?.copyWith(
-                                          fontSize: 18,
-                                          fontWeight: FontWeight.w500,
-                                          height: 1.35,
-                                          color: Colors.white.withValues(
-                                            alpha: 0.85,
-                                          ),
-                                        ),
+                                    style: context.text.title.copyWith(
+                                      color: Colors.white.withValues(
+                                        alpha: 0.85,
+                                      ),
+                                    ),
                                   ),
                                 ),
                               ],
@@ -183,11 +163,8 @@ class SplashWelcomeLayout extends StatelessWidget {
                                       style: ElevatedButton.styleFrom(
                                         backgroundColor: Colors.white,
                                         foregroundColor: Colors.black,
-                                        textStyle: const TextStyle(
-                                          fontFamily: googleSans,
-                                          fontSize: 16,
-                                          fontWeight: FontWeight.w600,
-                                        ),
+                                        textStyle:
+                                            context.text.inherited.subtitle,
                                       ),
                                       onPressed: isSigningIn
                                           ? null
@@ -220,12 +197,10 @@ class SplashWelcomeLayout extends StatelessWidget {
                                       AppLocalizations.of(
                                         context,
                                       )!.splashSignInOrSignUp,
-                                      style: TextStyle(
+                                      style: context.text.label.copyWith(
                                         color: Colors.white.withValues(
                                           alpha: 0.8,
                                         ),
-                                        fontSize: 14,
-                                        fontWeight: FontWeight.w500,
                                       ),
                                     ),
                                   ),

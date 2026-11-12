@@ -260,11 +260,8 @@ class _TrackViewState extends ConsumerState<TrackView>
       header: true,
       child: Text(
         title,
-        style: Theme.of(context).textTheme.titleLarge?.copyWith(
-          letterSpacing: 0.2,
-          fontSize: 22,
+        style: context.text.headline.copyWith(
           color: Theme.of(context).colorScheme.onSurface,
-          fontWeight: FontWeight.w700,
         ),
       ),
     );
@@ -284,16 +281,12 @@ class _TrackViewState extends ConsumerState<TrackView>
         body: subTitle,
         selectable: true,
         textAlign: WrapAlignment.start,
-        p: Theme.of(context).textTheme.headlineMedium?.copyWith(
-          fontSize: 16,
-          fontWeight: FontWeight.normal,
+        p: context.text.body.copyWith(
           color: Theme.of(context).colorScheme.onSurface,
         ),
-        a: Theme.of(context).textTheme.headlineMedium?.copyWith(
-          decoration: TextDecoration.underline,
-          fontSize: 16,
-          fontWeight: FontWeight.normal,
+        a: context.text.body.copyWith(
           color: Theme.of(context).colorScheme.onSurface,
+          decoration: TextDecoration.underline,
         ),
         onTapLink: (text, href, title) {
           handleNavigation(TypeConstants.url, [href], context);

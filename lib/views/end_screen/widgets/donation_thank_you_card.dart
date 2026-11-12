@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:medito/constants/colors/color_constants.dart';
-import 'package:medito/constants/styles/widget_styles.dart';
 import 'package:medito/l10n/app_localizations.dart';
 
 import '../../home/widgets/home_gradient_border.dart';
+import 'package:medito/constants/theme/medito_text.dart';
 
 /// Donor-only thank-you shown in place of the donation ask for the snooze
 /// window after a completed donation.
@@ -34,10 +34,7 @@ class DonationThankYouCard extends StatelessWidget {
               child: Text(
                 l10n.thankYouForYourSupport,
                 textAlign: TextAlign.center,
-                style: Theme.of(context).textTheme.headlineSmall?.copyWith(
-                  fontFamily: googleSans,
-                  fontSize: 20,
-                  fontWeight: FontWeight.w400,
+                style: context.text.title.copyWith(
                   color: context.onBrandAccent,
                 ),
               ),
@@ -46,10 +43,7 @@ class DonationThankYouCard extends StatelessWidget {
             Text(
               l10n.donorSupportMessage,
               textAlign: TextAlign.center,
-              style: Theme.of(context).textTheme.headlineMedium?.copyWith(
-                fontSize: 14,
-                fontWeight: FontWeight.w400,
-                height: 1.4,
+              style: context.text.bodySmall.copyWith(
                 color: context.onBrandAccent.withValues(alpha: 0.9),
               ),
             ),

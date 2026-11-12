@@ -7,6 +7,7 @@ import 'package:medito/views/home/widgets/bottom_sheet/row_item_widget.dart';
 import 'package:medito/views/settings/widgets/announce_setting.dart';
 import 'package:medito/widgets/medito_icon.dart';
 import 'package:medito/widgets/radio_option_card.dart';
+import 'package:medito/constants/theme/medito_text.dart';
 
 /// Settings row for the app theme: shows the current choice as subtitle and
 /// opens [ThemeSheet] on tap.
@@ -81,10 +82,7 @@ class ThemeSheet extends ConsumerWidget {
               header: true,
               child: Text(
                 l10n.selectTheme,
-                style: theme.textTheme.titleMedium?.copyWith(
-                  color: onSurface,
-                  fontWeight: FontWeight.w600,
-                ),
+                style: context.text.label.copyWith(color: onSurface),
               ),
             ),
             const SizedBox(height: 16),

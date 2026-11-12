@@ -18,6 +18,7 @@ import 'package:medito/providers/providers.dart';
 import 'package:medito/views/player/widgets/bottom_actions/single_back_action_bar.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:share_plus/share_plus.dart';
+import 'package:medito/constants/theme/medito_text.dart';
 
 /// A selectable background palette for the quote share card.
 ///
@@ -255,10 +256,7 @@ class _QuoteShareScreenState extends ConsumerState<QuoteShareScreen> {
                           )
                         : Text(
                             AppLocalizations.of(context)!.share,
-                            style: const TextStyle(
-                              fontSize: 16,
-                              fontWeight: FontWeight.w600,
-                            ),
+                            style: context.text.inherited.subtitle,
                           ),
                   ),
                 ),
@@ -413,11 +411,8 @@ class _ShareCard extends StatelessWidget {
                         const SizedBox(width: 10),
                         Text(
                           'medito.app',
-                          style: TextStyle(
-                            fontSize: 14,
+                          style: context.text.bodySmall.copyWith(
                             color: palette.secondary,
-                            letterSpacing: 0.5,
-                            fontFamily: googleSans,
                           ),
                         ),
                       ],
@@ -434,24 +429,17 @@ class _ShareCard extends StatelessWidget {
                                 Text(
                                   data.quote,
                                   textAlign: TextAlign.center,
-                                  style: TextStyle(
-                                    fontSize: 20,
-                                    height: 1.55,
+                                  style: context.text.title.copyWith(
                                     color: palette.foreground,
-                                    fontWeight: FontWeight.w300,
                                     fontStyle: FontStyle.italic,
-                                    fontFamily: googleSans,
                                   ),
                                 ),
                                 const SizedBox(height: 20),
                                 Text(
                                   '— ${data.author}',
                                   textAlign: TextAlign.center,
-                                  style: TextStyle(
-                                    fontSize: 14,
+                                  style: context.text.bodySmall.copyWith(
                                     color: palette.secondary,
-                                    fontWeight: FontWeight.w400,
-                                    fontFamily: googleSans,
                                   ),
                                 ),
                               ],

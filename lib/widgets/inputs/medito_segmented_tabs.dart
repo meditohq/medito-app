@@ -101,9 +101,7 @@ class MeditoSegmentedTabs extends StatelessWidget {
                         child: Center(
                           child: AnimatedDefaultTextStyle(
                             duration: _duration,
-                            style: theme.textTheme.titleSmall!.copyWith(
-                              fontFamily: googleSans,
-                              fontWeight: FontWeight.w600,
+                            style: context.text.label.copyWith(
                               color: i == selectedIndex
                                   ? context.onBrandAccent
                                   : theme.colorScheme.onSurface.withValues(

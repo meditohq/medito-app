@@ -11,6 +11,7 @@ import 'package:medito/providers/providers.dart';
 import 'package:medito/constants/strings/analytics_event_constants.dart';
 import 'package:medito/services/analytics/firebase_analytics_service.dart';
 import 'package:medito/widgets/medito_icon.dart';
+import 'package:medito/constants/theme/medito_text.dart';
 
 class CustomiseHomeLayoutScreen extends ConsumerStatefulWidget {
   const CustomiseHomeLayoutScreen({super.key});
@@ -69,7 +70,7 @@ class CustomiseHomeLayoutScreenState
                 ),
                 child: Text(
                   AppLocalizations.of(context)!.customiseHomeLayoutHint,
-                  style: Theme.of(context).textTheme.bodyMedium,
+                  style: context.text.muted.body,
                   textAlign: TextAlign.center,
                 ),
               ),

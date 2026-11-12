@@ -212,10 +212,7 @@ class _TimerViewState extends ConsumerState<TimerView> {
                       Padding(
                         padding: const EdgeInsets.symmetric(horizontal: 20),
                         child: MeditoSegmentedTabs(
-                          labels: [
-                            l10n.timerTitle,
-                            l10n.timerModeStopwatch,
-                          ],
+                          labels: [l10n.timerTitle, l10n.timerModeStopwatch],
                           selectedIndex: settings.mode.index,
                           onChanged: (index) {
                             unawaited(HapticFeedback.selectionClick());
@@ -235,8 +232,7 @@ class _TimerViewState extends ConsumerState<TimerView> {
                           children: [
                             if (isStopwatch)
                               const Padding(
-                                padding:
-                                    EdgeInsets.symmetric(horizontal: 20),
+                                padding: EdgeInsets.symmetric(horizontal: 20),
                                 child: _StopwatchInfo(),
                               ),
                             // Kept mounted while hidden so switching back
@@ -328,19 +324,13 @@ class _StopwatchInfo extends StatelessWidget {
                   // Same type as the sound rows in the player's sheet.
                   Text(
                     l10n.timerStopwatchTitle,
-                    style: theme.textTheme.bodyLarge?.copyWith(
-                      fontSize: 16,
-                      fontWeight: FontWeight.w600,
-                      color: onSurface,
-                    ),
+                    style: context.text.subtitle.copyWith(color: onSurface),
                   ),
                   const SizedBox(height: 4),
                   Text(
                     l10n.timerStopwatchCaption,
-                    style: theme.textTheme.bodyMedium?.copyWith(
-                      fontSize: 14,
+                    style: context.text.bodySmall.copyWith(
                       color: onSurface.withValues(alpha: 0.7),
-                      height: 1.4,
                     ),
                   ),
                 ],
@@ -384,9 +374,7 @@ class _PresetChips extends StatelessWidget {
               minutes: kTimerPresetMinutes[i],
               selected: kTimerPresetMinutes[i] == selectedMinutes,
               label: l10n.min,
-              semanticLabel: l10n.timerPresetSemantics(
-                kTimerPresetMinutes[i],
-              ),
+              semanticLabel: l10n.timerPresetSemantics(kTimerPresetMinutes[i]),
               onTap: () => onSelected(kTimerPresetMinutes[i]),
               theme: theme,
             ),
@@ -445,17 +433,12 @@ class _PresetChip extends StatelessWidget {
               children: [
                 Text(
                   '$minutes',
-                  style: theme.textTheme.titleLarge?.copyWith(
-                    color: foreground,
-                    fontWeight: FontWeight.w600,
-                    height: 1.1,
-                  ),
+                  style: context.text.subtitle.copyWith(color: foreground),
                 ),
                 Text(
                   label,
-                  style: theme.textTheme.labelSmall?.copyWith(
+                  style: context.text.bodySmall.copyWith(
                     color: foreground.withValues(alpha: 0.7),
-                    height: 1.1,
                   ),
                 ),
               ],

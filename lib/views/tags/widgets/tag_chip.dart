@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:medito/utils/utils.dart';
+import 'package:medito/constants/theme/medito_text.dart';
 
 /// Small rounded pill naming a tag. Tapping opens the tag's track list.
 ///
@@ -31,10 +32,7 @@ class TagChip extends StatelessWidget {
             padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
             child: Text(
               label,
-              style: theme.textTheme.bodyMedium?.copyWith(
-                color: onSurface,
-                fontWeight: FontWeight.w500,
-              ),
+              style: context.text.subtitle.copyWith(color: onSurface),
             ),
           ),
         ),

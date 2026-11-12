@@ -115,25 +115,14 @@ class DebugInfoScreen extends ConsumerWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          SelectableText(
-            fullInfo,
-            style: Theme.of(context).textTheme.bodyMedium,
-          ),
+          SelectableText(fullInfo, style: context.text.muted.body),
           if (localStatsSummary.isNotEmpty) ...[
             const SizedBox(height: 24),
             const Divider(),
             const SizedBox(height: 8),
-            Text(
-              'Local Stats',
-              style: Theme.of(
-                context,
-              ).textTheme.titleSmall?.copyWith(fontWeight: FontWeight.bold),
-            ),
+            Text('Local Stats', style: context.text.label),
             const SizedBox(height: 4),
-            SelectableText(
-              localStatsSummary,
-              style: Theme.of(context).textTheme.bodyMedium,
-            ),
+            SelectableText(localStatsSummary, style: context.text.muted.body),
           ],
           const SizedBox(height: 24),
           const Divider(),
@@ -157,12 +146,7 @@ class DebugInfoScreen extends ConsumerWidget {
             const SizedBox(height: 24),
             const Divider(),
             const SizedBox(height: 16),
-            Text(
-              'Pending Reminders',
-              style: Theme.of(
-                context,
-              ).textTheme.titleLarge?.copyWith(fontWeight: FontWeight.bold),
-            ),
+            Text('Pending Reminders', style: context.text.subtitle),
             const SizedBox(height: 16),
             _buildPendingReminders(context, ref),
           ],
@@ -192,7 +176,7 @@ class DebugInfoScreen extends ConsumerWidget {
           );
           return Text(
             'Error loading reminders: ${snapshot.error}',
-            style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+            style: context.text.body.copyWith(
               color: Theme.of(context).colorScheme.error,
             ),
           );
@@ -211,7 +195,7 @@ class DebugInfoScreen extends ConsumerWidget {
             children: [
               Text(
                 'No pending reminders',
-                style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                style: context.text.body.copyWith(
                   color: Theme.of(
                     context,
                   ).colorScheme.onSurface.withValues(alpha: 0.7),
@@ -220,7 +204,7 @@ class DebugInfoScreen extends ConsumerWidget {
               const SizedBox(height: 8),
               Text(
                 'Note: On Android, notifications scheduled with inexactAllowWhileIdle may not appear in pending notifications.',
-                style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                style: context.text.caption.copyWith(
                   color: Theme.of(
                     context,
                   ).colorScheme.onSurface.withValues(alpha: 0.5),
@@ -265,7 +249,7 @@ class DebugInfoScreen extends ConsumerWidget {
 
         return SelectableText(
           buffer.toString(),
-          style: Theme.of(context).textTheme.bodyMedium,
+          style: context.text.muted.body,
         );
       },
     );
@@ -435,16 +419,11 @@ class DebugInfoScreen extends ConsumerWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text(
-          title,
-          style: Theme.of(
-            context,
-          ).textTheme.titleSmall?.copyWith(fontWeight: FontWeight.bold),
-        ),
+        Text(title, style: context.text.label),
         const SizedBox(height: 4),
         SelectableText(
           body.isEmpty ? emptyText : body,
-          style: Theme.of(context).textTheme.bodyMedium,
+          style: context.text.muted.body,
         ),
       ],
     );

@@ -427,13 +427,7 @@ class _NotificationsScreenState extends ConsumerState<NotificationsScreen>
                                   _notificationsTitle(
                                     AppLocalizations.of(context)!,
                                   ),
-                                  style: Theme.of(context)
-                                      .textTheme
-                                      .displayLarge
-                                      ?.copyWith(
-                                        fontSize: 24,
-                                        fontWeight: FontWeight.w600,
-                                      ),
+                                  style: context.text.headline,
                                   textAlign: TextAlign.center,
                                 ),
                                 // When a reminder already exists (e.g. re-entering
@@ -447,10 +441,7 @@ class _NotificationsScreenState extends ConsumerState<NotificationsScreen>
                                     )!.onboardingReminderCurrentlySet(
                                       reminderTime.format(context),
                                     ),
-                                    style: Theme.of(context)
-                                        .textTheme
-                                        .bodyMedium
-                                        ?.copyWith(fontSize: 16, height: 1.5),
+                                    style: context.text.muted.body,
                                     textAlign: TextAlign.center,
                                   ),
                                 ],
@@ -612,45 +603,29 @@ class _NotificationsScreenState extends ConsumerState<NotificationsScreen>
               children: [
                 Row(
                   children: [
-                    const Expanded(
+                    Expanded(
                       child: Text(
                         'MEDITO',
-                        style: TextStyle(
-                          color: Colors.black54,
-                          fontSize: 12,
-                          fontWeight: FontWeight.w600,
-                          letterSpacing: 0.4,
-                        ),
+                        style: context.text.on(Colors.black54).caption,
                       ),
                     ),
                     Text(
                       l10n.notificationPreviewTimestamp,
-                      style: const TextStyle(
-                        color: Colors.black45,
-                        fontSize: 12,
-                      ),
+                      style: context.text.on(Colors.black45).caption,
                     ),
                   ],
                 ),
                 const SizedBox(height: 2),
                 Text(
                   title,
-                  style: const TextStyle(
-                    color: Colors.black,
-                    fontSize: 14,
-                    fontWeight: FontWeight.w600,
-                  ),
+                  style: context.text.on(Colors.black).label,
                   maxLines: 1,
                   overflow: TextOverflow.ellipsis,
                 ),
                 const SizedBox(height: 1),
                 Text(
                   body,
-                  style: const TextStyle(
-                    color: Colors.black87,
-                    fontSize: 12,
-                    height: 1.3,
-                  ),
+                  style: context.text.on(Colors.black87).caption,
                   maxLines: 3,
                   overflow: TextOverflow.ellipsis,
                 ),
@@ -689,9 +664,7 @@ class _NotificationsScreenState extends ConsumerState<NotificationsScreen>
       children: [
         Text(
           l10n.reminderChipsQuestion,
-          style: Theme.of(
-            context,
-          ).textTheme.bodyMedium?.copyWith(fontSize: 16, height: 1.5),
+          style: context.text.muted.body,
           textAlign: TextAlign.center,
         ),
         const SizedBox(height: 16),
@@ -722,10 +695,7 @@ class _NotificationsScreenState extends ConsumerState<NotificationsScreen>
             icon: const Icon(Icons.schedule_rounded, size: 20),
             label: Text(
               l10n.reminderSlotCustom,
-              style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                fontSize: 16,
-                fontWeight: FontWeight.w500,
-              ),
+              style: context.text.muted.subtitle,
             ),
           ),
         ),
@@ -771,19 +741,13 @@ class _NotificationsScreenState extends ConsumerState<NotificationsScreen>
               Text(
                 slot.label(l10n),
                 textAlign: TextAlign.center,
-                style: theme.textTheme.bodyMedium?.copyWith(
-                  fontSize: 14,
-                  fontWeight: FontWeight.w600,
-                  height: 1.2,
-                ),
+                style: context.text.muted.bodySmall,
               ),
               const SizedBox(height: 2),
               Text(
                 slot.time.format(context),
                 textAlign: TextAlign.center,
-                style: theme.textTheme.bodyMedium?.copyWith(
-                  fontSize: 14,
-                  height: 1.2,
+                style: context.text.bodySmall.copyWith(
                   color: onSurface.withValues(alpha: 0.7),
                 ),
               ),

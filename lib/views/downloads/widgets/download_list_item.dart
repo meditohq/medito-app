@@ -3,6 +3,7 @@ import 'package:medito/widgets/medito_icon.dart';
 import 'package:medito/widgets/shimmers/widgets/box_shimmer_widget.dart';
 import 'package:medito/widgets/widgets.dart';
 import 'package:flutter/material.dart';
+import 'package:medito/constants/theme/medito_text.dart';
 
 const _coverSize = 72.0;
 const _coverRadius = 14.0;
@@ -27,8 +28,6 @@ class DownloadListItemWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final textTheme = Theme.of(context).textTheme;
-
     return Padding(
       padding: _rowPadding,
       child: Row(
@@ -71,7 +70,7 @@ class DownloadListItemWidget extends StatelessWidget {
               children: [
                 Text(
                   title,
-                  style: textTheme.headlineMedium?.copyWith(letterSpacing: 0),
+                  style: context.text.subtitle,
                   maxLines: 2,
                   overflow: TextOverflow.ellipsis,
                 ),
@@ -79,7 +78,7 @@ class DownloadListItemWidget extends StatelessWidget {
                   const SizedBox(height: 4),
                   Text(
                     subtitle,
-                    style: textTheme.titleMedium?.copyWith(letterSpacing: 0),
+                    style: context.text.muted.bodySmall,
                     maxLines: 2,
                     overflow: TextOverflow.ellipsis,
                   ),

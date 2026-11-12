@@ -86,9 +86,7 @@ class SoundListTileWidget extends ConsumerWidget {
                                 : sound.id == kSessionBellsId
                                 ? AppLocalizations.of(context)!.sessionBells
                                 : sound.title,
-                            style: theme.textTheme.bodyLarge?.copyWith(
-                              fontSize: 16,
-                              fontWeight: FontWeight.w600,
+                            style: context.text.subtitle.copyWith(
                               color: onSurface,
                             ),
                           ),
@@ -98,10 +96,8 @@ class SoundListTileWidget extends ConsumerWidget {
                               AppLocalizations.of(
                                 context,
                               )!.sessionBellsDescription,
-                              style: theme.textTheme.bodyMedium?.copyWith(
-                                fontSize: 14,
+                              style: context.text.bodySmall.copyWith(
                                 color: onSurface.withValues(alpha: 0.7),
-                                height: 1.4,
                               ),
                             ),
                           ],
@@ -112,8 +108,7 @@ class SoundListTileWidget extends ConsumerWidget {
                                 AppLocalizations.of(
                                   context,
                                 )!.soundNeedsConnection,
-                                style: theme.textTheme.bodySmall?.copyWith(
-                                  fontFamily: googleSans,
+                                style: context.text.caption.copyWith(
                                   color: onSurface.withValues(alpha: 0.7),
                                 ),
                               ),
@@ -148,8 +143,7 @@ class SoundListTileWidget extends ConsumerWidget {
         liveRegion: true,
         child: Text(
           AppLocalizations.of(context)!.backgroundSoundDownloadFailed,
-          style: Theme.of(context).textTheme.bodySmall?.copyWith(
-            fontFamily: googleSans,
+          style: context.text.caption.copyWith(
             color: Theme.of(context).colorScheme.error,
           ),
         ),

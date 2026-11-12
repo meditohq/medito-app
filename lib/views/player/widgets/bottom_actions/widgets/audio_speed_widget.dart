@@ -39,11 +39,7 @@ class AudioSpeedWidget extends ConsumerWidget {
               : null,
           child: Text(
             formatSpeed(speed),
-            style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-              color: ColorConstants.white,
-              fontFamily: googleSans,
-              fontSize: 18,
-            ),
+            style: context.text.on(ColorConstants.white).body,
             textAlign: TextAlign.center,
           ),
         ),

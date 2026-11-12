@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:medito/l10n/app_localizations.dart';
+import 'package:medito/constants/theme/medito_text.dart';
 
 /// iOS has no API to pin a widget, so Settings' "Add Home Screen Widget" row
 /// opens this sheet with the steps instead of Android's system pin dialog.
@@ -39,10 +40,7 @@ class AddWidgetSheet extends StatelessWidget {
               header: true,
               child: Text(
                 l10n.addWidgetSheetTitle,
-                style: theme.textTheme.titleMedium?.copyWith(
-                  color: onSurface,
-                  fontWeight: FontWeight.w600,
-                ),
+                style: context.text.label.copyWith(color: onSurface),
               ),
             ),
             const SizedBox(height: 16),
@@ -52,8 +50,7 @@ class AddWidgetSheet extends StatelessWidget {
             ],
             Text(
               l10n.addWidgetFootnote,
-              style: theme.textTheme.bodySmall?.copyWith(
-                fontWeight: FontWeight.w400,
+              style: context.text.caption.copyWith(
                 color: onSurface.withValues(alpha: 0.6),
               ),
             ),
@@ -90,10 +87,7 @@ class _Step extends StatelessWidget {
             ),
             child: Text(
               '$number',
-              style: theme.textTheme.labelMedium?.copyWith(
-                color: onSurface,
-                fontWeight: FontWeight.w600,
-              ),
+              style: context.text.subtitle.copyWith(color: onSurface),
             ),
           ),
           const SizedBox(width: 12),
@@ -102,7 +96,7 @@ class _Step extends StatelessWidget {
               padding: const EdgeInsets.only(top: 2),
               child: Text(
                 text,
-                style: theme.textTheme.bodyMedium?.copyWith(color: onSurface),
+                style: context.text.body.copyWith(color: onSurface),
               ),
             ),
           ),

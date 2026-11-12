@@ -65,8 +65,7 @@ class _BulkAddSessionsDialogState extends State<BulkAddSessionsDialog> {
             const SizedBox(height: 4),
             Text(
               l10n.daysAlreadyHaveSession(alreadyFilled, widget.dayCount),
-              style: theme.textTheme.bodySmall?.copyWith(
-                fontFamily: googleSans,
+              style: context.text.caption.copyWith(
                 color: theme.colorScheme.onSurface.withOpacityValue(0.7),
               ),
             ),
@@ -163,8 +162,7 @@ class _StreakRow extends StatelessWidget {
           Expanded(
             child: Text(
               label,
-              style: theme.textTheme.bodyMedium?.copyWith(
-                fontFamily: googleSans,
+              style: context.text.body.copyWith(
                 color: theme.colorScheme.onSurface.withOpacityValue(0.75),
               ),
             ),
@@ -172,9 +170,7 @@ class _StreakRow extends StatelessWidget {
           const SizedBox(width: 12),
           Text(
             value,
-            style: theme.textTheme.bodyMedium?.copyWith(
-              fontFamily: googleSans,
-              fontWeight: FontWeight.w700,
+            style: context.text.subtitle.copyWith(
               color: emphasize
                   ? context.brandAccent
                   : theme.colorScheme.onSurface,

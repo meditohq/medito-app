@@ -244,8 +244,7 @@ class _ManualSessionDialogState extends State<ManualSessionDialog>
             liveRegion: true,
             child: Text(
               l10n.cannotAddFutureSession,
-              style: theme.textTheme.bodySmall?.copyWith(
-                fontFamily: googleSans,
+              style: context.text.caption.copyWith(
                 color: theme.colorScheme.error,
               ),
             ),
@@ -312,8 +311,7 @@ class _ManualSessionDialogState extends State<ManualSessionDialog>
             liveRegion: true,
             child: Text(
               l10n.endDateBeforeStartError,
-              style: theme.textTheme.bodySmall?.copyWith(
-                fontFamily: googleSans,
+              style: context.text.caption.copyWith(
                 color: theme.colorScheme.error,
               ),
             ),
@@ -446,8 +444,7 @@ class _ManualSessionDialogState extends State<ManualSessionDialog>
                   children: [
                     Text(
                       l10n.time,
-                      style: theme.textTheme.bodySmall?.copyWith(
-                        fontFamily: googleSans,
+                      style: context.text.caption.copyWith(
                         color: theme.colorScheme.onSurface.withOpacityValue(
                           0.75,
                         ),
@@ -458,8 +455,7 @@ class _ManualSessionDialogState extends State<ManualSessionDialog>
                       _selectedTime != null
                           ? _selectedTime!.format(context)
                           : l10n.selectTime,
-                      style: theme.textTheme.bodyMedium?.copyWith(
-                        fontFamily: googleSans,
+                      style: context.text.body.copyWith(
                         color: theme.colorScheme.onSurface,
                       ),
                     ),
@@ -506,18 +502,15 @@ class _ManualSessionDialogState extends State<ManualSessionDialog>
             children: [
               Text(
                 label,
-                style: theme.textTheme.bodySmall?.copyWith(
-                  fontFamily: googleSans,
+                style: context.text.caption.copyWith(
                   color: theme.colorScheme.onSurface.withOpacityValue(0.75),
                 ),
               ),
               const SizedBox(height: 4),
               Text(
                 fmt.format(value),
-                style: theme.textTheme.bodyMedium?.copyWith(
-                  fontFamily: googleSans,
+                style: context.text.subtitle.copyWith(
                   color: theme.colorScheme.onSurface,
-                  fontWeight: FontWeight.w600,
                 ),
               ),
             ],
@@ -550,8 +543,7 @@ class _PreviewRow extends StatelessWidget {
           Expanded(
             child: Text(
               label,
-              style: theme.textTheme.bodyMedium?.copyWith(
-                fontFamily: googleSans,
+              style: context.text.body.copyWith(
                 color: theme.colorScheme.onSurface.withOpacityValue(0.75),
               ),
             ),
@@ -559,9 +551,7 @@ class _PreviewRow extends StatelessWidget {
           const SizedBox(width: 12),
           Text(
             value,
-            style: theme.textTheme.bodyMedium?.copyWith(
-              fontFamily: googleSans,
-              fontWeight: FontWeight.w700,
+            style: context.text.subtitle.copyWith(
               color: emphasize
                   ? context.brandAccent
                   : theme.colorScheme.onSurface,

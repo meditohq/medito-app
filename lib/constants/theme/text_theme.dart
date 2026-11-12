@@ -1,147 +1,19 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_markdown/flutter_markdown.dart';
 
-import '../constants.dart';
+import 'medito_text.dart';
 
+/// Material's text slots filled from the app's type scale ([MeditoText]), so
+/// stock widgets match. App code reads styles from `context.text` instead.
 TextTheme meditoTextTheme(BuildContext context, [ThemeMode? themeMode]) {
   final brightness = MediaQuery.of(context).platformBrightness;
   final isDark =
       themeMode == ThemeMode.dark ||
       (themeMode == ThemeMode.system && brightness == Brightness.dark);
 
-  return Theme.of(context).textTheme.copyWith(
-    displayLarge: TextStyle(
-      // greetings text
-      // btm bar text selected
-      fontSize: 18,
-      letterSpacing: 0.5,
-      fontWeight: FontWeight.w800,
-      height: 1.5,
-      color: isDark ? ColorConstants.white : ColorConstants.lightOnSurface,
-      fontFamily: googleSans,
-    ),
-    displayMedium: TextStyle(
-      // btm bar text unselected
-      fontSize: 18,
-      letterSpacing: 0.5,
-      fontWeight: FontWeight.w700,
-      height: 1.5,
-      color: isDark ? ColorConstants.graphite : ColorConstants.lightGraphite,
-      fontFamily: googleSans,
-    ),
-    displaySmall: TextStyle(
-      // header of rows on homepage
-      fontSize: 18,
-      letterSpacing: 0.5,
-      fontWeight: FontWeight.w800,
-      height: 1.3,
-      color: isDark ? ColorConstants.white : ColorConstants.lightOnSurface,
-      fontFamily: googleSans,
-    ),
-    headlineMedium: TextStyle(
-      // packs title on home and packs screen
-      // streak tile data (not title)
-      // downloads tile session name
-      // overflow menu
-      fontSize: 16,
-      letterSpacing: 0.5,
-      fontWeight: FontWeight.w600,
-      height: 1.3,
-      color: isDark ? ColorConstants.white : ColorConstants.lightOnSurface,
-      fontFamily: googleSans,
-    ),
-    headlineSmall: TextStyle(
-      // stats widget
-      fontSize: 20,
-      letterSpacing: 0.5,
-      fontWeight: FontWeight.w700,
-      height: 1.2,
-      color: isDark ? ColorConstants.white : ColorConstants.lightOnSurface,
-      fontFamily: googleSans,
-    ),
-    titleMedium: TextStyle(
-      // packs subtitle on home
-      // downloads subtitle
-      fontSize: 14,
-      letterSpacing: 0.4,
-      fontWeight: FontWeight.w500,
-      height: 1.5,
-      color: isDark ? ColorConstants.graphite : ColorConstants.lightGraphite,
-      fontFamily: googleSans,
-    ),
-    titleSmall: TextStyle(
-      // shortcut title
-      fontSize: 14,
-      letterSpacing: 0.2,
-      fontWeight: FontWeight.w500,
-      height: 1.5,
-      color: isDark ? ColorConstants.white : ColorConstants.lightOnSurface,
-      fontFamily: googleSans,
-    ),
-    bodySmall: TextStyle(
-      // caption / overline / tag (12)
-      fontSize: 12,
-      letterSpacing: 0.8,
-      fontWeight: FontWeight.w600,
-      height: 1.5,
-      color: isDark ? ColorConstants.graphite : ColorConstants.lightGraphite,
-      fontFamily: googleSans,
-    ),
-    bodyMedium: TextStyle(
-      // error widget
-      fontSize: 16,
-      letterSpacing: 0.5,
-      fontWeight: FontWeight.normal,
-      height: 1.3,
-      color: isDark ? ColorConstants.graphite : ColorConstants.lightGraphite,
-      fontFamily: googleSans,
-    ),
-    bodyLarge: TextStyle(
-      // daily text and quote
-      fontSize: 14,
-      letterSpacing: 0.5,
-      fontWeight: FontWeight.w400,
-      height: 1.5,
-      color: isDark ? ColorConstants.white : ColorConstants.lightOnSurface,
-      fontFamily: googleSans,
-    ),
-    titleLarge: TextStyle(
-      // onboarding option button label
-      fontSize: 16,
-      letterSpacing: 0.2,
-      fontWeight: FontWeight.w500,
-      height: 1.3,
-      color: isDark ? ColorConstants.white : ColorConstants.lightOnSurface,
-      fontFamily: googleSans,
-    ),
-    labelLarge: TextStyle(
-      // section header (20)
-      fontSize: 20,
-      letterSpacing: 0.8,
-      fontWeight: FontWeight.w600,
-      height: 1.5,
-      color: isDark ? ColorConstants.white : ColorConstants.lightOnSurface,
-      fontFamily: googleSans,
-    ),
-    labelMedium: TextStyle(
-      // error widget
-      fontSize: 16,
-      letterSpacing: 0.5,
-      fontWeight: FontWeight.w500,
-      height: 1.3,
-      color: isDark ? ColorConstants.white : ColorConstants.lightOnSurface,
-      fontFamily: googleSans,
-    ),
-    labelSmall: TextStyle(
-      // daily text and quote
-      fontSize: 14,
-      letterSpacing: 0.5,
-      fontWeight: FontWeight.w400,
-      height: 1.5,
-      color: isDark ? ColorConstants.white : ColorConstants.lightOnSurface,
-      fontFamily: googleSans,
-    ),
-  );
+  return MeditoText.forBrightness(
+    isDark ? Brightness.dark : Brightness.light,
+  ).toTextTheme();
 }
 
 MarkdownStyleSheet buildMarkdownStyleSheet(BuildContext context) {

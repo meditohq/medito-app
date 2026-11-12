@@ -12,12 +12,12 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/widget_previews.dart';
 import 'package:medito/constants/colors/color_constants.dart';
-import 'package:medito/constants/styles/widget_styles.dart';
 import 'package:medito/models/stripe/payment_method_model.dart';
 import 'package:medito/views/end_screen/widgets/donation_thank_you_card.dart';
 import 'package:medito/views/end_screen/widgets/inline_donation_pay.dart';
 import 'package:medito/views/home/widgets/home_gradient_border.dart';
 import 'package:medito/views/previews/preview_support.dart';
+import 'package:medito/constants/theme/medito_text.dart';
 
 Future<void> _noopPay({
   required int amount,
@@ -57,26 +57,17 @@ class _CardFrame extends StatelessWidget {
                   children: [
                     Text(
                       'Support Medito',
-                      style: Theme.of(context).textTheme.headlineSmall
-                          ?.copyWith(
-                            fontFamily: googleSans,
-                            fontSize: 22,
-                            fontWeight: FontWeight.w400,
-                            height: 1.2,
-                            color: context.onBrandAccent,
-                          ),
+                      style: context.text.headline.copyWith(
+                        color: context.onBrandAccent,
+                      ),
                     ),
                     const SizedBox(height: 10),
                     Text(
                       'Medito is free because people like you choose to support '
                       'it. No ads, no paywalls.',
-                      style: Theme.of(context).textTheme.headlineMedium
-                          ?.copyWith(
-                            fontSize: 16,
-                            fontWeight: FontWeight.w400,
-                            height: 1.4,
-                            color: context.onBrandAccent.withValues(alpha: 0.9),
-                          ),
+                      style: context.text.body.copyWith(
+                        color: context.onBrandAccent.withValues(alpha: 0.9),
+                      ),
                     ),
                     const SizedBox(height: 20),
                     Padding(

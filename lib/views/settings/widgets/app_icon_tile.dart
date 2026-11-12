@@ -154,10 +154,7 @@ class AppIconSheet extends StatelessWidget {
               header: true,
               child: Text(
                 l10n.appIconTitle,
-                style: theme.textTheme.titleMedium?.copyWith(
-                  color: onSurface,
-                  fontWeight: FontWeight.w600,
-                ),
+                style: context.text.label.copyWith(color: onSurface),
               ),
             ),
             const SizedBox(height: 16),
@@ -254,9 +251,7 @@ class _AppIconChoice extends StatelessWidget {
                   textAlign: TextAlign.center,
                   maxLines: 2,
                   overflow: TextOverflow.ellipsis,
-                  style: theme.textTheme.bodySmall?.copyWith(
-                    fontSize: 12,
-                    fontWeight: selected ? FontWeight.w600 : FontWeight.w500,
+                  style: context.text.caption.copyWith(
                     color: onSurface.withValues(alpha: selected ? 1 : 0.7),
                   ),
                 ),

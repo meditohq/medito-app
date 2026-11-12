@@ -17,21 +17,12 @@ class ImpactCard extends StatelessWidget {
         children: [
           Text(
             AppLocalizations.of(context)!.impactCardHelpMessage,
-            style: const TextStyle(
-              color: Colors.white,
-              fontSize: 16,
-              fontWeight: FontWeight.bold,
-              height: 1.5,
-            ),
+            style: context.text.on(Colors.white).subtitle,
           ),
           const SizedBox(height: 8),
           Text(
             AppLocalizations.of(context)!.impactCardTestimonial,
-            style: const TextStyle(
-              color: Colors.white70,
-              fontSize: 14,
-              height: 1.5,
-            ),
+            style: context.text.on(Colors.white70).bodySmall,
           ),
         ],
       ),

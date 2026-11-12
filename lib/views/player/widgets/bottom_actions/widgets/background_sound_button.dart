@@ -190,12 +190,9 @@ class _BackgroundSoundButtonState extends ConsumerState<BackgroundSoundButton> {
                         Flexible(
                           child: Text(
                             l10n.changeBackgroundSoundsHint,
-                            style: Theme.of(context).textTheme.bodyMedium
-                                ?.copyWith(
-                                  color: const Color(0xFFF0F0F0),
-                                  fontSize: 13,
-                                  height: 1.35,
-                                ),
+                            style: context.text.bodySmall.copyWith(
+                              color: const Color(0xFFF0F0F0),
+                            ),
                           ),
                         ),
                         IconButton(

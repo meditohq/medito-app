@@ -61,9 +61,7 @@ class OnboardingProgressIndicator extends StatelessWidget {
           const SizedBox(height: 10),
           Text(
             l10n.onboardingStepIndicator(step, totalSteps),
-            style: theme.textTheme.bodySmall?.copyWith(
-              fontSize: 13,
-              fontWeight: FontWeight.w500,
+            style: context.text.label.copyWith(
               color: theme.colorScheme.onSurface.withValues(alpha: 0.7),
             ),
           ),

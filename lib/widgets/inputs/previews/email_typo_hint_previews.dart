@@ -12,6 +12,7 @@ import 'package:flutter/widget_previews.dart';
 import 'package:medito/views/previews/preview_support.dart';
 import 'package:medito/widgets/inputs/email_typo_hint.dart';
 import 'package:medito/widgets/inputs/medito_text_field.dart';
+import 'package:medito/constants/theme/medito_text.dart';
 
 const emailHintPreviewSize = Size(390, 720);
 
@@ -34,12 +35,9 @@ Widget _emailField(String caption, String text) {
       children: [
         Text(
           caption,
-          style: const TextStyle(
-            fontSize: 12,
-            fontWeight: FontWeight.w600,
-            letterSpacing: 0.4,
-            color: Color(0xFF9E9E9E),
-          ),
+          style: MeditoText.forBrightness(
+            Brightness.dark,
+          ).on(const Color(0xFF9E9E9E)).caption,
         ),
         const SizedBox(height: 6),
         MeditoTextField(

@@ -20,6 +20,7 @@ import 'package:medito/views/shop/widgets/shop_product_card.dart';
 import 'package:medito/widgets/adaptive/adaptive_page_body.dart';
 import 'package:medito/widgets/medito_icon.dart';
 import 'package:medito/widgets/shimmers/widgets/box_shimmer_widget.dart';
+import 'package:medito/constants/theme/medito_text.dart';
 
 /// A single product: photos for the chosen colour, colour/size pickers,
 /// details, and a sticky "Add to bag".
@@ -413,11 +414,7 @@ class _Details extends StatelessWidget {
             namesRoute: true,
             child: Text(
               name,
-              style: theme.textTheme.headlineSmall?.copyWith(
-                color: onSurface,
-                fontSize: 24,
-                height: 1.25,
-              ),
+              style: context.text.headline.copyWith(color: onSurface),
             ),
           ),
           const SizedBox(height: 8),
@@ -452,9 +449,7 @@ class _Details extends StatelessWidget {
                       onPressed: () => _showSizeGuide(context, product, size),
                       style: TextButton.styleFrom(
                         visualDensity: VisualDensity.compact,
-                        textStyle: theme.textTheme.titleSmall?.copyWith(
-                          fontWeight: FontWeight.w600,
-                        ),
+                        textStyle: context.text.label,
                       ),
                       icon: const Icon(Icons.straighten_rounded, size: 18),
                       label: Text(l10n.shopSizeGuide),
@@ -531,11 +526,7 @@ class _Price extends StatelessWidget {
     final l10n = AppLocalizations.of(context)!;
     final theme = Theme.of(context);
     final onSurface = theme.colorScheme.onSurface;
-    final style = theme.textTheme.titleLarge?.copyWith(
-      color: onSurface,
-      fontSize: 20,
-      fontWeight: FontWeight.w600,
-    );
+    final style = context.text.title.copyWith(color: onSurface);
 
     // Before a size is picked, show the colour's cheapest size as "From".
     final needsSize = product.sizes.length > 1 && !sizeChosen;
@@ -575,9 +566,7 @@ class _Price extends StatelessWidget {
             const SizedBox(width: 8),
             Text(
               compareAt.format(),
-              style: style?.copyWith(
-                fontSize: 16,
-                fontWeight: FontWeight.w400,
+              style: context.text.body.copyWith(
                 color: onSurface.withValues(alpha: 0.5),
                 decoration: TextDecoration.lineThrough,
               ),
@@ -617,7 +606,7 @@ class _SectionLabel extends StatelessWidget {
             ),
         ],
       ),
-      style: theme.textTheme.titleSmall?.copyWith(color: onSurface),
+      style: context.text.label.copyWith(color: onSurface),
     );
   }
 }
@@ -753,9 +742,7 @@ class _HtmlBlocks extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final style = Theme.of(
-      context,
-    ).textTheme.bodyLarge?.copyWith(color: color, fontSize: 15, height: 1.55);
+    final style = context.text.body.copyWith(color: color);
     final blocks = parseShopHtml(html);
 
     return Column(
@@ -806,10 +793,7 @@ class _InfoSection extends StatelessWidget {
             expandedCrossAxisAlignment: CrossAxisAlignment.start,
             title: Text(
               section.title.isEmpty ? l10n.shopMoreDetails : section.title,
-              style: theme.textTheme.titleSmall?.copyWith(
-                color: onSurface,
-                fontWeight: FontWeight.w600,
-              ),
+              style: context.text.label.copyWith(color: onSurface),
             ),
             children: [
               _HtmlBlocks(
@@ -851,7 +835,7 @@ class _SupportNote extends StatelessWidget {
             Expanded(
               child: Text(
                 text,
-                style: theme.textTheme.titleMedium?.copyWith(
+                style: context.text.label.copyWith(
                   color: onSurface.withValues(alpha: 0.75),
                 ),
               ),
@@ -1062,11 +1046,8 @@ class _SizeGuideSheetState extends ConsumerState<_SizeGuideSheet> {
       );
     } else {
       final data = chart.value!;
-      final headerStyle = theme.textTheme.titleSmall?.copyWith(
-        color: muted,
-        fontWeight: FontWeight.w600,
-      );
-      final cellStyle = theme.textTheme.titleSmall?.copyWith(color: onSurface);
+      final headerStyle = context.text.label.copyWith(color: muted);
+      final cellStyle = context.text.label.copyWith(color: onSurface);
       body = Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
@@ -1125,7 +1106,7 @@ class _SizeGuideSheetState extends ConsumerState<_SizeGuideSheet> {
                       excludeSemantics: true,
                       child: _cell(
                         row.label,
-                        cellStyle?.copyWith(fontWeight: FontWeight.w600),
+                        cellStyle.copyWith(fontWeight: FontWeight.w600),
                       ),
                     ),
                     for (final m in data.measures)
@@ -1148,7 +1129,7 @@ class _SizeGuideSheetState extends ConsumerState<_SizeGuideSheet> {
           const SizedBox(height: 16),
           Text(
             l10n.shopSizeChartNote,
-            style: theme.textTheme.titleMedium?.copyWith(color: muted),
+            style: context.text.label.copyWith(color: muted),
           ),
         ],
       );
@@ -1164,15 +1145,13 @@ class _SizeGuideSheetState extends ConsumerState<_SizeGuideSheet> {
               header: true,
               child: Text(
                 l10n.shopSizeGuide,
-                style: theme.textTheme.headlineSmall?.copyWith(
-                  color: onSurface,
-                ),
+                style: context.text.title.copyWith(color: onSurface),
               ),
             ),
             const SizedBox(height: 4),
             Text(
               widget.product.name,
-              style: theme.textTheme.titleMedium?.copyWith(color: muted),
+              style: context.text.label.copyWith(color: muted),
             ),
             const SizedBox(height: 16),
             body,

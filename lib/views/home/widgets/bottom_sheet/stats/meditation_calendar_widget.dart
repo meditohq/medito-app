@@ -625,18 +625,7 @@ class _MeditationCalendarWidgetState
     return HeaderStyle(
       formatButtonVisible: false,
       titleCentered: true,
-      titleTextStyle:
-          theme.textTheme.titleMedium?.copyWith(
-            fontSize: 16,
-            fontWeight: FontWeight.w600,
-            fontFamily: googleSans,
-          ) ??
-          TextStyle(
-            fontSize: 16,
-            fontWeight: FontWeight.w600,
-            fontFamily: googleSans,
-            color: theme.colorScheme.onSurface,
-          ),
+      titleTextStyle: context.text.subtitle,
       leftChevronIcon: MeditoIcon(
         assetName: MeditoIcons.arrowLeft,
         semanticLabel: AppLocalizations.of(context)!.previousMonth,
@@ -661,7 +650,7 @@ class _MeditationCalendarWidgetState
         color: context.brandAccent,
         shape: BoxShape.circle,
       ),
-      todayTextStyle: _dayTextStyle(context, fontWeight: FontWeight.w600),
+      todayTextStyle: _dayTextStyle(context),
       todayDecoration: BoxDecoration(
         color: Theme.of(context).colorScheme.surface,
         shape: BoxShape.circle,
@@ -671,12 +660,9 @@ class _MeditationCalendarWidgetState
   }
 
   DaysOfWeekStyle _daysOfWeekStyle(BuildContext context) {
-    final style = (Theme.of(context).textTheme.bodySmall ?? const TextStyle())
-        .copyWith(
-          fontFamily: googleSans,
-          color: Theme.of(context).colorScheme.onSurface.withOpacityValue(0.6),
-          fontSize: 12,
-        );
+    final style = context.text.caption.copyWith(
+      color: Theme.of(context).colorScheme.onSurface.withOpacityValue(0.6),
+    );
 
     return DaysOfWeekStyle(weekdayStyle: style, weekendStyle: style);
   }
@@ -735,15 +721,16 @@ class _MeditationCalendarWidgetState
                     Localizations.localeOf(context).toString(),
                   ).format(date),
                   textAlign: TextAlign.center,
-                  style: _dayTextStyle(
-                    context,
-                    color: theme.colorScheme.onSurface.withOpacityValue(
-                      disabled ? 0.3 : 0.85,
-                    ),
-                    fontWeight: selected || today
-                        ? FontWeight.w700
-                        : FontWeight.w400,
-                  ).copyWith(fontSize: 12),
+                  style:
+                      _dayTextStyle(
+                        context,
+                        color: theme.colorScheme.onSurface.withOpacityValue(
+                          disabled ? 0.3 : 0.85,
+                        ),
+                        // Bold is the only thing marking today in the grid.
+                      ).copyWith(
+                        fontWeight: selected || today ? FontWeight.w700 : null,
+                      ),
                   maxLines: 1,
                 ),
               ),
@@ -791,16 +778,9 @@ class _MeditationCalendarWidgetState
   Color _freezeColor(BuildContext context) =>
       _isDark(context) ? ColorConstants.lightBlue : _kFreezeBlueLight;
 
-  TextStyle _dayTextStyle(
-    BuildContext context, {
-    Color? color,
-    FontWeight? fontWeight,
-  }) {
-    final theme = Theme.of(context);
-    return (theme.textTheme.bodyMedium ?? const TextStyle()).copyWith(
-      fontFamily: googleSans,
-      color: color ?? theme.colorScheme.onSurface,
-      fontWeight: fontWeight,
+  TextStyle _dayTextStyle(BuildContext context, {Color? color}) {
+    return context.text.caption.copyWith(
+      color: color ?? Theme.of(context).colorScheme.onSurface,
     );
   }
 
@@ -860,9 +840,7 @@ class _MeditationCalendarWidgetState
       header: true,
       child: Text(
         AppLocalizations.of(context)!.daysSelected(rangeDays.length),
-        style: Theme.of(context).textTheme.titleLarge?.copyWith(
-          fontFamily: googleSans,
-          fontWeight: FontWeight.w600,
+        style: context.text.subtitle.copyWith(
           color: Theme.of(context).colorScheme.onSurface,
         ),
       ),
@@ -879,8 +857,7 @@ class _MeditationCalendarWidgetState
       final locale = Localizations.localeOf(context).toString();
       return Text(
         '${DateFormat.MMMd(locale).format(_rangeStart!)} – ${DateFormat.yMMMd(locale).format(_rangeEnd!)}',
-        style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-          fontFamily: googleSans,
+        style: context.text.body.copyWith(
           color: Theme.of(context).colorScheme.onSurface,
         ),
       );
@@ -898,10 +875,8 @@ class _MeditationCalendarWidgetState
           Flexible(
             child: Text(
               l10n.streakFreezeUsed,
-              style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                fontFamily: googleSans,
+              style: context.text.subtitle.copyWith(
                 color: _freezeColor(context),
-                fontWeight: FontWeight.w500,
               ),
             ),
           ),
@@ -911,8 +886,7 @@ class _MeditationCalendarWidgetState
 
     return Text(
       l10n.sessionCount(sessions.length),
-      style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-        fontFamily: googleSans,
+      style: context.text.body.copyWith(
         color: Theme.of(context).colorScheme.onSurface,
       ),
     );
@@ -1004,8 +978,7 @@ class _MeditationCalendarWidgetState
             ),
             label: Text(
               l10n.addSessionsToSelectedDays,
-              style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                fontFamily: googleSans,
+              style: context.text.body.copyWith(
                 color: Theme.of(context).colorScheme.onSurface,
               ),
             ),
@@ -1027,8 +1000,7 @@ class _MeditationCalendarWidgetState
             onPressed: _isAddingSession ? null : _clearRange,
             child: Text(
               l10n.cancel,
-              style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                fontFamily: googleSans,
+              style: context.text.body.copyWith(
                 color: Theme.of(
                   context,
                 ).colorScheme.onSurface.withOpacityValue(0.7),
@@ -1052,8 +1024,7 @@ class _MeditationCalendarWidgetState
         ),
         label: Text(
           AppLocalizations.of(context)!.addSession,
-          style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-            fontFamily: googleSans,
+          style: context.text.body.copyWith(
             color: Theme.of(context).colorScheme.onSurface,
           ),
         ),
@@ -1126,13 +1097,10 @@ class _SessionItemWidget extends ConsumerWidget {
             child: Text(
               // The device's 12/24-hour setting and locale.
               TimeOfDay.fromDateTime(date).format(context),
-              style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                fontFamily: googleSans,
-                fontWeight: FontWeight.w600,
+              style: context.text.caption.copyWith(
                 color: Theme.of(
                   context,
                 ).colorScheme.onSurface.withOpacityValue(0.7),
-                fontSize: 12,
               ),
             ),
           ),
@@ -1155,9 +1123,7 @@ class _SessionItemWidget extends ConsumerWidget {
                         AppLocalizations.of(context)!,
                       ),
                     ),
-                    style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                      fontFamily: googleSans,
-                      fontWeight: FontWeight.w600,
+                    style: context.text.subtitle.copyWith(
                       color: Theme.of(context).colorScheme.onSurface,
                     ),
                   )
@@ -1167,34 +1133,26 @@ class _SessionItemWidget extends ConsumerWidget {
                       session.id,
                       AppLocalizations.of(context)!,
                     ),
-                    style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                      fontFamily: googleSans,
-                      fontWeight: FontWeight.w600,
+                    style: context.text.subtitle.copyWith(
                       color: Theme.of(context).colorScheme.onSurface,
                     ),
                   )
                 : trackAsync!.when(
                     data: (track) => Text(
                       track.title,
-                      style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                        fontFamily: googleSans,
-                        fontWeight: FontWeight.w600,
+                      style: context.text.subtitle.copyWith(
                         color: Theme.of(context).colorScheme.onSurface,
                       ),
                     ),
                     loading: () => Text(
                       AppLocalizations.of(context)!.loading,
-                      style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                        fontFamily: googleSans,
-                        fontWeight: FontWeight.w600,
+                      style: context.text.subtitle.copyWith(
                         color: Theme.of(context).colorScheme.onSurface,
                       ),
                     ),
                     error: (_, _) => Text(
                       AppLocalizations.of(context)!.historySessionFallback,
-                      style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                        fontFamily: googleSans,
-                        fontWeight: FontWeight.w600,
+                      style: context.text.subtitle.copyWith(
                         color: Theme.of(context).colorScheme.onSurface,
                       ),
                     ),
@@ -1294,8 +1252,7 @@ class _RangePreviewRow extends StatelessWidget {
           Expanded(
             child: Text(
               label,
-              style: theme.textTheme.bodyMedium?.copyWith(
-                fontFamily: googleSans,
+              style: context.text.body.copyWith(
                 color: theme.colorScheme.onSurface.withOpacityValue(0.75),
               ),
             ),
@@ -1303,9 +1260,7 @@ class _RangePreviewRow extends StatelessWidget {
           const SizedBox(width: 12),
           Text(
             value,
-            style: theme.textTheme.bodyMedium?.copyWith(
-              fontFamily: googleSans,
-              fontWeight: FontWeight.w700,
+            style: context.text.subtitle.copyWith(
               color: emphasize
                   ? context.brandAccent
                   : theme.colorScheme.onSurface,

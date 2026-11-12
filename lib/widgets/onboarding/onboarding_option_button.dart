@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:medito/constants/theme/medito_text.dart';
 import 'package:medito/constants/styles/widget_styles.dart';
 
 /// A full-width selectable option tile used in onboarding question screens.
@@ -50,8 +51,7 @@ class OnboardingOptionButton extends StatelessWidget {
           ),
           child: Text(
             label,
-            style: theme.textTheme.titleLarge?.copyWith(
-              fontWeight: selected ? FontWeight.w600 : FontWeight.w500,
+            style: context.text.subtitle.copyWith(
               color: selected ? colorScheme.primary : colorScheme.onSurface,
             ),
           ),

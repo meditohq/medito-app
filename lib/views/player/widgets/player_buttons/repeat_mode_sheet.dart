@@ -7,6 +7,7 @@ import 'package:medito/providers/player/player_provider.dart';
 import 'package:medito/providers/player/repeat_state_provider.dart';
 import 'package:medito/services/analytics/firebase_analytics_service.dart';
 import 'package:medito/widgets/radio_option_card.dart';
+import 'package:medito/constants/theme/medito_text.dart';
 
 Future<void> showRepeatModeSheet(BuildContext context) {
   return showModalBottomSheet<void>(
@@ -64,10 +65,7 @@ class RepeatModeSheet extends ConsumerWidget {
               header: true,
               child: Text(
                 l10n.repeat,
-                style: theme.textTheme.titleMedium?.copyWith(
-                  color: onSurface,
-                  fontWeight: FontWeight.w600,
-                ),
+                style: context.text.label.copyWith(color: onSurface),
               ),
             ),
             const SizedBox(height: 16),

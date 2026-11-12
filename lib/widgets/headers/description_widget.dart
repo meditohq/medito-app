@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 
-import '../../constants/styles/widget_styles.dart';
 import '../markdown_widget.dart';
+import 'package:medito/constants/theme/medito_text.dart';
 
 class DescriptionWidget extends StatelessWidget {
   const DescriptionWidget({
@@ -22,12 +22,7 @@ class DescriptionWidget extends StatelessWidget {
     if (description == '') {
       return Container();
     }
-    final pStyle = Theme.of(context).textTheme.bodyLarge?.copyWith(
-      fontFamily: googleSans,
-      fontSize: 14,
-      fontWeight: FontWeight.w500,
-      height: 1.5,
-    );
+    final pStyle = context.text.body;
 
     return Container(
       color: Theme.of(context).cardColor,
@@ -40,13 +35,7 @@ class DescriptionWidget extends StatelessWidget {
           selectable: true,
           textAlign: WrapAlignment.start,
           p: pStyle,
-          a: Theme.of(context).textTheme.bodyLarge?.copyWith(
-            fontFamily: googleSans,
-            decoration: TextDecoration.underline,
-            fontSize: 14,
-            fontWeight: FontWeight.w500,
-            height: 1.5,
-          ),
+          a: context.text.body.copyWith(decoration: TextDecoration.underline),
         ),
       ),
     );

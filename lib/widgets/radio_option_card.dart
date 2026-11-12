@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:medito/constants/colors/color_constants.dart';
 import 'package:medito/constants/styles/widget_styles.dart';
+import 'package:medito/constants/theme/medito_text.dart';
 
 /// A tappable card with a radio indicator, title and description, for picking
 /// one option from a short list (settings sheets). The selected card gets a
@@ -72,9 +73,7 @@ class RadioOptionCard extends StatelessWidget {
                       children: [
                         Text(
                           title,
-                          style: theme.textTheme.bodyLarge?.copyWith(
-                            fontSize: 16,
-                            fontWeight: FontWeight.w600,
+                          style: context.text.subtitle.copyWith(
                             color: onSurface,
                           ),
                         ),
@@ -82,9 +81,8 @@ class RadioOptionCard extends StatelessWidget {
                           const SizedBox(height: 4),
                           Text(
                             description!,
-                            style: theme.textTheme.bodyMedium?.copyWith(
+                            style: context.text.body.copyWith(
                               color: onSurface.withValues(alpha: 0.7),
-                              height: 1.4,
                             ),
                           ),
                         ],

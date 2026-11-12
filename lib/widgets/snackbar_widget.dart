@@ -35,13 +35,7 @@ void showSnackBar(
         Expanded(
           child: Text(
             text,
-            style: context != null
-                ? Theme.of(context).textTheme.bodyMedium?.copyWith(
-                    color: foregroundColor,
-                    fontFamily: googleSans,
-                    fontSize: 14,
-                  )
-                : null,
+            style: context?.text.bodySmall.copyWith(color: foregroundColor),
           ),
         ),
         if (hasAction)
@@ -54,8 +48,7 @@ void showSnackBar(
               actionLabel,
               style: TextStyle(
                 color: foregroundColor,
-                fontWeight: FontWeight.bold,
-                fontSize: 16,
+                fontWeight: FontWeight.w600,
               ),
             ),
           ),

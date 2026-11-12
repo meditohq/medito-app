@@ -28,6 +28,7 @@ import 'package:medito/constants/strings/analytics_event_constants.dart';
 import 'package:medito/providers/providers.dart';
 import '../../home_styles.dart';
 import '../home_gradient_border.dart';
+import 'package:medito/constants/theme/medito_text.dart';
 
 const _kCardBorderRadius = kHomeHeroRadius;
 const _kPlayButtonSize = 52.0;
@@ -383,12 +384,7 @@ class _UpNextCompletedState extends ConsumerState<_UpNextCompleted> {
               Expanded(
                 child: Text(
                   l10n.completed.toUpperCase(),
-                  style: theme.textTheme.bodySmall?.copyWith(
-                    fontSize: 14,
-                    fontWeight: FontWeight.w600,
-                    letterSpacing: 1.2,
-                    color: palette.muted,
-                  ),
+                  style: context.text.label.copyWith(color: palette.muted),
                 ),
               ),
             ],
@@ -398,18 +394,13 @@ class _UpNextCompletedState extends ConsumerState<_UpNextCompleted> {
             header: true,
             child: Text(
               title,
-              style: theme.textTheme.headlineSmall?.copyWith(
-                fontSize: isHero ? 24 : 22,
-                fontWeight: FontWeight.w700,
-                height: 1.2,
-                color: onSurface,
-              ),
+              style: context.text.headline.copyWith(color: onSurface),
             ),
           ),
           const SizedBox(height: 6),
           Text(
             subtitle,
-            style: theme.textTheme.bodyMedium?.copyWith(color: palette.muted),
+            style: context.text.body.copyWith(color: palette.muted),
           ),
           if (hasNext) ...[
             const SizedBox(height: padding16),
@@ -491,10 +482,8 @@ class _CompletedCta extends StatelessWidget {
                         child: Text(
                           label,
                           textAlign: TextAlign.center,
-                          style: TextStyle(
+                          style: context.text.subtitle.copyWith(
                             color: palette.buttonForeground,
-                            fontSize: 16,
-                            fontWeight: FontWeight.w600,
                           ),
                         ),
                       ),
@@ -708,13 +697,9 @@ class _UpNextContentState extends ConsumerState<_UpNextContent>
                                         Flexible(
                                           child: Text(
                                             eyebrow.toUpperCase(),
-                                            style: theme.textTheme.bodySmall
-                                                ?.copyWith(
-                                                  fontSize: 14,
-                                                  fontWeight: FontWeight.w600,
-                                                  letterSpacing: 1.2,
-                                                  color: palette.muted,
-                                                ),
+                                            style: context.text.label.copyWith(
+                                              color: palette.muted,
+                                            ),
                                             maxLines: 1,
                                             overflow: TextOverflow.ellipsis,
                                           ),
@@ -722,24 +707,17 @@ class _UpNextContentState extends ConsumerState<_UpNextContent>
                                         const SizedBox(width: 4),
                                         Text(
                                           '·',
-                                          style: theme.textTheme.bodySmall
-                                              ?.copyWith(
-                                                fontSize: 14,
-                                                fontWeight: FontWeight.w600,
-                                                color: palette.muted,
-                                              ),
+                                          style: context.text.label.copyWith(
+                                            color: palette.muted,
+                                          ),
                                         ),
                                         const SizedBox(width: 4),
                                         Expanded(
                                           child: Text(
                                             widget.data.pack.title,
-                                            style: theme.textTheme.bodySmall
-                                                ?.copyWith(
-                                                  fontSize: 14,
-                                                  fontWeight: FontWeight.w600,
-                                                  letterSpacing: 1.2,
-                                                  color: palette.muted,
-                                                ),
+                                            style: context.text.label.copyWith(
+                                              color: palette.muted,
+                                            ),
                                             maxLines: 1,
                                             overflow: TextOverflow.ellipsis,
                                           ),
@@ -748,13 +726,9 @@ class _UpNextContentState extends ConsumerState<_UpNextContent>
                                     ),
                                   Text(
                                     nextSession.title,
-                                    style: theme.textTheme.headlineSmall
-                                        ?.copyWith(
-                                          fontSize: isHero ? 24 : 22,
-                                          fontWeight: FontWeight.w700,
-                                          height: 1.2,
-                                          color: palette.foreground,
-                                        ),
+                                    style: context.text.headline.copyWith(
+                                      color: palette.foreground,
+                                    ),
                                   ),
                                   _VariantLine(
                                     trackId: nextSession.id,
@@ -762,7 +736,8 @@ class _UpNextContentState extends ConsumerState<_UpNextContent>
                                   ),
                                   // Progress bar stays off the hero — the
                                   // image is doing the work.
-                                  if (!isHero && widget.data.totalCount > 0) ...[
+                                  if (!isHero &&
+                                      widget.data.totalCount > 0) ...[
                                     const SizedBox(height: 10),
                                     _ProgressRow(
                                       completed: widget.data.completedCount,
@@ -800,7 +775,6 @@ class _UpNextContentState extends ConsumerState<_UpNextContent>
     required String label,
     required VoidCallback onPressed,
   }) {
-    final theme = Theme.of(context);
     // Custom rather than SlidableAction: its default label style is too large
     // for half-width tiles and wrapped "Open pack" out of view.
     return CustomSlidableAction(
@@ -832,10 +806,7 @@ class _UpNextContentState extends ConsumerState<_UpNextContent>
               label,
               maxLines: 1,
               overflow: TextOverflow.ellipsis,
-              style: theme.textTheme.bodySmall?.copyWith(
-                color: palette.foreground,
-                fontWeight: FontWeight.w600,
-              ),
+              style: context.text.caption.copyWith(color: palette.foreground),
             ),
           ],
         ),
@@ -1080,11 +1051,7 @@ class _VariantLine extends ConsumerWidget {
     if (variant == null) return const SizedBox.shrink();
     final track = variant.track;
     final text = variant.text;
-    final style = Theme.of(context).textTheme.bodyMedium?.copyWith(
-      fontSize: 15,
-      fontWeight: FontWeight.w500,
-      color: palette.muted,
-    );
+    final style = context.text.subtitle.copyWith(color: palette.muted);
 
     // Opaque so the gap between text and pencil opens the sheet too, not the
     // player; the vertical padding makes the target thumb-sized.
@@ -1207,8 +1174,6 @@ class _ProgressRow extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final theme = Theme.of(context);
-
     return Row(
       children: [
         Expanded(
@@ -1225,12 +1190,7 @@ class _ProgressRow extends StatelessWidget {
         const SizedBox(width: 10),
         Text(
           AppLocalizations.of(context)!.upNextProgress(completed, total),
-          style: theme.textTheme.bodySmall?.copyWith(
-            fontSize: 12,
-            fontWeight: FontWeight.w600,
-            letterSpacing: 0.6,
-            color: palette.muted,
-          ),
+          style: context.text.caption.copyWith(color: palette.muted),
         ),
       ],
     );

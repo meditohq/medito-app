@@ -123,14 +123,14 @@ class FavoritesViewState extends ConsumerState<FavoritesView> {
         children: [
           Text(
             AppLocalizations.of(context)!.someThingWentWrong,
-            style: Theme.of(context).textTheme.bodyLarge,
+            style: context.text.bodySmall,
           ),
           const SizedBox(height: 16),
           ElevatedButton(
             onPressed: _onRefresh,
             child: Text(
               AppLocalizations.of(context)!.retry,
-              style: Theme.of(context).textTheme.titleMedium,
+              style: context.text.muted.bodySmall,
             ),
           ),
         ],
@@ -166,16 +166,14 @@ class FavoritesViewState extends ConsumerState<FavoritesView> {
           children: [
             Text(
               _currentFilter.emptyStateMessage(context),
-              style: Theme.of(context).textTheme.bodyLarge,
+              style: context.text.bodySmall,
               textAlign: TextAlign.center,
             ),
             const SizedBox(height: 8),
             Text(
               AppLocalizations.of(context)!.addItemsToFavoritesMessage,
-              style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                color: Theme.of(
-                  context,
-                ).textTheme.bodyMedium?.color?.withOpacityValue(0.7),
+              style: context.text.body.copyWith(
+                color: context.text.muted.color?.withOpacityValue(0.7),
               ),
               textAlign: TextAlign.center,
             ),
@@ -246,7 +244,7 @@ class FavoritesViewState extends ConsumerState<FavoritesView> {
     return ChoiceChip(
       label: Text(
         filter.label(context),
-        style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+        style: context.text.body.copyWith(
           color: isSelected
               ? Theme.of(context).colorScheme.onPrimary
               : Theme.of(context).colorScheme.onSurface,

@@ -47,10 +47,7 @@ class PackItemWidget extends ConsumerWidget {
                     mainAxisSize: MainAxisSize.min,
                     children: [
                       if (item.title.isNotNullAndNotEmpty())
-                        Text(
-                          item.title,
-                          style: Theme.of(context).textTheme.headlineMedium,
-                        ),
+                        Text(item.title, style: context.text.subtitle),
                       if (hasSubtitle || isDownloaded)
                         Padding(
                           padding: const EdgeInsets.only(top: 4),
@@ -60,9 +57,7 @@ class PackItemWidget extends ConsumerWidget {
                                 Flexible(
                                   child: Text(
                                     item.subtitle!,
-                                    style: Theme.of(
-                                      context,
-                                    ).textTheme.titleMedium,
+                                    style: context.text.muted.bodySmall,
                                   ),
                                 ),
                               if (hasSubtitle && isDownloaded)
@@ -75,9 +70,7 @@ class PackItemWidget extends ConsumerWidget {
                                   child: Icon(
                                     Icons.download_done,
                                     size: 14,
-                                    color: Theme.of(
-                                      context,
-                                    ).textTheme.titleMedium?.color,
+                                    color: context.text.muted.color,
                                     semanticLabel: AppLocalizations.of(
                                       context,
                                     )!.trackDownloaded,

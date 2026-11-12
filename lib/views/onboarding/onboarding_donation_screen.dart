@@ -278,25 +278,21 @@ class _DonationScreenState extends ConsumerState<OnboardingDonationScreen> {
                               children: [
                                 OnboardingStepTitle(
                                   AppLocalizations.of(context)!.donationTitle,
-                                  style: TextStyle(
+                                  style: context.text.headline.copyWith(
                                     color: Theme.of(
                                       context,
                                     ).colorScheme.onSurface,
-                                    fontSize: 24,
-                                    fontWeight: FontWeight.w600,
                                   ),
                                   textAlign: TextAlign.center,
                                 ),
                                 const SizedBox(height: 24),
                                 Text(
                                   AppLocalizations.of(context)!.donationBody,
-                                  style: TextStyle(
+                                  style: context.text.body.copyWith(
                                     color: Theme.of(context)
                                         .colorScheme
                                         .onSurface
                                         .withValues(alpha: 0.7),
-                                    fontSize: 16,
-                                    height: 1.5,
                                   ),
                                   textAlign: TextAlign.center,
                                 ),

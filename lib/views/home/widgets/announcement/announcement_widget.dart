@@ -154,11 +154,7 @@ class _AnnouncementWidgetState extends ConsumerState<AnnouncementWidget>
                 top: padding20,
               ),
               child: Column(
-                children: [
-                  _text(context),
-                  height16,
-                  _actionBtn(context),
-                ],
+                children: [_text(context), height16, _actionBtn(context)],
               ),
             ),
           ),
@@ -175,7 +171,7 @@ class _AnnouncementWidgetState extends ConsumerState<AnnouncementWidget>
         onPressed: _handleDismiss,
         child: Text(
           AppLocalizations.of(context)!.dismiss,
-          style: theme.textTheme.headlineMedium?.copyWith(
+          style: context.text.subtitle.copyWith(
             color: theme.colorScheme.onSurface.withValues(alpha: 0.6),
           ),
         ),
@@ -201,7 +197,7 @@ class _AnnouncementWidgetState extends ConsumerState<AnnouncementWidget>
   }
 
   Widget _text(BuildContext context) {
-    var markDownTheme = Theme.of(context).textTheme.bodyMedium?.copyWith(
+    var markDownTheme = context.text.body.copyWith(
       color: Theme.of(context).colorScheme.onSurface,
     );
 
@@ -211,11 +207,8 @@ class _AnnouncementWidgetState extends ConsumerState<AnnouncementWidget>
       // long-clickable read-only field instead of plain text.
       selectable: false,
       textAlign: WrapAlignment.start,
-      a: markDownTheme?.copyWith(
-        decoration: TextDecoration.underline,
-        fontWeight: FontWeight.w700,
-      ),
-      p: markDownTheme?.copyWith(fontWeight: FontWeight.w500),
+      a: markDownTheme.copyWith(decoration: TextDecoration.underline),
+      p: markDownTheme,
     );
   }
 

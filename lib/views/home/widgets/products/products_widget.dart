@@ -20,6 +20,7 @@ import 'package:medito/widgets/shimmers/widgets/box_shimmer_widget.dart';
 
 import '../../home_styles.dart';
 import '../home_gradient_border.dart';
+import 'package:medito/constants/theme/medito_text.dart';
 
 const _tileWidth = 148.0;
 const _tileGap = 12.0;
@@ -84,12 +85,7 @@ class ProductsWidget extends ConsumerWidget {
                           : l10n.meditationProducts,
                       overflow: TextOverflow.ellipsis,
                       maxLines: 1,
-                      style: theme.textTheme.labelLarge?.copyWith(
-                        fontSize: 20,
-                        fontWeight: FontWeight.w400,
-                        height: 28 / 24,
-                        color: onSurface,
-                      ),
+                      style: context.text.title.copyWith(color: onSurface),
                     ),
                   ),
                 ),
@@ -113,9 +109,7 @@ class ProductsWidget extends ConsumerWidget {
                   onPressed: openAll,
                   style: TextButton.styleFrom(
                     padding: const EdgeInsets.only(left: 12, right: 8),
-                    textStyle: theme.textTheme.titleSmall?.copyWith(
-                      fontWeight: FontWeight.w600,
-                    ),
+                    textStyle: context.text.label,
                   ),
                   child: Row(
                     mainAxisSize: MainAxisSize.min,
@@ -134,8 +128,7 @@ class ProductsWidget extends ConsumerWidget {
             padding: const EdgeInsets.fromLTRB(16, 8, 16, 0),
             child: Text(
               l10n.blackFridaySubtitle,
-              style: theme.textTheme.bodySmall?.copyWith(
-                fontSize: 14,
+              style: context.text.label.copyWith(
                 color: onSurface.withValues(alpha: 0.7),
               ),
             ),
@@ -290,10 +283,7 @@ class _ProductTile extends ConsumerWidget {
                   product.name,
                   maxLines: 1,
                   overflow: TextOverflow.ellipsis,
-                  style: theme.textTheme.titleSmall?.copyWith(
-                    color: onSurface,
-                    height: 1.3,
-                  ),
+                  style: context.text.label.copyWith(color: onSurface),
                 ),
               ),
               Padding(
@@ -301,10 +291,8 @@ class _ProductTile extends ConsumerWidget {
                 child: Text(
                   priceLabel,
                   maxLines: 1,
-                  style: theme.textTheme.titleSmall?.copyWith(
+                  style: context.text.label.copyWith(
                     color: onSurface.withValues(alpha: 0.6),
-                    fontWeight: FontWeight.w600,
-                    height: 1.3,
                   ),
                 ),
               ),
@@ -431,10 +419,7 @@ class _SeeAllTile extends StatelessWidget {
                         const SizedBox(height: 12),
                         Text(
                           l10n.shopSeeAll,
-                          style: theme.textTheme.titleSmall?.copyWith(
-                            color: onSurface,
-                            fontWeight: FontWeight.w600,
-                          ),
+                          style: context.text.label.copyWith(color: onSurface),
                         ),
                       ],
                     ),
@@ -532,10 +517,7 @@ class _BagPill extends ConsumerWidget {
                     const SizedBox(width: 6),
                     Text(
                       '$count',
-                      style: theme.textTheme.titleSmall?.copyWith(
-                        color: onSurface,
-                        fontWeight: FontWeight.w600,
-                      ),
+                      style: context.text.label.copyWith(color: onSurface),
                     ),
                   ],
                 ),

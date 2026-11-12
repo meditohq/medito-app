@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:medito/widgets/medito_icon.dart';
 import 'medito_nav_bar.dart';
+import 'package:medito/constants/theme/medito_text.dart';
 
 /// The same destinations as the phone bar, sized to the available window.
 class MeditoSidebar extends StatelessWidget {
@@ -69,7 +70,7 @@ class MeditoSidebar extends StatelessWidget {
                                       Text(
                                         items[i].label,
                                         textAlign: TextAlign.center,
-                                        style: theme.textTheme.labelSmall,
+                                        style: context.text.bodySmall,
                                       ),
                                     ],
                                   ),

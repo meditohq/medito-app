@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:medito/l10n/app_localizations.dart';
 import 'package:medito/widgets/dialogs/dialogs.dart';
+import 'package:medito/constants/theme/medito_text.dart';
 
 class EditSessionDialog extends StatefulWidget {
   const EditSessionDialog({super.key, required this.initialDate});
@@ -159,8 +160,7 @@ class _EditableSessionField extends StatelessWidget {
                     children: [
                       Text(
                         label,
-                        style: theme.textTheme.bodySmall?.copyWith(
-                          fontSize: 12,
+                        style: context.text.caption.copyWith(
                           color: theme.colorScheme.onSurface.withValues(
                             alpha: 0.75,
                           ),
@@ -169,9 +169,7 @@ class _EditableSessionField extends StatelessWidget {
                       const SizedBox(height: 4),
                       Text(
                         value,
-                        style: theme.textTheme.bodyMedium?.copyWith(
-                          fontSize: 16,
-                          fontWeight: FontWeight.w600,
+                        style: context.text.subtitle.copyWith(
                           color: theme.colorScheme.onSurface,
                         ),
                       ),

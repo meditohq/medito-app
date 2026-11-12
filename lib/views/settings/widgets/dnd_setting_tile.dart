@@ -9,6 +9,7 @@ import 'package:medito/views/home/widgets/bottom_sheet/row_item_widget.dart';
 import 'package:medito/views/settings/widgets/announce_setting.dart';
 import 'package:medito/widgets/dialogs/dialogs.dart';
 import 'package:medito/widgets/radio_option_card.dart';
+import 'package:medito/constants/theme/medito_text.dart';
 
 /// Settings row for "Silence phone during meditation": shows On / Off and
 /// opens [DndSheet] on tap. Same shape as the Zen Mode row.
@@ -179,10 +180,7 @@ class _DndSheetState extends ConsumerState<DndSheet> {
               header: true,
               child: Text(
                 widget.title,
-                style: theme.textTheme.titleMedium?.copyWith(
-                  color: onSurface,
-                  fontWeight: FontWeight.w600,
-                ),
+                style: context.text.label.copyWith(color: onSurface),
               ),
             ),
             const SizedBox(height: 16),
@@ -202,8 +200,7 @@ class _DndSheetState extends ConsumerState<DndSheet> {
             const SizedBox(height: 12),
             Text(
               l10n.dndFootnote,
-              style: theme.textTheme.bodySmall?.copyWith(
-                fontWeight: FontWeight.w400,
+              style: context.text.caption.copyWith(
                 color: onSurface.withValues(alpha: 0.6),
               ),
             ),

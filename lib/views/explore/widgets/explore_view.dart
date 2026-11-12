@@ -103,7 +103,7 @@ class ExploreViewState extends ConsumerState<ExploreView> {
               child: Center(
                 child: Text(
                   AppLocalizations.of(context)!.explorePacksEmpty,
-                  style: Theme.of(context).textTheme.bodyLarge,
+                  style: context.text.bodySmall,
                 ),
               ),
             ),

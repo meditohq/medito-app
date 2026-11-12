@@ -75,8 +75,7 @@ class DeleteAccountConfirmationDialog extends StatelessWidget {
                         ),
                         child: Text(
                           l10n.deleteAccountManageDonations,
-                          style: theme.textTheme.bodyMedium?.copyWith(
-                            fontWeight: FontWeight.w600,
+                          style: context.text.subtitle.copyWith(
                             color: theme.colorScheme.onSurface,
                             decoration: TextDecoration.underline,
                           ),
@@ -215,16 +214,13 @@ class _DeleteAccountScreenState extends ConsumerState<DeleteAccountScreen> {
                         header: true,
                         child: Text(
                           l10n.deleteAccountReasonTitle,
-                          style: theme.textTheme.titleMedium?.copyWith(
-                            color: onSurface,
-                            fontWeight: FontWeight.w600,
-                          ),
+                          style: context.text.label.copyWith(color: onSurface),
                         ),
                       ),
                       const SizedBox(height: 4),
                       Text(
                         l10n.deleteAccountReasonSubtitle,
-                        style: theme.textTheme.bodyMedium?.copyWith(
+                        style: context.text.body.copyWith(
                           color: onSurface.withOpacityValue(0.7),
                         ),
                       ),
@@ -261,10 +257,8 @@ class _DeleteAccountScreenState extends ConsumerState<DeleteAccountScreen> {
                                             Expanded(
                                               child: Text(
                                                 _reasonLabel(l10n, reason),
-                                                style: theme.textTheme.bodyLarge
-                                                    ?.copyWith(
-                                                      color: onSurface,
-                                                    ),
+                                                style: context.text.bodySmall
+                                                    .copyWith(color: onSurface),
                                               ),
                                             ),
                                           ],
@@ -368,9 +362,8 @@ class AccountDeletedScreen extends ConsumerWidget {
                           child: Text(
                             l10n.accountDeletedTitle,
                             textAlign: TextAlign.center,
-                            style: theme.textTheme.titleLarge?.copyWith(
+                            style: context.text.subtitle.copyWith(
                               color: onSurface,
-                              fontWeight: FontWeight.w600,
                             ),
                           ),
                         ),
@@ -378,9 +371,8 @@ class AccountDeletedScreen extends ConsumerWidget {
                         Text(
                           l10n.accountDeletedBody,
                           textAlign: TextAlign.center,
-                          style: theme.textTheme.bodyMedium?.copyWith(
+                          style: context.text.body.copyWith(
                             color: onSurface.withOpacityValue(0.75),
-                            height: 1.5,
                           ),
                         ),
                         const Spacer(),

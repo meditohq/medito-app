@@ -159,7 +159,7 @@ class _MeditoTextFieldState extends State<MeditoTextField> {
     );
     final focusedBorder = borderWith(theme.colorScheme.primary, 1);
     final errorBorder = borderWith(theme.colorScheme.error, 1);
-    final hintLabelStyle = TextStyle(fontFamily: googleSans, color: muted);
+    final hintLabelStyle = context.text.body.copyWith(color: muted);
 
     // Helper / error / counter live below the ringed box (see class doc), so
     // keep them out of the InputDecoration and drive the border colour
@@ -182,7 +182,7 @@ class _MeditoTextFieldState extends State<MeditoTextField> {
       maxLines: widget.obscureText ? 1 : widget.maxLines,
       textAlign: widget.textAlign,
       cursorColor: onSurface,
-      style: TextStyle(fontFamily: googleSans, color: onSurface),
+      style: context.text.body.copyWith(color: onSurface),
       decoration: InputDecoration(
         // No floating label — the label is rendered statically above the box
         // (see below). Only the hint lives in the decoration.
@@ -261,9 +261,7 @@ class _MeditoTextFieldState extends State<MeditoTextField> {
     final supportingColor =
         widget.supportingTextColor ??
         (hasError ? theme.colorScheme.error : muted);
-    final supportingStyle = TextStyle(
-      fontFamily: googleSans,
-      fontSize: 12,
+    final supportingStyle = context.text.caption.copyWith(
       color: supportingColor,
     );
 
@@ -283,10 +281,7 @@ class _MeditoTextFieldState extends State<MeditoTextField> {
             child: ExcludeSemantics(
               child: Text(
                 label,
-                style: TextStyle(
-                  fontFamily: googleSans,
-                  fontSize: 14,
-                  fontWeight: FontWeight.w500,
+                style: context.text.label.copyWith(
                   color: onSurface.withOpacityValue(0.7),
                 ),
               ),

@@ -9,18 +9,12 @@ class ArtistTitleWidget extends ConsumerWidget {
     required this.trackTitle,
     this.artistName,
     this.artistUrlPath,
-    this.trackTitleFontSize = 24,
-    this.artistNameFontSize = 14,
-    this.artistUrlPathFontSize = 13,
     this.isPlayerScreen = false,
     this.titleHeight = 35,
   });
 
   final String? trackTitle;
   final String? artistName, artistUrlPath;
-  final double trackTitleFontSize;
-  final double artistNameFontSize;
-  final double artistUrlPathFontSize;
   final bool isPlayerScreen;
   final double titleHeight;
 
@@ -38,12 +32,7 @@ class ArtistTitleWidget extends ConsumerWidget {
           child: Text(
             trackTitle ?? '',
             textAlign: TextAlign.center,
-            style: Theme.of(context).primaryTextTheme.headlineMedium?.copyWith(
-              fontFamily: googleSans,
-              color: ColorConstants.white,
-              fontSize: trackTitleFontSize,
-              letterSpacing: 0.2,
-            ),
+            style: context.text.on(ColorConstants.white).headline,
           ),
         ),
       ),
@@ -51,12 +40,7 @@ class ArtistTitleWidget extends ConsumerWidget {
   }
 
   Widget _subtitle(BuildContext context) {
-    var style = Theme.of(context).textTheme.titleMedium?.copyWith(
-      fontFamily: googleSans,
-      fontSize: artistNameFontSize,
-      letterSpacing: 0,
-      color: ColorConstants.white,
-    );
+    final style = context.text.on(ColorConstants.white).label;
 
     final name = artistName ?? '';
     final url = artistUrlPath ?? '';
