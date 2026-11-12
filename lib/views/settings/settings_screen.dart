@@ -6,7 +6,6 @@ import 'dart:io';
 import 'package:flutter/foundation.dart' show kIsWeb;
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:flutter_svg/flutter_svg.dart';
 import 'package:medito/constants/constants.dart';
 import 'package:medito/constants/icons/medito_icons.dart';
 import 'package:medito/constants/strings/analytics_event_constants.dart';
@@ -19,18 +18,15 @@ import 'package:medito/utils/utils.dart';
 import 'package:medito/views/debug/debug_info_screen.dart';
 import 'package:medito/views/home/widgets/bottom_sheet/row_item_widget.dart';
 import 'package:medito/views/settings/advanced_settings_screen.dart';
+import 'package:medito/views/settings/appearance_settings_screen.dart';
+import 'package:medito/views/settings/manage_defaults_screen.dart';
 import 'package:medito/views/settings/health_sync_tile.dart';
 import 'package:medito/views/settings/widgets/account_section_widget.dart';
 import 'package:medito/views/settings/widgets/dnd_setting_tile.dart';
 import 'package:medito/views/settings/widgets/reminder_tile.dart';
-import 'package:medito/views/settings/widgets/app_icon_tile.dart';
-import 'package:medito/views/settings/widgets/theme_tile.dart';
-import 'package:medito/views/settings/widgets/add_widget_sheet.dart';
-import 'package:medito/views/settings/widgets/widget_option_tile.dart';
 import 'package:medito/views/settings/widgets/zen_mode_tile.dart';
 import 'package:medito/l10n/app_localizations.dart';
 import 'package:medito/widgets/medito_icon.dart';
-import 'package:medito/src/audio_pigeon.g.dart';
 
 import '../home/widgets/header/home_header_widget.dart';
 import '../home/widgets/home_gradient_border.dart';
@@ -75,6 +71,12 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
   bool _rateAvailabilityLogged = false;
   static const _ratePath = 'rate_medito';
 
+  // Which card a row belongs to.
+  static const _sectionSupport = 'support';
+  static const _sectionCustomisation = 'customisation';
+  static const _sectionCommunity = 'community';
+  static const _sectionHelp = 'help';
+
   @override
   void initState() {
     super.initState();
@@ -102,155 +104,78 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
             ),
       );
     }
+    final l10n = AppLocalizations.of(context)!;
+    final onSurface = Theme.of(context).colorScheme.onSurface;
     final List<SettingsItem> settingsItems = [
-      if (canRate)
-        SettingsItem(
-          section: AppLocalizations.of(context)!.supportCommunitySection,
-          type: TypeConstants.url,
-          title: AppLocalizations.of(context)!.ratingAskCta,
-          icon: MeditoIcon(
-            assetName: MeditoIcons.star,
-            color: Theme.of(context).colorScheme.onSurface,
-          ),
-          path: _ratePath,
-        ),
+      // Support Medito: kept directly under the account card so Donate stays
+      // in the first screenful.
       SettingsItem(
-        section: AppLocalizations.of(context)!.helpLegalSection,
-        type: TypeConstants.url,
-        title: AppLocalizations.of(context)!.helpTitle,
-        icon: MeditoIcon(
-          assetName: MeditoIcons.help,
-          color: Theme.of(context).colorScheme.onSurface,
-        ),
-        path: 'https://medito.support.site/',
-      ),
-      SettingsItem(
-        section: AppLocalizations.of(context)!.supportCommunitySection,
+        section: _sectionSupport,
         type: TypeConstants.route,
-        title: AppLocalizations.of(context)!.donateTitle,
-        icon: MeditoIcon(
-          assetName: MeditoIcons.heart,
-          color: Theme.of(context).colorScheme.onSurface,
-        ),
+        title: l10n.donateTitle,
+        icon: MeditoIcon(assetName: MeditoIcons.heart, color: onSurface),
         path: RouteConstants.donation,
       ),
       SettingsItem(
-        section: AppLocalizations.of(context)!.supportCommunitySection,
+        section: _sectionSupport,
         type: TypeConstants.route,
-        title: AppLocalizations.of(context)!.shopTitle,
-        icon: MeditoIcon(
-          assetName: MeditoIcons.shop,
-          color: Theme.of(context).colorScheme.onSurface,
-        ),
+        title: l10n.shopTitle,
+        icon: MeditoIcon(assetName: MeditoIcons.shop, color: onSurface),
         path: RouteConstants.shop,
       ),
-      SettingsItem(
-        section: AppLocalizations.of(context)!.helpLegalSection,
-        type: TypeConstants.route,
-        title: AppLocalizations.of(context)!.editStatsTitle,
-        icon: MeditoIcon(
-          assetName: MeditoIcons.graphUp,
-          color: Theme.of(context).colorScheme.onSurface,
+      if (canRate)
+        SettingsItem(
+          section: _sectionSupport,
+          type: TypeConstants.url,
+          title: l10n.ratingAskCta,
+          icon: MeditoIcon(assetName: MeditoIcons.star, color: onSurface),
+          path: _ratePath,
         ),
-        path: '${RouteConstants.stats}:history',
+      // Customisation: how a session behaves. How the app looks lives on the
+      // Appearance screen, opened from the first row of this card.
+      SettingsItem(
+        section: _sectionCustomisation,
+        type: TypeConstants.toggle,
+        title: l10n.zenMode,
+        icon: Icon(Icons.spa_outlined, color: onSurface),
+        path: TypeConstants.toggleZenMode,
       ),
-      SettingsItem(
-        section: AppLocalizations.of(context)!.supportCommunitySection,
-        type: TypeConstants.url,
-        title: AppLocalizations.of(context)!.telegramTitle,
-        icon: MeditoIcon(
-          assetName: MeditoIcons.telegram,
-          color: Theme.of(context).colorScheme.onSurface,
+      if (_isDndSupported)
+        SettingsItem(
+          section: _sectionCustomisation,
+          type: TypeConstants.toggle,
+          title: l10n.enableDndDuringMeditation,
+          icon: MeditoIcon(assetName: MeditoIcons.moon, color: onSurface),
+          path: TypeConstants.toggleDnd,
         ),
+      SettingsItem(
+        section: _sectionCommunity,
+        type: TypeConstants.url,
+        title: l10n.telegramTitle,
+        icon: MeditoIcon(assetName: MeditoIcons.telegram, color: onSurface),
         path: 'https://t.me/meditoapp',
       ),
       SettingsItem(
-        section: AppLocalizations.of(context)!.supportCommunitySection,
+        section: _sectionCommunity,
         type: TypeConstants.url,
-        title: AppLocalizations.of(context)!.whatsappTitle,
-        icon: MeditoIcon(
-          assetName: MeditoIcons.whatsapp,
-          color: Theme.of(context).colorScheme.onSurface,
-        ),
+        title: l10n.whatsappTitle,
+        icon: MeditoIcon(assetName: MeditoIcons.whatsapp, color: onSurface),
         path: 'https://whatsapp.com/channel/0029Vaov2lZ5kg77zmTZfd2X',
       ),
       SettingsItem(
-        section: AppLocalizations.of(context)!.customizationSection,
-        type: TypeConstants.theme,
-        title: AppLocalizations.of(context)!.themeTitle,
-        icon: MeditoIcon(
-          assetName: MeditoIcons.settings,
-          color: Theme.of(context).colorScheme.onSurface,
-        ),
-        path: TypeConstants.theme,
+        section: _sectionHelp,
+        type: TypeConstants.url,
+        title: l10n.helpTitle,
+        icon: MeditoIcon(assetName: MeditoIcons.help, color: onSurface),
+        path: 'https://medito.support.site/',
       ),
       SettingsItem(
-        section: AppLocalizations.of(context)!.customizationSection,
-        type: TypeConstants.appIcon,
-        title: AppLocalizations.of(context)!.appIconTitle,
-        icon: Container(
-          width: 24,
-          height: 24,
-          decoration: BoxDecoration(
-            border: Border.all(
-              color: Theme.of(context).colorScheme.onSurface,
-              width: 1.5,
-            ),
-            borderRadius: BorderRadius.circular(6),
-          ),
-          padding: const EdgeInsets.all(3),
-          child: SvgPicture.asset(
-            AssetConstants.icLogo,
-            excludeFromSemantics: true,
-            colorFilter: ColorFilter.mode(
-              Theme.of(context).colorScheme.onSurface,
-              BlendMode.srcIn,
-            ),
-          ),
-        ),
-        path: TypeConstants.appIcon,
-      ),
-      SettingsItem(
-        section: AppLocalizations.of(context)!.customizationSection,
+        section: _sectionHelp,
         type: TypeConstants.route,
-        title: AppLocalizations.of(context)!.customiseHomeLayout,
-        icon: MeditoIcon(
-          assetName: MeditoIcons.pencil,
-          color: Theme.of(context).colorScheme.onSurface,
-        ),
-        path: TypeConstants.customiseHomeLayout,
+        title: l10n.editStatsTitle,
+        icon: MeditoIcon(assetName: MeditoIcons.graphUp, color: onSurface),
+        path: '${RouteConstants.stats}:history',
       ),
-      SettingsItem(
-        section: AppLocalizations.of(context)!.customizationSection,
-        type: TypeConstants.toggle,
-        title: AppLocalizations.of(context)!.enableDndDuringMeditation,
-        icon: MeditoIcon(
-          assetName: MeditoIcons.moon,
-          color: Theme.of(context).colorScheme.onSurface,
-        ),
-        path: TypeConstants.toggleDnd,
-      ),
-      SettingsItem(
-        section: AppLocalizations.of(context)!.customizationSection,
-        type: TypeConstants.toggle,
-        title: AppLocalizations.of(context)!.zenMode,
-        icon: MeditoIcon(
-          assetName: MeditoIcons.sun,
-          color: Theme.of(context).colorScheme.onSurface,
-        ),
-        path: TypeConstants.toggleZenMode,
-      ),
-      if (!kIsWeb && (Platform.isAndroid || Platform.isIOS))
-        SettingsItem(
-          section: AppLocalizations.of(context)!.customizationSection,
-          type: TypeConstants.route,
-          title: AppLocalizations.of(context)!.addHomeScreenWidget,
-          icon: MeditoIcon(
-            assetName: MeditoIcons.home,
-            color: Theme.of(context).colorScheme.onSurface,
-          ),
-          path: TypeConstants.addWidget,
-        ),
     ];
 
     return Scaffold(
@@ -285,38 +210,6 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
       await ref.read(reviewServiceProvider).openStore();
       return;
     }
-    if (item.path == TypeConstants.addWidget) {
-      if (Platform.isIOS) {
-        unawaited(
-          ref
-              .read(analyticsServiceProvider)
-              .logEvent(
-                name: AnalyticsEventConstants.homeWidgetInstructionsShown,
-              ),
-        );
-        await showAddWidgetSheet(context);
-        return;
-      }
-      try {
-        final widgetManager = MeditoWidgetManager();
-        final dialogShown = await widgetManager.pinWidget('consistency');
-        unawaited(
-          ref
-              .read(analyticsServiceProvider)
-              .logEvent(
-                name: AnalyticsEventConstants.homeWidgetPinRequested,
-                parameters: {
-                  AnalyticsEventConstants.paramWidgetType: 'consistency',
-                  'dialog_shown': dialogShown ? 'true' : 'false',
-                },
-              ),
-        );
-      } catch (e) {
-        // Silently fail - Android system dialog handles user interaction
-      }
-      return;
-    }
-
     await handleNavigation(
       item.type,
       [item.path.toString().getIdFromPath(), item.path],
@@ -374,9 +267,6 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
     final isDndToggle = isToggleItem && item.path == TypeConstants.toggleDnd;
     final isZenModeToggle =
         isToggleItem && item.path == TypeConstants.toggleZenMode;
-    final isThemeItem = item.type == TypeConstants.theme;
-    final isWidgetItem = item.path == TypeConstants.addWidget;
-
     if (isDndToggle) {
       return DndSettingTile(
         icon: item.icon,
@@ -390,31 +280,6 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
         icon: item.icon,
         title: item.title,
         hasUnderline: !isLast,
-      );
-    }
-
-    if (item.type == TypeConstants.appIcon) {
-      return AppIconTile(
-        icon: item.icon,
-        title: item.title,
-        hasUnderline: !isLast,
-      );
-    }
-
-    if (isThemeItem) {
-      return ThemeTile(
-        icon: item.icon,
-        title: item.title,
-        hasUnderline: !isLast,
-      );
-    }
-
-    if (isWidgetItem) {
-      return WidgetOptionTile(
-        icon: item.icon,
-        title: item.title,
-        hasUnderline: !isLast,
-        onTap: () => handleItemPress(context, item),
       );
     }
 
@@ -476,59 +341,25 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
     final isEffectivelySignedIn =
         user != null && user.email != null && user.email!.isNotEmpty;
 
-    final allCustomizationItems =
-        _getItemsBySection(
-              settingsItems,
-              AppLocalizations.of(context)!.customizationSection,
-            )
-            .where(
-              (item) =>
-                  !item.path.contains(TypeConstants.toggleDnd) ||
-                  _isDndSupported,
-            )
-            .toList();
+    final l10n = AppLocalizations.of(context)!;
+    final onSurface = Theme.of(context).colorScheme.onSurface;
 
-    final widgetItem = allCustomizationItems
-        .where((item) => item.path == TypeConstants.addWidget)
-        .firstOrNull;
+    List<Widget> tiles(String section, {bool endsCard = true}) {
+      final items = _getItemsBySection(settingsItems, section);
+      return [
+        for (var i = 0; i < items.length; i++)
+          _buildMenuItemTile(
+            context,
+            ref,
+            items[i],
+            isLast: endsCard && i == items.length - 1,
+          ),
+      ];
+    }
 
-    // Everything except the widget shortcut (which leads the card)
-    final otherCustomizationItems = allCustomizationItems
-        .where((item) => item.path != TypeConstants.addWidget)
-        .toList();
-
-    // Support & Community card
-    final communityItems = _getItemsBySection(
-      settingsItems,
-      AppLocalizations.of(context)!.supportCommunitySection,
-    );
-
-    // Help & Legal card
-    final helpItems = _getItemsBySection(
-      settingsItems,
-      AppLocalizations.of(context)!.helpLegalSection,
-    );
-
-    // Other customization card children
-    final otherCustomizationChildren = <Widget>[
-      if (widgetItem != null)
-        _buildMenuItemTile(
-          context,
-          ref,
-          widgetItem,
-          isLast: otherCustomizationItems.isEmpty && !_isHealthSyncAvailable,
-        ),
-      for (var i = 0; i < otherCustomizationItems.length; i++)
-        _buildMenuItemTile(
-          context,
-          ref,
-          otherCustomizationItems[i],
-          isLast:
-              i == otherCustomizationItems.length - 1 &&
-              !_isHealthSyncAvailable,
-        ),
-      if (_isHealthSyncAvailable) const HealthSyncTile(hasUnderline: false),
-    ];
+    void push(Widget screen) =>
+        Navigator.of(context)
+            .push(MaterialPageRoute<void>(builder: (_) => screen));
 
     return SliverPadding(
       padding: const EdgeInsets.only(top: padding16),
@@ -539,41 +370,37 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
             _buildSectionTitle(context, AppLocalizations.of(context)!.account),
             _buildSectionCard([const AccountSectionWidget(inCard: true)]),
           ],
-          _buildSectionTitle(
-            context,
-            AppLocalizations.of(context)!.supportCommunity,
-          ),
+          _buildSectionTitle(context, l10n.supportMedito),
+          _buildSectionCard(tiles(_sectionSupport)),
+          _buildSectionTitle(context, l10n.customization),
           _buildSectionCard([
-            for (var i = 0; i < communityItems.length; i++)
-              _buildMenuItemTile(
-                context,
-                ref,
-                communityItems[i],
-                isLast: i == communityItems.length - 1,
-              ),
+            RowItemWidget(
+              icon: Icon(Icons.palette_outlined, color: onSurface),
+              title: l10n.appearance,
+              onTap: () => push(const AppearanceSettingsScreen()),
+            ),
+            ...tiles(_sectionCustomisation, endsCard: false),
+            if (_isHealthSyncAvailable) const HealthSyncTile(),
+            RowItemWidget(
+              icon: Icon(Icons.tune_rounded, color: onSurface),
+              title: l10n.manageDefaults,
+              hasUnderline: false,
+              onTap: () => push(const ManageDefaultsScreen()),
+            ),
           ]),
-          _buildSectionTitle(
-            context,
-            AppLocalizations.of(context)!.customization,
-          ),
-          if (otherCustomizationChildren.isNotEmpty)
-            _buildSectionCard(otherCustomizationChildren),
-          _buildSectionTitle(context, AppLocalizations.of(context)!.helpLegal),
+          _buildSectionTitle(context, l10n.community),
+          _buildSectionCard(tiles(_sectionCommunity)),
+          _buildSectionTitle(context, l10n.helpTitle),
           _buildSectionCard([
-            for (final item in helpItems)
-              _buildMenuItemTile(context, ref, item),
+            ...tiles(_sectionHelp, endsCard: false),
             RowItemWidget(
               icon: MeditoIcon(
                 assetName: MeditoIcons.settings,
-                color: Theme.of(context).colorScheme.onSurface,
+                color: onSurface,
               ),
-              title: AppLocalizations.of(context)!.advanced,
+              title: l10n.advanced,
               hasUnderline: false,
-              onTap: () => Navigator.of(context).push(
-                MaterialPageRoute<void>(
-                  builder: (_) => const AdvancedSettingsScreen(),
-                ),
-              ),
+              onTap: () => push(const AdvancedSettingsScreen()),
             ),
           ]),
           if (isEffectivelySignedIn) ...[

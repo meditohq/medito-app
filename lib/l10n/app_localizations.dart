@@ -1840,6 +1840,18 @@ abstract class AppLocalizations {
   /// **'Advanced'**
   String get advanced;
 
+  /// Settings row and screen title for theme, app icon, home layout and widgets
+  ///
+  /// In en, this message translates to:
+  /// **'Appearance'**
+  String get appearance;
+
+  /// Settings section title for the Telegram and WhatsApp links
+  ///
+  /// In en, this message translates to:
+  /// **'Community'**
+  String get community;
+
   /// No description provided for @restorePreviousStats.
   ///
   /// In en, this message translates to:

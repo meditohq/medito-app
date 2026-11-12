@@ -427,6 +427,14 @@
   "supportCommunity": "Support & Community",
   "helpLegal": "Help & Legal",
   "advanced": "Advanced",
+  "appearance": "Appearance",
+  "@appearance": {
+    "description": "Settings row and screen title for theme, app icon, home layout and widgets"
+  },
+  "community": "Community",
+  "@community": {
+    "description": "Settings section title for the Telegram and WhatsApp links"
+  },
   "restorePreviousStats": "Restore previous stats",
   "dayStartsTitle": "When my day starts",
   "@dayStartsTitle": {

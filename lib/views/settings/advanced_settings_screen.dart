@@ -13,14 +13,13 @@ import 'package:medito/views/home/widgets/header/home_header_widget.dart';
 import 'package:medito/views/home/widgets/home_gradient_border.dart';
 import 'package:medito/views/onboarding/onboarding_pager_screen.dart';
 import 'package:medito/views/player/widgets/bottom_actions/single_back_action_bar.dart';
-import 'package:medito/views/settings/manage_defaults_screen.dart';
 import 'package:medito/views/settings/restore_stats_screen.dart';
 import 'package:medito/views/settings/widgets/day_boundary_offset_dialog.dart';
 import 'package:medito/widgets/medito_icon.dart';
 
 /// "Advanced" settings, previously an expandable section at the bottom of the
-/// Settings page. Defaults, stats restore, day boundary, debug info and the
-/// legal links.
+/// Settings page. Stats restore, day boundary, debug info and the legal
+/// links.
 class AdvancedSettingsScreen extends ConsumerWidget {
   const AdvancedSettingsScreen({super.key});
 
@@ -49,11 +48,6 @@ class AdvancedSettingsScreen extends ConsumerWidget {
     final dayOffset = ref.watch(dayBoundaryOffsetProvider).value ?? 0;
 
     final rows = <Widget>[
-      RowItemWidget(
-        icon: Icon(Icons.settings_outlined, color: onSurface),
-        title: l10n.manageDefaults,
-        onTap: () => _push(context, const ManageDefaultsScreen()),
-      ),
       RowItemWidget(
         icon: Icon(Icons.restore_outlined, color: onSurface),
         title: l10n.restorePreviousStats,
