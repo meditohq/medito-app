@@ -280,6 +280,18 @@ class _OnboardingResultScreenState
                       ),
                     ),
                   ],
+                  // Beginners get the reassurance here, as the page's subtext
+                  // (like the question pages), so the card below is only the
+                  // session and its button. Gone once the session is done.
+                  if (_useBeginnerPresentation && !_done) ...[
+                    const SizedBox(height: 8),
+                    Text(
+                      l10n.onboardingFirstMeditationSubtitle,
+                      style: context.text.body.copyWith(
+                        color: theme.colorScheme.onSurface.withAlpha(160),
+                      ),
+                    ),
+                  ],
                   if (widget.showMeditation) ...[
                     const SizedBox(height: 24),
                     _buildMeditation(context, l10n),
@@ -321,7 +333,9 @@ class _OnboardingResultScreenState
     final onSurface = Theme.of(context).colorScheme.onSurface;
     return Container(
       width: double.infinity,
-      padding: const EdgeInsets.symmetric(vertical: 20, horizontal: 16),
+      padding: _useBeginnerPresentation
+          ? const EdgeInsets.all(16)
+          : const EdgeInsets.symmetric(vertical: 20, horizontal: 16),
       decoration: BoxDecoration(
         color: onSurface.withOpacityValue(0.05),
         borderRadius: BorderRadius.circular(16),
@@ -341,16 +355,18 @@ class _OnboardingResultScreenState
         : null;
     final isPlaying = _started && audio.isPlaying;
 
+    if (_useBeginnerPresentation) {
+      return _buildBeginnerPlayer(
+        context,
+        l10n,
+        busy: busy,
+        isPlaying: isPlaying,
+        progress: progress,
+      );
+    }
+
     return Column(
       children: [
-        if (_useBeginnerPresentation) ...[
-          Text(
-            l10n.onboardingFirstMeditationTitle,
-            style: context.text.subtitle,
-            textAlign: TextAlign.center,
-          ),
-          const SizedBox(height: 12),
-        ],
         // Duration cue only matters before they commit; once playing it's
         // noise, so hide it (and the time readout below).
         if (!_started) ...[
@@ -396,71 +412,121 @@ class _OnboardingResultScreenState
           ),
         ],
         const SizedBox(height: 16),
-        if (_useBeginnerPresentation)
-          SizedBox(
-            width: double.infinity,
-            child: ElevatedButton.icon(
-              style: ElevatedButton.styleFrom(
-                minimumSize: const Size(0, 56),
-                padding: const EdgeInsets.symmetric(
-                  horizontal: 24,
-                  vertical: 16,
-                ),
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(12),
-                ),
-              ),
-              onPressed: busy ? null : (_started ? _togglePlayPause : _begin),
-              icon: busy
-                  ? const SizedBox(
-                      width: 22,
-                      height: 22,
-                      child: CircularProgressIndicator(strokeWidth: 2),
-                    )
-                  : Icon(isPlaying ? Icons.pause : Icons.play_arrow),
-              label: Text(
-                !_started
-                    ? l10n.onboardingFirstMeditationBegin
-                    : isPlaying
-                    ? l10n.pause
-                    : l10n.play,
-                textAlign: TextAlign.center,
-              ),
+        SizedBox(
+          width: 64,
+          height: 64,
+          child: ElevatedButton(
+            style: ElevatedButton.styleFrom(
+              shape: const CircleBorder(),
+              padding: EdgeInsets.zero,
             ),
-          )
-        else
-          SizedBox(
-            width: 64,
-            height: 64,
-            child: ElevatedButton(
-              style: ElevatedButton.styleFrom(
-                shape: const CircleBorder(),
-                padding: EdgeInsets.zero,
-              ),
-              onPressed: busy ? null : (_started ? _togglePlayPause : _begin),
-              child: busy
-                  ? SizedBox(
-                      width: 22,
-                      height: 22,
-                      child: CircularProgressIndicator(
-                        strokeWidth: 2,
-                        color: context.onBrandAccent,
-                        semanticsLabel: l10n.loading,
-                      ),
-                    )
-                  : Icon(
-                      isPlaying ? Icons.pause : Icons.play_arrow,
+            onPressed: busy ? null : (_started ? _togglePlayPause : _begin),
+            child: busy
+                ? SizedBox(
+                    width: 22,
+                    height: 22,
+                    child: CircularProgressIndicator(
+                      strokeWidth: 2,
                       color: context.onBrandAccent,
-                      size: 32,
-                      // Icon-only button: this is its only name.
-                      semanticLabel: !_started
-                          ? l10n.onboardingFirstMeditationBegin
-                          : isPlaying
-                          ? l10n.pause
-                          : l10n.play,
+                      semanticsLabel: l10n.loading,
                     ),
+                  )
+                : Icon(
+                    isPlaying ? Icons.pause : Icons.play_arrow,
+                    color: context.onBrandAccent,
+                    size: 32,
+                    // Icon-only button: this is its only name.
+                    semanticLabel: !_started
+                        ? l10n.onboardingFirstMeditationBegin
+                        : isPlaying
+                        ? l10n.pause
+                        : l10n.play,
+                  ),
+          ),
+        ),
+      ],
+    );
+  }
+
+  /// The beginner card: the session's name and length on the left, like a
+  /// track row, with the one action underneath. Everything is left-aligned to
+  /// match the heading above it.
+  Widget _buildBeginnerPlayer(
+    BuildContext context,
+    AppLocalizations l10n, {
+    required bool busy,
+    required bool isPlaying,
+    required double? progress,
+  }) {
+    final onSurface = Theme.of(context).colorScheme.onSurface;
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(l10n.onboardingFirstMeditationTitle, style: context.text.subtitle),
+        // Duration cue only matters before they commit; once playing the
+        // progress bar takes its place.
+        if (!_started) ...[
+          const SizedBox(height: 4),
+          Row(
+            children: [
+              Icon(
+                Icons.schedule,
+                size: 16,
+                color: onSurface.withOpacityValue(0.6),
+              ),
+              const SizedBox(width: 6),
+              Expanded(
+                child: Text(
+                  l10n.onboardingFirstMeditationDuration,
+                  style: context.text.muted.bodySmall,
+                ),
+              ),
+            ],
+          ),
+        ] else ...[
+          const SizedBox(height: 14),
+          // A bare, ever-changing percentage ("4") is noise next to the
+          // play/pause button.
+          ExcludeSemantics(
+            child: ClipRRect(
+              borderRadius: BorderRadius.circular(8),
+              child: LinearProgressIndicator(
+                value: progress,
+                minHeight: 5,
+                backgroundColor: onSurface.withOpacityValue(0.12),
+              ),
             ),
           ),
+        ],
+        const SizedBox(height: 16),
+        SizedBox(
+          width: double.infinity,
+          child: ElevatedButton.icon(
+            style: ElevatedButton.styleFrom(
+              minimumSize: const Size(0, 56),
+              padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 16),
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(12),
+              ),
+            ),
+            onPressed: busy ? null : (_started ? _togglePlayPause : _begin),
+            icon: busy
+                ? const SizedBox(
+                    width: 22,
+                    height: 22,
+                    child: CircularProgressIndicator(strokeWidth: 2),
+                  )
+                : Icon(isPlaying ? Icons.pause : Icons.play_arrow),
+            label: Text(
+              !_started
+                  ? l10n.onboardingFirstMeditationBegin
+                  : isPlaying
+                  ? l10n.pause
+                  : l10n.play,
+              textAlign: TextAlign.center,
+            ),
+          ),
+        ),
       ],
     );
   }
