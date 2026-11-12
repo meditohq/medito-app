@@ -20,6 +20,7 @@ class ShortcutsItemsWidget extends ConsumerWidget {
 
   static const _kItemBorderWidth = 0.5;
   static const _kItemBorderRadius = kHomeTileRadius;
+  static const _kItemMinHeight = 48.0;
 
   final List<ShortcutsModel> data;
 
@@ -54,33 +55,38 @@ class ShortcutsItemsWidget extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    var size = MediaQuery.of(context).size;
-    var isWideScreen = size.width > 600;
-    final columns = isWideScreen ? 8 : 4;
-    const horizontalPadding = padding16;
-    const spacing = padding12;
-    const runSpacing = 10.0;
-    final totalSpacing = (columns - 1) * spacing;
-    final totalPadding = horizontalPadding * 2;
-    final containerSize = (size.width - totalPadding - totalSpacing) / columns;
+    // Two columns of wide tiles (four on tablets), icon and label side by
+    // side. The label sits inside its own tap target with half the screen to
+    // itself, so "Challenges" and "Emergency" neither shrink nor crowd their
+    // neighbours the way captions under four narrow squares did.
+    final columns = MediaQuery.sizeOf(context).width > 600 ? 4 : 2;
+    const spacing = 10.0;
 
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: padding16),
-      child: Wrap(
-        spacing: spacing,
-        runSpacing: runSpacing,
-        alignment: WrapAlignment.start,
-        children: data
-            .map(
-              (e) => _buildShortcutItem(
-                context,
-                ref,
-                e,
-                containerSize,
-                containerSize,
+      child: Column(
+        children: [
+          for (var start = 0; start < data.length; start += columns) ...[
+            if (start > 0) const SizedBox(height: spacing),
+            // Tiles in a row share the tallest one's height, so a label that
+            // wraps at large text sizes doesn't leave a ragged row.
+            IntrinsicHeight(
+              child: Row(
+                crossAxisAlignment: CrossAxisAlignment.stretch,
+                children: [
+                  for (var i = start; i < start + columns; i++) ...[
+                    if (i > start) const SizedBox(width: spacing),
+                    Expanded(
+                      child: i < data.length
+                          ? _buildShortcutItem(context, ref, data[i])
+                          : const SizedBox.shrink(),
+                    ),
+                  ],
+                ],
               ),
-            )
-            .toList(),
+            ),
+          ],
+        ],
       ),
     );
   }
@@ -89,38 +95,9 @@ class ShortcutsItemsWidget extends ConsumerWidget {
     BuildContext context,
     WidgetRef ref,
     ShortcutsModel e,
-    double width,
-    double height,
   ) {
-    final backgroundColor = Theme.of(context).cardColor;
-    final iconColor = Theme.of(context).colorScheme.onSurface;
-    final textColor = Theme.of(context).colorScheme.onSurface;
-
-    final iconSize = (width * 0.5).clamp(26.0, 36.0);
-
-    final squareButton = HomeGradientBorder(
-      backgroundColor: backgroundColor,
-      borderRadius: _kItemBorderRadius,
-      borderWidth: _kItemBorderWidth,
-      child: SizedBox(
-        width: width,
-        height: width,
-        child: Material(
-          type: MaterialType.transparency,
-          child: InkWell(
-            onTap: () => _handleChipPress(context, ref, e),
-            borderRadius: BorderRadius.circular(_kItemBorderRadius),
-            child: Center(
-              child: MeditoRemoteIcon(
-                icon: e.icon ?? '',
-                size: iconSize,
-                color: iconColor,
-              ),
-            ),
-          ),
-        ),
-      ),
-    );
+    final theme = Theme.of(context);
+    final onSurface = theme.colorScheme.onSurface;
 
     return Semantics(
       label: e.title,
@@ -128,72 +105,45 @@ class ShortcutsItemsWidget extends ConsumerWidget {
       excludeSemantics: true,
       // excludeSemantics drops the child's tap action, so give it here.
       onTap: () => _handleChipPress(context, ref, e),
-      child: SizedBox(
-        width: width,
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            squareButton,
-            GestureDetector(
-              onTap: () => _handleChipPress(context, ref, e),
+      child: HomeGradientBorder(
+        backgroundColor: theme.cardColor,
+        borderRadius: _kItemBorderRadius,
+        borderWidth: _kItemBorderWidth,
+        child: Material(
+          type: MaterialType.transparency,
+          child: InkWell(
+            onTap: () => _handleChipPress(context, ref, e),
+            borderRadius: BorderRadius.circular(_kItemBorderRadius),
+            child: ConstrainedBox(
+              constraints: const BoxConstraints(minHeight: _kItemMinHeight),
               child: Padding(
-                padding: const EdgeInsets.only(top: 8),
-                child: _ShortcutTitle(
-                  title: e.title ?? '',
-                  style: context.text.label.copyWith(
-                    color: textColor.withOpacityValue(0.9),
-                  ),
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 14,
+                  vertical: 8,
+                ),
+                child: Row(
+                  children: [
+                    MeditoRemoteIcon(
+                      icon: e.icon ?? '',
+                      size: 24,
+                      color: onSurface,
+                    ),
+                    const SizedBox(width: 12),
+                    Expanded(
+                      child: Text(
+                        e.title ?? '',
+                        style: context.text.label,
+                        maxLines: 2,
+                        overflow: TextOverflow.ellipsis,
+                      ),
+                    ),
+                  ],
                 ),
               ),
             ),
-          ],
+          ),
         ),
       ),
-    );
-  }
-}
-
-/// A shortcut's caption. Wraps to two lines at large text sizes rather than
-/// shrinking back to the default size; only a word too wide for the tile on
-/// its own is scaled down, so it isn't split mid-word.
-class _ShortcutTitle extends StatelessWidget {
-  const _ShortcutTitle({required this.title, required this.style});
-
-  final String title;
-  final TextStyle? style;
-
-  @override
-  Widget build(BuildContext context) {
-    return LayoutBuilder(
-      builder: (context, constraints) {
-        final textScaler = MediaQuery.textScalerOf(context);
-        final direction = Directionality.of(context);
-        final wordTooWide = title.split(RegExp(r'\s+')).any((word) {
-          final painter = TextPainter(
-            text: TextSpan(text: word, style: style),
-            textDirection: direction,
-            textScaler: textScaler,
-            maxLines: 1,
-          )..layout();
-          final width = painter.width;
-          painter.dispose();
-          return width > constraints.maxWidth;
-        });
-
-        if (wordTooWide) {
-          return FittedBox(
-            fit: BoxFit.scaleDown,
-            child: Text(title, style: style, maxLines: 1),
-          );
-        }
-        return Text(
-          title,
-          style: style,
-          maxLines: 2,
-          overflow: TextOverflow.ellipsis,
-          textAlign: TextAlign.center,
-        );
-      },
     );
   }
 }
