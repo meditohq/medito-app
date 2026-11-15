@@ -1,24 +1,64 @@
+import 'dart:async';
+
 import '../../utils/logger.dart';
+
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:medito/constants/http/http_constants.dart';
 import 'package:medito/models/models.dart';
 import 'package:medito/services/network/http_api_service.dart';
+import 'package:medito/services/notifications/push_token_registration.dart';
+import 'package:medito/services/notifications/supporter_campaign_api.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class HeaderService {
   DeviceAndAppInfoModel _deviceInfo;
   String? _fcmToken;
   final _httpApiService = HttpApiService();
+  static HeaderService? _active;
+  StreamSubscription<String>? _tokenSubscription;
+  late final PushTokenRegistration _registration;
 
   HeaderService(this._deviceInfo) {
+    _active?._tokenSubscription?.cancel();
+    _active = this;
+    _registration = PushTokenRegistration(
+      getToken: () => FirebaseMessaging.instance.getToken(),
+      onToken: (token) {
+        _fcmToken = token;
+        _updateHeaders();
+      },
+      onFailure: () => AppLogger.w(
+        'HEADER',
+        'Push token unavailable; registration will retry on Home/resume sync',
+      ),
+    );
     _initFcmTokenListener();
+  }
+
+  /// Retry a failed startup registration before syncing campaign eligibility.
+  /// Does not request OS permission or delete an existing Firebase token.
+  static Future<void> ensurePushToken() async {
+    if (!isMockMode) await _active?._registration.ensureToken();
   }
 
   void _initFcmTokenListener() {
     if (isMockMode) return;
-    FirebaseMessaging.instance.onTokenRefresh.listen((fcmToken) {
-      _fcmToken = fcmToken;
-      _updateHeaders();
+    _tokenSubscription = FirebaseMessaging.instance.onTokenRefresh.listen((
+      fcmToken,
+    ) {
+      _registration.acceptToken(fcmToken);
+      unawaited(_syncCampaignPreferences());
     });
+  }
+
+  Future<void> _syncCampaignPreferences() async {
+    try {
+      await SupporterCampaignApi.updatePreferences(
+        await SharedPreferences.getInstance(),
+      );
+    } catch (_) {
+      // Home/resume sync retries without disrupting token/header registration.
+    }
   }
 
   Future<void> initialise() async {
@@ -26,30 +66,8 @@ class HeaderService {
       _updateHeaders();
       return;
     }
-    try {
-      // getToken can hang indefinitely on iOS when the device is offline
-      // (the SDK waits for an APNS token that never arrives). This runs in
-      // the splash screen's critical path, so bound it — app launch must
-      // never depend on push registration. The onTokenRefresh listener
-      // picks the token up later once connectivity returns.
-      _fcmToken = await FirebaseMessaging.instance.getToken().timeout(
-        const Duration(seconds: 8),
-      );
-      if (_fcmToken == null) {
-        // Force token creation if it's null
-        await FirebaseMessaging.instance.deleteToken().timeout(
-          const Duration(seconds: 5),
-        );
-        _fcmToken = await FirebaseMessaging.instance.getToken().timeout(
-          const Duration(seconds: 5),
-        );
-      }
-    } catch (e) {
-      // Handle error but continue execution
-      AppLogger.e('HEADER', 'Error getting FCM token: $e');
-    } finally {
-      _updateHeaders();
-    }
+    await _registration.ensureToken();
+    _updateHeaders();
   }
 
   /// Update the device info and refresh headers

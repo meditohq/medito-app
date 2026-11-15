@@ -2,6 +2,7 @@ import 'package:medito/constants/http/http_constants.dart';
 import 'package:medito/constants/strings/shared_preference_constants.dart';
 import 'package:medito/providers/donation/supporter_appeal_experiment.dart';
 import 'package:medito/services/network/http_api_service.dart';
+import 'package:medito/services/network/header_service.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -16,6 +17,7 @@ class SupporterCampaignApi {
     required bool permissionGranted,
     String consistencyBand = 'unknown',
   }) async {
+    if (permissionGranted) await HeaderService.ensurePushToken();
     final response = await client.postRequest(
       'supporter-campaigns/sync',
       body: {
@@ -34,9 +36,9 @@ class SupporterCampaignApi {
         'consistency_band': consistencyBand,
         if (prefs.getBool(SupporterAppealExperiment.dismissedKey) == true &&
             SupporterAppealExperiment(prefs).assignment?.isServer == true)
-          'dismissed_assignment_id': SupporterAppealExperiment(
-            prefs,
-          ).assignment!.id,
+          'dismissed_assignment_id': SupporterAppealExperiment(prefs)
+              .assignment!
+              .id,
       },
     );
     return response['assignment'] as Map<String, dynamic>?;
