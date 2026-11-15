@@ -58,7 +58,7 @@ jobs:
     if: github.event_name == 'workflow_dispatch' && inputs.android_promote_to_production
 
     steps:
-      - uses: actions/checkout@v4.4.0
+      - uses: actions/checkout@v7.0.1
         with:
           persist-credentials: false
 
@@ -81,11 +81,11 @@ jobs:
     if: github.event_name != 'workflow_dispatch' || inputs.android_internal || inputs.android_production
 
     steps:
-      - uses: actions/checkout@v4.4.0
+      - uses: actions/checkout@v7.0.1
         with:
           persist-credentials: false
 
-      - uses: actions/setup-java@v4.9.1
+      - uses: actions/setup-java@v6.2.0
         with:
           distribution: temurin
           java-version: '17'
@@ -95,26 +95,26 @@ jobs:
       # build and timed out over the iOS build tree, failing a job whose tests
       # had passed (run 37440292038 attempt 2).
       - name: Cache Flutter SDK
-        uses: actions/cache@v4.3.0
+        uses: actions/cache@v6.1.0
         with:
           path: ${{ runner.tool_cache }}/flutter
           key: flutter-sdk-${{ runner.os }}-${{ runner.arch }}-3.47.2
 
-      - uses: subosito/flutter-action@v2.12.0
+      - uses: subosito/flutter-action@v2.23.0
         with:
           flutter-version: '3.47.2'
           channel: stable
           cache: false
 
       - name: Cache pub packages
-        uses: actions/cache@v4.3.0
+        uses: actions/cache@v6.1.0
         with:
           path: ~/.pub-cache
           key: ${{ runner.os }}-pub-${{ hashFiles('pubspec.lock') }}
           restore-keys: ${{ runner.os }}-pub-
 
       - name: Cache Gradle
-        uses: actions/cache@v4.3.0
+        uses: actions/cache@v6.1.0
         with:
           path: |
             ~/.gradle/caches
@@ -127,7 +127,7 @@ jobs:
 
       - name: Cache build_runner outputs
         id: cache-buildrunner
-        uses: actions/cache@v4.3.0
+        uses: actions/cache@v6.1.0
         with:
           path: |
             lib/**/*.g.dart
@@ -141,7 +141,7 @@ jobs:
 
       - name: Cache pigeon outputs
         id: cache-pigeon
-        uses: actions/cache@v4.3.0
+        uses: actions/cache@v6.1.0
         with:
           path: |
             lib/src/audio_pigeon.g.dart
@@ -211,7 +211,7 @@ jobs:
           ls -lh build/app/outputs/apk/prod/release/app-prod-release.apk
 
       - name: Upload APK artifact
-        uses: actions/upload-artifact@v4.6.2
+        uses: actions/upload-artifact@v7.0.2
         with:
           name: app-prod-release
           path: build/app/outputs/apk/prod/release/app-prod-release.apk
@@ -225,12 +225,12 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - uses: actions/checkout@v4.4.0
+      - uses: actions/checkout@v7.0.1
         with:
           persist-credentials: false
 
       - name: Download APK
-        uses: actions/download-artifact@v4.3.0
+        uses: actions/download-artifact@v8.0.2
         with:
           name: app-prod-release
           path: build/app/outputs/apk/prod/release/
@@ -354,7 +354,7 @@ jobs:
 
       - name: Upload Maestro debug output
         if: failure()
-        uses: actions/upload-artifact@v4.6.2
+        uses: actions/upload-artifact@v7.0.2
         with:
           name: maestro-debug-android
           path: /tmp/maestro-debug/
@@ -388,14 +388,14 @@ jobs:
     steps:
       # fetch-depth: 0 so we can resolve previous tags and `git show` the
       # smoke.yaml that matches the previously-shipped binary.
-      - uses: actions/checkout@v4.4.0
+      - uses: actions/checkout@v7.0.1
         with:
           persist-credentials: false
           fetch-depth: 0
 
       # NEW APK (this release) — already built and uploaded upstream.
       - name: Download NEW APK
-        uses: actions/download-artifact@v4.3.0
+        uses: actions/download-artifact@v8.0.2
         with:
           name: app-prod-release
           path: /tmp/new/
@@ -426,7 +426,7 @@ jobs:
       - name: Download OLD APK (pinned to previous tag's commit)
         id: old-apk
         if: steps.prev.outputs.sha != ''
-        uses: dawidd6/action-download-artifact@v6
+        uses: dawidd6/action-download-artifact@v28
         continue-on-error: true
         with:
           workflow: release.yml
@@ -531,7 +531,7 @@ jobs:
 
       - name: Upload upgrade-test debug output
         if: failure()
-        uses: actions/upload-artifact@v4.6.2
+        uses: actions/upload-artifact@v7.0.2
         with:
           name: maestro-debug-android-upgrade
           path: /tmp/maestro-debug/
@@ -555,12 +555,12 @@ jobs:
     environment: prod
 
     steps:
-      - uses: actions/checkout@v4.4.0
+      - uses: actions/checkout@v7.0.1
         with:
           persist-credentials: false
 
       - name: Download APK
-        uses: actions/download-artifact@v4.3.0
+        uses: actions/download-artifact@v8.0.2
         with:
           name: app-prod-release
           path: build/app/outputs/apk/prod/release/
@@ -628,7 +628,7 @@ jobs:
       MAESTRO_DRIVER_STARTUP_TIMEOUT: 180000
 
     steps:
-      - uses: actions/checkout@v4.4.0
+      - uses: actions/checkout@v7.0.1
         with:
           persist-credentials: false
 
@@ -642,26 +642,26 @@ jobs:
       # build and timed out over the iOS build tree, failing a job whose tests
       # had passed (run 37440292038 attempt 2).
       - name: Cache Flutter SDK
-        uses: actions/cache@v4.3.0
+        uses: actions/cache@v6.1.0
         with:
           path: ${{ runner.tool_cache }}/flutter
           key: flutter-sdk-${{ runner.os }}-${{ runner.arch }}-3.47.2
 
-      - uses: subosito/flutter-action@v2.12.0
+      - uses: subosito/flutter-action@v2.23.0
         with:
           flutter-version: '3.47.2'
           channel: stable
           cache: false
 
       - name: Cache pub packages
-        uses: actions/cache@v4.3.0
+        uses: actions/cache@v6.1.0
         with:
           path: ~/.pub-cache
           key: ${{ runner.os }}-pub-${{ hashFiles('pubspec.lock') }}
           restore-keys: ${{ runner.os }}-pub-
 
       - name: Cache CocoaPods
-        uses: actions/cache@v4.3.0
+        uses: actions/cache@v6.1.0
         with:
           path: ios/Pods
           key: ${{ runner.os }}-pods-${{ hashFiles('ios/Podfile.lock') }}
@@ -669,7 +669,7 @@ jobs:
 
       - name: Cache iOS app
         id: cache-ios-app
-        uses: actions/cache@v4.3.0
+        uses: actions/cache@v6.1.0
         with:
           path: build/ios/iphonesimulator/Medito Dev.app
           key: ${{ runner.os }}-ios-app-${{ hashFiles('lib/**/*.dart', 'pubspec.lock', 'ios/Podfile.lock', 'ios/Runner.xcodeproj/project.pbxproj', 'ios/Runner/**', 'ios/MeditoWidget/**', 'ios/*.entitlements', 'ios/*.plist') }}
@@ -681,7 +681,7 @@ jobs:
       - name: Cache build_runner outputs
         if: steps.cache-ios-app.outputs.cache-hit != 'true'
         id: cache-buildrunner
-        uses: actions/cache@v4.3.0
+        uses: actions/cache@v6.1.0
         with:
           path: |
             lib/**/*.g.dart
@@ -696,7 +696,7 @@ jobs:
       - name: Cache pigeon outputs
         if: steps.cache-ios-app.outputs.cache-hit != 'true'
         id: cache-pigeon
-        uses: actions/cache@v4.3.0
+        uses: actions/cache@v6.1.0
         with:
           path: |
             lib/src/audio_pigeon.g.dart
@@ -790,7 +790,7 @@ jobs:
           tar -C build/ios/iphonesimulator -cf /tmp/sim-app/medito-sim.tar "Medito Dev.app"
 
       - name: Upload simulator .app artifact
-        uses: actions/upload-artifact@v4.6.2
+        uses: actions/upload-artifact@v7.0.2
         with:
           name: medito-sim-app
           path: /tmp/sim-app/medito-sim.tar
@@ -865,7 +865,7 @@ jobs:
 
       - name: Upload Maestro debug output
         if: failure()
-        uses: actions/upload-artifact@v4.6.2
+        uses: actions/upload-artifact@v7.0.2
         with:
           name: maestro-debug-ios
           path: /tmp/maestro-debug/
@@ -903,14 +903,14 @@ jobs:
     continue-on-error: true
 
     steps:
-      - uses: actions/checkout@v4.4.0
+      - uses: actions/checkout@v7.0.1
         with:
           persist-credentials: false
           fetch-depth: 0
 
       # NEW .app (this release) — uploaded by ios-smoke-test.
       - name: Download NEW simulator .app
-        uses: actions/download-artifact@v4.3.0
+        uses: actions/download-artifact@v8.0.2
         with:
           name: medito-sim-app
           path: /tmp/new/
@@ -941,7 +941,7 @@ jobs:
       - name: Download OLD .app (pinned to previous tag's commit)
         id: old-app
         if: steps.prev.outputs.sha != ''
-        uses: dawidd6/action-download-artifact@v6
+        uses: dawidd6/action-download-artifact@v28
         continue-on-error: true
         with:
           workflow: release.yml
@@ -1022,7 +1022,7 @@ jobs:
 
       - name: Upload upgrade-test debug output
         if: failure()
-        uses: actions/upload-artifact@v4.6.2
+        uses: actions/upload-artifact@v7.0.2
         with:
           name: maestro-debug-ios-upgrade
           path: /tmp/maestro-debug/
@@ -1047,7 +1047,7 @@ jobs:
     if: github.event_name != 'workflow_dispatch' || inputs.ios_testflight || inputs.ios_appstore
 
     steps:
-      - uses: actions/checkout@v4.4.0
+      - uses: actions/checkout@v7.0.1
         with:
           persist-credentials: false
 
@@ -1061,26 +1061,26 @@ jobs:
       # build and timed out over the iOS build tree, failing a job whose tests
       # had passed (run 37440292038 attempt 2).
       - name: Cache Flutter SDK
-        uses: actions/cache@v4.3.0
+        uses: actions/cache@v6.1.0
         with:
           path: ${{ runner.tool_cache }}/flutter
           key: flutter-sdk-${{ runner.os }}-${{ runner.arch }}-3.47.2
 
-      - uses: subosito/flutter-action@v2.12.0
+      - uses: subosito/flutter-action@v2.23.0
         with:
           flutter-version: '3.47.2'
           channel: stable
           cache: false
 
       - name: Cache pub packages
-        uses: actions/cache@v4.3.0
+        uses: actions/cache@v6.1.0
         with:
           path: ~/.pub-cache
           key: ${{ runner.os }}-pub-${{ hashFiles('pubspec.lock') }}
           restore-keys: ${{ runner.os }}-pub-
 
       - name: Cache CocoaPods
-        uses: actions/cache@v4.3.0
+        uses: actions/cache@v6.1.0
         with:
           path: ios/Pods
           key: ${{ runner.os }}-pods-${{ hashFiles('ios/Podfile.lock') }}
@@ -1100,7 +1100,7 @@ jobs:
 
       - name: Cache build_runner outputs
         id: cache-buildrunner
-        uses: actions/cache@v4.3.0
+        uses: actions/cache@v6.1.0
         with:
           path: |
             lib/**/*.g.dart
@@ -1114,7 +1114,7 @@ jobs:
 
       - name: Cache pigeon outputs
         id: cache-pigeon
-        uses: actions/cache@v4.3.0
+        uses: actions/cache@v6.1.0
         with:
           path: |
             lib/src/audio_pigeon.g.dart
@@ -1286,7 +1286,7 @@ jobs:
 
       - name: Upload iOS dSYM artifact
         if: ${{ !cancelled() && steps.dsyms.outputs.found == 'true' }}
-        uses: actions/upload-artifact@v4.6.2
+        uses: actions/upload-artifact@v7.0.2
         with:
           name: ${{ steps.dsyms.outputs.name }}
           path: /tmp/ios-dsyms
@@ -1308,7 +1308,7 @@ jobs:
     permissions:
       contents: write
     steps:
-      - uses: actions/checkout@v4.4.0
+      - uses: actions/checkout@v7.0.1
       - name: Tag commit with pubspec version
         run: |
           VERSION=$(grep '^version:' pubspec.yaml | sed 's/version: *//' | cut -d'+' -f1)
