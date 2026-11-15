@@ -18,9 +18,10 @@ publish_to: none
 version: 2611.11.0+302489
 
 environment:
-  sdk: "^3.8.0"
-  # device_preview 3.0 requires Flutter >= 3.47.0.
-  flutter: ">=3.47.0"
+  sdk: ">=3.13.2 <3.14.0"
+  # Match the 3.47 toolchain used by CI and .fvmrc. Newer Flutter minors
+  # change flutter_test's pinned packages and need a coordinated upgrade.
+  flutter: ">=3.47.2 <3.48.0"
 
 dependencies:
   flutter:

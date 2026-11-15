@@ -16,6 +16,15 @@ The app is free, forever: no ads, no spam, no need to sign up or pay. Medito App
 
 ### Contributions (Running in Mock Mode (no keys required))
 
+Use **Flutter 3.47.2 / Dart 3.13.2**, matching CI and the checked-in `.fvmrc`. With FVM,
+run `fvm install` and prefix the commands below with `fvm` (for example,
+`fvm flutter pub get` and `fvm dart run build_runner build --delete-conflicting-outputs`).
+Alternatively, put a Flutter 3.47.2 installation on your `PATH`.
+
+Flutter 3.50 changes the test packages pinned by the SDK and cannot resolve
+the current Riverpod/code-generator dependencies. Upgrade the SDK and those
+dependencies together; `flutter pub upgrade` alone does not fix that mismatch.
+
 Contributors can run the app without any API keys or Firebase setup using mock mode. All network calls are intercepted and return hardcoded sample data — no real credentials are needed.
 
 1. Clone the repository and install dependencies:
