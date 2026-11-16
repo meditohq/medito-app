@@ -3217,6 +3217,96 @@ class AppLocalizationsDe extends AppLocalizations {
   }
 
   @override
+  String get onPhone => 'Auf dem Handy';
+
+  @override
+  String get onWatch => 'Auf der Uhr';
+
+  @override
+  String get sendToWatch => 'An die Uhr senden';
+
+  @override
+  String get removeFromWatch => 'Von der Uhr entfernen';
+
+  @override
+  String get waitingForWatch => 'Warte auf die Uhr';
+
+  @override
+  String get sendingToWatch => 'Wird gesendet …';
+
+  @override
+  String get readyOnWatch => 'Auf der Uhr bereit';
+
+  @override
+  String get watchRemovalPending => 'Entfernen ausstehend';
+
+  @override
+  String get watchStorageFull =>
+      'Nicht genug Speicher auf deiner Uhr. Entferne einige Downloads und versuche es erneut.';
+
+  @override
+  String get watchTransferFailed =>
+      'Diese Sitzung konnte nicht gesendet werden. Versuche es erneut.';
+
+  @override
+  String get emptyWatchDownloads =>
+      'Sende Sitzungen von „Auf dem Handy“, um sie offline auf deiner Uhr zu hören.';
+
+  @override
+  String get watchStatusUnavailable =>
+      'Deine Uhr konnte nicht geprüft werden. Versuche es erneut.';
+
+  @override
+  String get watchCopyIndependent =>
+      'Wenn du einen Download vom Handy entfernst, bleibt die Kopie auf der Uhr erhalten.';
+
+  @override
+  String get cancelWatchTransfer => 'Übertragung abbrechen';
+
+  @override
+  String get selectSessions => 'Auswählen';
+
+  @override
+  String get checkingWatch => 'Uhr wird geprüft …';
+
+  @override
+  String get watchSimulatorTransferUnavailable =>
+      'Zum Senden von Downloads an die Apple Watch brauchst du ein echtes, gekoppeltes iPhone und eine Uhr.';
+
+  @override
+  String get noWatchConnected => 'Keine Uhr verbunden';
+
+  @override
+  String get watchInstallTitle => 'Medito auf deiner Uhr';
+
+  @override
+  String get watchInstallSubtitle => 'Meditiere direkt am Handgelenk';
+
+  @override
+  String get watchInstallAndroidOpened =>
+      'Sieh auf deine Uhr, um Medito zu installieren';
+
+  @override
+  String get watchInstallAndroidFailed =>
+      'Deine Uhr ist nicht erreichbar. Öffne den Play Store auf deiner Uhr und suche nach Medito.';
+
+  @override
+  String get watchInstallIosIntro =>
+      'Medito gibt es auch für die Apple Watch. So installierst du die App:';
+
+  @override
+  String get watchInstallIosStep1 => 'Öffne die Watch-App auf deinem iPhone';
+
+  @override
+  String get watchInstallIosStep2 => 'Scrolle nach unten zu „Verfügbare Apps“';
+
+  @override
+  String get watchInstallIosStep3 => 'Tippe neben Medito auf „Installieren“';
+
+  @override
+  String get watchInstallOpenWatchApp => 'Watch-App öffnen';
+
+  @override
   String get timerTitle => 'Timer';
 
   @override
@@ -3362,39 +3452,6 @@ class AppLocalizationsDe extends AppLocalizations {
 
   @override
   String get meditatedToday => 'Heute meditiert';
-
-  @override
-  String get endScreenDone => 'Fertig';
-
-  @override
-  String endScreenRestoredLastNight(String title) {
-    return 'Willkommen zurück. Du hast „$title“ letzte Nacht beendet.';
-  }
-
-  @override
-  String endScreenRestoredEarlierToday(String title) {
-    return 'Willkommen zurück. Du hast „$title“ heute beendet.';
-  }
-
-  @override
-  String endScreenRestoredYesterday(String title) {
-    return 'Willkommen zurück. Du hast „$title“ gestern beendet.';
-  }
-
-  @override
-  String endScreenRestoredTimerLastNight(int minutes) {
-    return 'Willkommen zurück. Du hast letzte Nacht einen $minutes-Minuten-Timer beendet.';
-  }
-
-  @override
-  String endScreenRestoredTimerEarlierToday(int minutes) {
-    return 'Willkommen zurück. Du hast heute einen $minutes-Minuten-Timer beendet.';
-  }
-
-  @override
-  String endScreenRestoredTimerYesterday(int minutes) {
-    return 'Willkommen zurück. Du hast gestern einen $minutes-Minuten-Timer beendet.';
-  }
 
   @override
   String upNextVariant(String guide, int minutes) {
@@ -3543,4 +3600,37 @@ class AppLocalizationsDe extends AppLocalizations {
   @override
   String get analyticsReconsentInfoBody =>
       'Ältere Versionen von Medito haben Nutzungsstatistiken bei allen ausgeschaltet, die Tracking abgelehnt haben – das ging weiter als nötig.\n\nNutzungsstatistiken erfassen, wie du die App nutzt, verknüpft mit deiner Medito-Nutzer-ID, damit wir sehen, welche Sessions helfen, und beheben können, was nicht funktioniert. Sie werden nie für Werbung oder App-übergreifendes Tracking verwendet.\n\nDu kannst das jederzeit unter Einstellungen → Erweitert → Datenschutzerklärung ändern.';
+
+  @override
+  String get endScreenDone => 'Fertig';
+
+  @override
+  String endScreenRestoredLastNight(String title) {
+    return 'Willkommen zurück. Du hast „$title“ letzte Nacht beendet.';
+  }
+
+  @override
+  String endScreenRestoredEarlierToday(String title) {
+    return 'Willkommen zurück. Du hast „$title“ heute beendet.';
+  }
+
+  @override
+  String endScreenRestoredYesterday(String title) {
+    return 'Willkommen zurück. Du hast „$title“ gestern beendet.';
+  }
+
+  @override
+  String endScreenRestoredTimerLastNight(int minutes) {
+    return 'Willkommen zurück. Du hast letzte Nacht einen $minutes-Minuten-Timer beendet.';
+  }
+
+  @override
+  String endScreenRestoredTimerEarlierToday(int minutes) {
+    return 'Willkommen zurück. Du hast heute einen $minutes-Minuten-Timer beendet.';
+  }
+
+  @override
+  String endScreenRestoredTimerYesterday(int minutes) {
+    return 'Willkommen zurück. Du hast gestern einen $minutes-Minuten-Timer beendet.';
+  }
 }

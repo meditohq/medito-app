@@ -36,3 +36,6 @@ dependencyResolutionManagement {
 }
 
 include ":app"
+// Wear OS companion (its own APK, same applicationId + signing key as :app
+// so the Data Layer pairs them). Built with ./gradlew :wear:assemble<Flavor><Type>.
+include ":wear"

@@ -5680,6 +5680,168 @@ abstract class AppLocalizations {
   /// **'Photo {index} of {count}'**
   String shopPhotoPosition(int index, int count);
 
+  /// No description provided for @onPhone.
+  ///
+  /// In en, this message translates to:
+  /// **'On phone'**
+  String get onPhone;
+
+  /// No description provided for @onWatch.
+  ///
+  /// In en, this message translates to:
+  /// **'On watch'**
+  String get onWatch;
+
+  /// No description provided for @sendToWatch.
+  ///
+  /// In en, this message translates to:
+  /// **'Send to watch'**
+  String get sendToWatch;
+
+  /// No description provided for @removeFromWatch.
+  ///
+  /// In en, this message translates to:
+  /// **'Remove from watch'**
+  String get removeFromWatch;
+
+  /// No description provided for @waitingForWatch.
+  ///
+  /// In en, this message translates to:
+  /// **'Waiting for watch'**
+  String get waitingForWatch;
+
+  /// No description provided for @sendingToWatch.
+  ///
+  /// In en, this message translates to:
+  /// **'Sending…'**
+  String get sendingToWatch;
+
+  /// No description provided for @readyOnWatch.
+  ///
+  /// In en, this message translates to:
+  /// **'Ready on watch'**
+  String get readyOnWatch;
+
+  /// No description provided for @watchRemovalPending.
+  ///
+  /// In en, this message translates to:
+  /// **'Removal pending'**
+  String get watchRemovalPending;
+
+  /// No description provided for @watchStorageFull.
+  ///
+  /// In en, this message translates to:
+  /// **'Not enough space on your watch. Remove some downloads and try again.'**
+  String get watchStorageFull;
+
+  /// No description provided for @watchTransferFailed.
+  ///
+  /// In en, this message translates to:
+  /// **'Could not send this session. Try again.'**
+  String get watchTransferFailed;
+
+  /// No description provided for @emptyWatchDownloads.
+  ///
+  /// In en, this message translates to:
+  /// **'Send sessions from On phone to listen offline on your watch.'**
+  String get emptyWatchDownloads;
+
+  /// No description provided for @watchStatusUnavailable.
+  ///
+  /// In en, this message translates to:
+  /// **'Could not check your watch. Try again.'**
+  String get watchStatusUnavailable;
+
+  /// No description provided for @watchCopyIndependent.
+  ///
+  /// In en, this message translates to:
+  /// **'Removing a phone download keeps its watch copy.'**
+  String get watchCopyIndependent;
+
+  /// No description provided for @cancelWatchTransfer.
+  ///
+  /// In en, this message translates to:
+  /// **'Cancel transfer'**
+  String get cancelWatchTransfer;
+
+  /// No description provided for @selectSessions.
+  ///
+  /// In en, this message translates to:
+  /// **'Select'**
+  String get selectSessions;
+
+  /// No description provided for @checkingWatch.
+  ///
+  /// In en, this message translates to:
+  /// **'Checking watch…'**
+  String get checkingWatch;
+
+  /// No description provided for @watchSimulatorTransferUnavailable.
+  ///
+  /// In en, this message translates to:
+  /// **'Sending downloads to Apple Watch requires a real paired iPhone and watch.'**
+  String get watchSimulatorTransferUnavailable;
+
+  /// No description provided for @noWatchConnected.
+  ///
+  /// In en, this message translates to:
+  /// **'No watch connected'**
+  String get noWatchConnected;
+
+  /// Settings row shown when a watch is paired but the Medito watch app isn't installed on it
+  ///
+  /// In en, this message translates to:
+  /// **'Medito on your watch'**
+  String get watchInstallTitle;
+
+  /// No description provided for @watchInstallSubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Meditate from your wrist'**
+  String get watchInstallSubtitle;
+
+  /// Snackbar after the Play Store was opened on the user's Wear OS watch
+  ///
+  /// In en, this message translates to:
+  /// **'Check your watch to install Medito'**
+  String get watchInstallAndroidOpened;
+
+  /// No description provided for @watchInstallAndroidFailed.
+  ///
+  /// In en, this message translates to:
+  /// **'Couldn\'t reach your watch. Open the Play Store on your watch and search for Medito.'**
+  String get watchInstallAndroidFailed;
+
+  /// No description provided for @watchInstallIosIntro.
+  ///
+  /// In en, this message translates to:
+  /// **'Medito has an Apple Watch app. To install it:'**
+  String get watchInstallIosIntro;
+
+  /// No description provided for @watchInstallIosStep1.
+  ///
+  /// In en, this message translates to:
+  /// **'Open the Watch app on your iPhone'**
+  String get watchInstallIosStep1;
+
+  /// Must match the section name in Apple's Watch app (iOS: 'Available Apps')
+  ///
+  /// In en, this message translates to:
+  /// **'Scroll down to Available Apps'**
+  String get watchInstallIosStep2;
+
+  /// No description provided for @watchInstallIosStep3.
+  ///
+  /// In en, this message translates to:
+  /// **'Tap Install next to Medito'**
+  String get watchInstallIosStep3;
+
+  /// No description provided for @watchInstallOpenWatchApp.
+  ///
+  /// In en, this message translates to:
+  /// **'Open Watch app'**
+  String get watchInstallOpenWatchApp;
+
   /// Title of the home Timer screen and of a timer session in the player
   ///
   /// In en, this message translates to:
@@ -5871,48 +6033,6 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Meditated today'**
   String get meditatedToday;
-
-  /// Button that closes an end screen shown on the next launch and returns to Home
-  ///
-  /// In en, this message translates to:
-  /// **'Done'**
-  String get endScreenDone;
-
-  /// Top line of an end screen shown on the next launch because the app was closed before it could appear (e.g. the user fell asleep). The session ended between 6pm yesterday and 5am today.
-  ///
-  /// In en, this message translates to:
-  /// **'Welcome back. You finished “{title}” last night.'**
-  String endScreenRestoredLastNight(String title);
-
-  /// As endScreenRestoredLastNight, for a session that ended earlier today
-  ///
-  /// In en, this message translates to:
-  /// **'Welcome back. You finished “{title}” earlier today.'**
-  String endScreenRestoredEarlierToday(String title);
-
-  /// As endScreenRestoredLastNight, for a session that ended yesterday during the day
-  ///
-  /// In en, this message translates to:
-  /// **'Welcome back. You finished “{title}” yesterday.'**
-  String endScreenRestoredYesterday(String title);
-
-  /// As endScreenRestoredLastNight, for a Timer session of {minutes} minutes
-  ///
-  /// In en, this message translates to:
-  /// **'Welcome back. You finished a {minutes}-minute timer last night.'**
-  String endScreenRestoredTimerLastNight(int minutes);
-
-  /// As endScreenRestoredEarlierToday, for a Timer session
-  ///
-  /// In en, this message translates to:
-  /// **'Welcome back. You finished a {minutes}-minute timer earlier today.'**
-  String endScreenRestoredTimerEarlierToday(int minutes);
-
-  /// As endScreenRestoredYesterday, for a Timer session
-  ///
-  /// In en, this message translates to:
-  /// **'Welcome back. You finished a {minutes}-minute timer yesterday.'**
-  String endScreenRestoredTimerYesterday(int minutes);
 
   /// Voice and length the Home hero will play, under the session title, e.g. Will · 10 min
   ///
@@ -6171,6 +6291,48 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Older versions of Medito switched usage stats off for anyone who declined tracking, which went further than it should have.\n\nUsage stats record how you use the app, linked to your Medito user ID, so we can see which sessions help and fix what breaks. They\'re never used for ads or to track you across other apps.\n\nYou can change this any time in Settings → Advanced → Privacy Policy.'**
   String get analyticsReconsentInfoBody;
+
+  /// Button that closes an end screen shown on the next launch and returns to Home
+  ///
+  /// In en, this message translates to:
+  /// **'Done'**
+  String get endScreenDone;
+
+  /// Top line of an end screen shown on the next launch because the app was closed before it could appear (e.g. the user fell asleep). The session ended between 6pm yesterday and 5am today.
+  ///
+  /// In en, this message translates to:
+  /// **'Welcome back. You finished “{title}” last night.'**
+  String endScreenRestoredLastNight(String title);
+
+  /// As endScreenRestoredLastNight, for a session that ended earlier today
+  ///
+  /// In en, this message translates to:
+  /// **'Welcome back. You finished “{title}” earlier today.'**
+  String endScreenRestoredEarlierToday(String title);
+
+  /// As endScreenRestoredLastNight, for a session that ended yesterday during the day
+  ///
+  /// In en, this message translates to:
+  /// **'Welcome back. You finished “{title}” yesterday.'**
+  String endScreenRestoredYesterday(String title);
+
+  /// As endScreenRestoredLastNight, for a Timer session of {minutes} minutes
+  ///
+  /// In en, this message translates to:
+  /// **'Welcome back. You finished a {minutes}-minute timer last night.'**
+  String endScreenRestoredTimerLastNight(int minutes);
+
+  /// As endScreenRestoredEarlierToday, for a Timer session
+  ///
+  /// In en, this message translates to:
+  /// **'Welcome back. You finished a {minutes}-minute timer earlier today.'**
+  String endScreenRestoredTimerEarlierToday(int minutes);
+
+  /// As endScreenRestoredYesterday, for a Timer session
+  ///
+  /// In en, this message translates to:
+  /// **'Welcome back. You finished a {minutes}-minute timer yesterday.'**
+  String endScreenRestoredTimerYesterday(int minutes);
 }
 
 class _AppLocalizationsDelegate

@@ -1,0 +1,71 @@
+{
+  "appVersion": "2611.11.0",
+  "versionCode": 302489,
+  "tabletGallery": [
+    "7-inch",
+    "10-inch"
+  ],
+  "assets": [
+    "/Users/mike/Projects/Medito/medito_new/output/store-promotion/android/upload/01-tablet-explore.png",
+    "/Users/mike/Projects/Medito/medito_new/output/store-promotion/android/upload/02-tablet-course.png",
+    "/Users/mike/Projects/Medito/medito_new/output/store-promotion/android/upload/03-tablet-player.png",
+    "/Users/mike/Projects/Medito/medito_new/output/store-promotion/android/upload/04-android-widgets.png"
+  ],
+  "provenance": {
+    "tablet": "Unaltered captures from the production APK on a Pixel Tablet emulator, placed inside branded frames",
+    "widgets": "Native Android widget picker from the production APK; its built-in sample widget previews are visible",
+    "releaseArtifact": "GitHub Actions run 43036413056, artifact app-prod-release",
+    "locale": "en-GB"
+  },
+  "files": [
+    {
+      "file": "/Users/mike/Projects/Medito/medito_new/output/store-promotion/android/upload/01-tablet-explore.png",
+      "pixels": [
+        3200,
+        1800
+      ],
+      "sha256": "bc77bb068be4feadb8bd7550e815a68217893d073d38197fd71d92ec4efc592d"
+    },
+    {
+      "file": "/Users/mike/Projects/Medito/medito_new/output/store-promotion/android/upload/02-tablet-course.png",
+      "pixels": [
+        3200,
+        1800
+      ],
+      "sha256": "c098be60c74c4ef7e218205a34cf7bb76b88ba965ded72e6087c92d14fc64914"
+    },
+    {
+      "file": "/Users/mike/Projects/Medito/medito_new/output/store-promotion/android/upload/03-tablet-player.png",
+      "pixels": [
+        3200,
+        1800
+      ],
+      "sha256": "0bb0646bb1a8b758966146ad1b691385154743ecf077f014bf3ce938b25650ef"
+    },
+    {
+      "file": "/Users/mike/Projects/Medito/medito_new/output/store-promotion/android/upload/04-android-widgets.png",
+      "pixels": [
+        1080,
+        1920
+      ],
+      "sha256": "4ab5e8918bf501b0613ef33d171f019e049163fa3ec0d7df2b4fbfccc63b7a59"
+    }
+  ],
+  "playStoreStatus": "Submitted: Google Play shows Changes in review for descriptions and phone, 7-inch tablet, and 10-inch tablet screenshots; automatic checks running",
+  "galleryPlacement": {
+    "phone": [
+      "04-android-widgets.png"
+    ],
+    "sevenInch": [
+      "03-tablet-player.png",
+      "01-tablet-explore.png",
+      "02-tablet-course.png"
+    ],
+    "tenInch": [
+      "01-tablet-explore.png",
+      "02-tablet-course.png",
+      "03-tablet-player.png"
+    ]
+  },
+  "reviewRestartApproved": true
+}

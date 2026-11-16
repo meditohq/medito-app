@@ -28,6 +28,10 @@ class AppDelegate: FlutterAppDelegate {
 
         // Register Flutter plugins
         GeneratedPluginRegistrant.register(with: self)
+
+        // Activate early so sessions finished on the watch are received even
+        // when the app is launched in the background to deliver them.
+        WatchSessionManager.shared.activate()
         
         // Set background fetch interval
         UIApplication.shared.setMinimumBackgroundFetchInterval(TimeInterval(60 * 15)) // 15 minutes
@@ -74,6 +78,8 @@ class AppDelegate: FlutterAppDelegate {
     /// Called from SceneDelegate once the scene (and its FlutterViewController) is attached,
     /// because `self.window` is nil on the AppDelegate when using a UIScene lifecycle.
     func registerMethodChannels(with controller: FlutterViewController) {
+        WatchSessionManager.shared.register(with: controller.binaryMessenger)
+
         // Siri channel
         let siriChannel = FlutterMethodChannel(
             name: "com.medito.app/siri",
@@ -259,7 +265,7 @@ extension AppDelegate: INUIAddVoiceShortcutViewControllerDelegate {
 }
 
 /// Tells Dart whether an Apple Watch is paired (and whether the Medito watch
-/// app is on it) so analytics can size the audience for a watch app.
+/// app is on it) for analytics and the Settings install prompt.
 ///
 /// Both flags are only valid once WCSession has activated. If nothing else
 /// has claimed the session it activates it itself; if another delegate owns
@@ -288,6 +294,14 @@ final class WatchPresence: NSObject, WatchPresenceApi, WCSessionDelegate {
             // Someone else activates it; read once they have.
             DispatchQueue.main.asyncAfter(deadline: .now() + 3) { self.flush() }
         }
+    }
+
+    /// iOS can't install a watch app from the phone, so open the Watch app
+    /// where Medito can be installed. `itms-watchs://` is undocumented but
+    /// long-standing; Dart shows the manual steps too in case it stops working.
+    func openWatchInstall(completion: @escaping (Result<Bool, Error>) -> Void) {
+        guard let url = URL(string: "itms-watchs://") else { return completion(.success(false)) }
+        UIApplication.shared.open(url) { opened in completion(.success(opened)) }
     }
 
     private func snapshot(_ session: WCSession) -> WatchStatus {

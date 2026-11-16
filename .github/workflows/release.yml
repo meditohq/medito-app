@@ -7,10 +7,22 @@ on:
         description: 'Android – Internal track'
         type: boolean
         default: false
+      android_beta:
+        description: 'Android – Open testing track'
+        type: boolean
+        default: false
       android_production:
         description: 'Android – Production track'
         type: boolean
         default: true
+      wear_os:
+        description: 'Also ship the Wear OS app to the matching Wear track(s) (wear:internal / wear:production). Needs the Wear OS form factor enabled in Play Console.'
+        type: boolean
+        default: false
+      wear_only:
+        description: 'Only upload the Wear OS APK; skip the phone Play upload. Useful after the phone APK was already uploaded.'
+        type: boolean
+        default: false
       ios_testflight:
         description: 'iOS – TestFlight'
         type: boolean
@@ -78,7 +90,7 @@ jobs:
     name: Android – Build
     runs-on: ubuntu-latest
     environment: prod
-    if: github.event_name != 'workflow_dispatch' || inputs.android_internal || inputs.android_production
+    if: github.event_name != 'workflow_dispatch' || inputs.android_internal || inputs.android_beta || inputs.android_production
 
     steps:
       - uses: actions/checkout@v7.0.1
@@ -219,10 +231,30 @@ jobs:
           # previously-shipped APK as its "old version" baseline.
           retention-days: 90
 
+      # The Wear OS companion (android/wear) is its own APK: same package and
+      # signing key as the phone app, versionCode 1_000_000_000 + the phone's.
+      # Runs after `flutter build apk`, which writes the flutter.versionCode it
+      # reads from android/local.properties.
+      - name: Build Wear OS APK
+        if: inputs.wear_os
+        working-directory: android
+        run: |
+          ./gradlew :wear:assembleProdRelease --no-daemon
+          ls -lh ../build/wear/outputs/apk/prod/release/wear-prod-release.apk
+
+      - name: Upload Wear OS APK artifact
+        if: inputs.wear_os
+        uses: actions/upload-artifact@v7.0.2
+        with:
+          name: wear-prod-release
+          path: build/wear/outputs/apk/prod/release/wear-prod-release.apk
+          retention-days: 30
+
   android-smoke-test:
     name: Android – Smoke Test
     needs: [android-build]
     runs-on: ubuntu-latest
+    if: ${{ github.event_name != 'workflow_dispatch' || inputs.wear_only != true }}
 
     steps:
       - uses: actions/checkout@v7.0.1
@@ -377,6 +409,7 @@ jobs:
     name: Android – Upgrade Test
     needs: [android-smoke-test]
     runs-on: ubuntu-latest
+    if: ${{ github.event_name != 'workflow_dispatch' || inputs.wear_only != true }}
     # action-download-artifact reads a previous run's artifact.
     permissions:
       contents: read
@@ -550,9 +583,10 @@ jobs:
 
   android-deploy:
     name: Android – Deploy
-    needs: [android-smoke-test, android-upgrade-test]
+    needs: [android-build, android-smoke-test, android-upgrade-test]
     runs-on: ubuntu-latest
     environment: prod
+    if: ${{ always() && needs.android-build.result == 'success' && (inputs.wear_only == true || needs.android-smoke-test.result == 'success') }}
 
     steps:
       - uses: actions/checkout@v7.0.1
@@ -564,6 +598,13 @@ jobs:
         with:
           name: app-prod-release
           path: build/app/outputs/apk/prod/release/
+
+      - name: Download Wear OS APK
+        if: inputs.wear_os
+        uses: actions/download-artifact@v8.0.2
+        with:
+          name: wear-prod-release
+          path: build/wear/outputs/apk/prod/release/
 
       - uses: ruby/setup-ruby@v1.338.0
         with:
@@ -589,7 +630,9 @@ jobs:
         env:
           PLAY_STORE_CONFIG_JSON: ${{ secrets.PLAY_STORE_CONFIG_JSON }}
         run: |
-          if [ "${{ github.event_name }}" != "workflow_dispatch" ]; then
+          if [ "${{ inputs.wear_only }}" = "true" ]; then
+            echo "Skipping phone Play upload because wear_only=true"
+          elif [ "${{ github.event_name }}" != "workflow_dispatch" ]; then
             bundle exec fastlane android upload_apk \
               apk_path:"../build/app/outputs/apk/prod/release/app-prod-release.apk" \
               track:"production"
@@ -604,16 +647,53 @@ jobs:
                 track:"internal" \
                 promote_to:"production" \
                 submit_review:"${{ inputs.submit_for_review }}"
+            elif [ "${{ inputs.android_internal }}" = "true" ] && [ "${{ inputs.android_beta }}" = "true" ]; then
+              bundle exec fastlane android upload_apk \
+                apk_path:"../build/app/outputs/apk/prod/release/app-prod-release.apk" \
+                track:"internal" \
+                promote_to:"beta"
             elif [ "${{ inputs.android_production }}" = "true" ]; then
               bundle exec fastlane android upload_apk \
                 apk_path:"../build/app/outputs/apk/prod/release/app-prod-release.apk" \
                 track:"production" \
                 submit_review:"${{ inputs.submit_for_review }}"
+            elif [ "${{ inputs.android_beta }}" = "true" ]; then
+              bundle exec fastlane android upload_apk \
+                apk_path:"../build/app/outputs/apk/prod/release/app-prod-release.apk" \
+                track:"beta"
             elif [ "${{ inputs.android_internal }}" = "true" ]; then
               bundle exec fastlane android upload_apk \
                 apk_path:"../build/app/outputs/apk/prod/release/app-prod-release.apk" \
                 track:"internal"
             fi
+          fi
+
+      # Same track choice as the phone app, on the Wear OS form-factor tracks.
+      - name: Upload Wear OS app to Play Store
+        if: inputs.wear_os
+        working-directory: android
+        env:
+          PLAY_STORE_CONFIG_JSON: ${{ secrets.PLAY_STORE_CONFIG_JSON }}
+        run: |
+          APK="../build/wear/outputs/apk/prod/release/wear-prod-release.apk"
+          BUILD=$(grep '^version:' ../pubspec.yaml | sed 's/.*+//')
+          CODE=$((1000000000 + BUILD))
+          if [ "${{ inputs.android_internal }}" = "true" ] && [ "${{ inputs.android_production }}" = "true" ]; then
+            bundle exec fastlane android upload_apk apk_path:"$APK" version_code:"$CODE" \
+              track:"wear:internal" promote_to:"wear:production" \
+              submit_review:"${{ inputs.submit_for_review }}"
+          elif [ "${{ inputs.android_internal }}" = "true" ] && [ "${{ inputs.android_beta }}" = "true" ]; then
+            bundle exec fastlane android upload_apk apk_path:"$APK" version_code:"$CODE" \
+              track:"wear:internal" promote_to:"wear:beta"
+          elif [ "${{ inputs.android_production }}" = "true" ]; then
+            bundle exec fastlane android upload_apk apk_path:"$APK" version_code:"$CODE" \
+              track:"wear:production" submit_review:"${{ inputs.submit_for_review }}"
+          elif [ "${{ inputs.android_beta }}" = "true" ]; then
+            bundle exec fastlane android upload_apk apk_path:"$APK" version_code:"$CODE" \
+              track:"wear:beta"
+          elif [ "${{ inputs.android_internal }}" = "true" ]; then
+            bundle exec fastlane android upload_apk apk_path:"$APK" version_code:"$CODE" \
+              track:"wear:internal"
           fi
 
   ios-smoke-test:
@@ -625,7 +705,7 @@ jobs:
     # startup timeout on a cold CI simulator ("iOS driver not ready in time",
     # run 36309254158), failing the job before any flow runs.
     env:
-      MAESTRO_DRIVER_STARTUP_TIMEOUT: 180000
+      MAESTRO_DRIVER_STARTUP_TIMEOUT: 300000
 
     steps:
       - uses: actions/checkout@v7.0.1
@@ -775,7 +855,19 @@ jobs:
       - name: Build iOS simulator app
         if: steps.cache-ios-app.outputs.cache-hit != 'true'
         run: |
-          flutter build ios --simulator --no-codesign \
+          # With the Apple Watch companion embedded, Flutter refuses a
+          # simulator build without a target device (-d), so pick any iPhone.
+          DEVICE=$(xcrun simctl list devices available -j | python3 -c "
+          import json, sys
+          data = json.load(sys.stdin)
+          for runtime, devices in data['devices'].items():
+            for d in devices:
+              if 'iPhone' in d['name'] and d['isAvailable']:
+                print(d['udid'])
+                sys.exit(0)
+          sys.exit(1)
+          ")
+          flutter build ios --simulator --no-codesign -d "$DEVICE" \
             --dart-define-from-file=.prod.json \
             --dart-define=MOCK_MODE=false \
             --dart-define=SMOKE_TEST_MODE=true \
@@ -897,7 +989,7 @@ jobs:
       contents: read
       actions: read
     env:
-      MAESTRO_DRIVER_STARTUP_TIMEOUT: 180000
+      MAESTRO_DRIVER_STARTUP_TIMEOUT: 300000
     # Non-blocking: a failed upgrade test won't gate the deploy. Useful when
     # there's no baseline yet, or to avoid blocking ship on a flaky test.
     continue-on-error: true
@@ -1041,7 +1133,7 @@ jobs:
 
   ios-deploy:
     name: iOS – Build & Deploy
-    needs: [ios-smoke-test, ios-upgrade-test]
+    needs: [ios-smoke-test]
     runs-on: macos-latest
     environment: prod
     if: github.event_name != 'workflow_dispatch' || inputs.ios_testflight || inputs.ios_appstore

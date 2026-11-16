@@ -1,0 +1,65 @@
+{
+  "appId": "1500780518",
+  "sourceVersion": "2611.11.0",
+  "sourceBuild": "302489",
+  "sourceArtifact": "GitHub Actions 43036413056 / medito-sim-app",
+  "locale": "en-GB",
+  "status": "Staged in App Store Connect Asset Library; awaiting next editable iOS version draft",
+  "assets": [
+    {
+      "filename": "medito-next-ipadPro129-01-explore.png",
+      "pixels": [
+        2752,
+        2064
+      ],
+      "bytes": 3178972,
+      "sha256": "2b99febc04fb0fb7ffb19442520fe4be074e128313b76c5b71eeaf8277d24401"
+    },
+    {
+      "filename": "medito-next-ipadPro129-02-course.png",
+      "pixels": [
+        2752,
+        2064
+      ],
+      "bytes": 1257639,
+      "sha256": "fdc5ecc15ee4d534263fe2190dd624fc8270d1a12c138ce872ffbc0039939cdd"
+    },
+    {
+      "filename": "medito-next-ipadPro129-03-player.png",
+      "pixels": [
+        2752,
+        2064
+      ],
+      "bytes": 1606518,
+      "sha256": "2dfc34f6a5558bc84220ef241dfb6d67e1bd03f32d3e1363c119c44107d0436d"
+    },
+    {
+      "filename": "medito-next-iPhone6.9-04-widgets.png",
+      "pixels": [
+        1320,
+        2868
+      ],
+      "bytes": 137761,
+      "sha256": "cfce74f47b0649f1611589ac853ce3c5c9cb974e392a535f9d95f9cd13943614"
+    }
+  ],
+  "widgetSource": {
+    "type": "Native SwiftUI preview capture",
+    "repoCommit": "fc3c032aa6f45b00b68e4050c9f4562211277990",
+    "views": [
+      "StreakWidgetView",
+      "ConsistencyWidgetView",
+      "UpNextWidgetEntryView"
+    ],
+    "data": "Example 7-day streak and 67% consistency; Observing distractions, 1/10 sessions",
+    "rendering": "Temporary preview host selects systemSmall/systemMedium and uses shared full-color theme plus standard 16-point widget margins. Font lookup points to bundled Google Sans. No app repository source changed.",
+    "capture": "raw/iphone-widgets.png",
+    "note": "Native widget previews arranged on a promotional background; not a Home Screen capture."
+  },
+  "assetLibraryIds": [
+    "34400005-9741-87e6-8026-61229b6e1eba",
+    "d5800005-9741-87e6-8003-306f483010a2",
+    "f9800005-9741-87e6-8028-f75a48da8c15",
+    "0a800005-9741-87e6-8039-72a7182d846f"
+  ]
+}

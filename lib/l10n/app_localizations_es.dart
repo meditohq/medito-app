@@ -3195,6 +3195,95 @@ class AppLocalizationsEs extends AppLocalizations {
   }
 
   @override
+  String get onPhone => 'En el teléfono';
+
+  @override
+  String get onWatch => 'En el reloj';
+
+  @override
+  String get sendToWatch => 'Enviar al reloj';
+
+  @override
+  String get removeFromWatch => 'Eliminar del reloj';
+
+  @override
+  String get waitingForWatch => 'Esperando al reloj';
+
+  @override
+  String get sendingToWatch => 'Enviando…';
+
+  @override
+  String get readyOnWatch => 'Disponible en el reloj';
+
+  @override
+  String get watchRemovalPending => 'Eliminación pendiente';
+
+  @override
+  String get watchStorageFull =>
+      'No hay suficiente espacio en tu reloj. Elimina algunas descargas e inténtalo de nuevo.';
+
+  @override
+  String get watchTransferFailed =>
+      'No se pudo enviar esta sesión. Inténtalo de nuevo.';
+
+  @override
+  String get emptyWatchDownloads =>
+      'Envía sesiones desde En el teléfono para escuchar sin conexión en tu reloj.';
+
+  @override
+  String get watchStatusUnavailable =>
+      'No se pudo comprobar tu reloj. Inténtalo de nuevo.';
+
+  @override
+  String get watchCopyIndependent =>
+      'Eliminar una descarga del teléfono conserva su copia en el reloj.';
+
+  @override
+  String get cancelWatchTransfer => 'Cancelar envío';
+
+  @override
+  String get selectSessions => 'Seleccionar';
+
+  @override
+  String get checkingWatch => 'Comprobando el reloj…';
+
+  @override
+  String get watchSimulatorTransferUnavailable =>
+      'Para enviar descargas al Apple Watch necesitas un iPhone y un reloj reales enlazados.';
+
+  @override
+  String get noWatchConnected => 'No hay ningún reloj conectado';
+
+  @override
+  String get watchInstallTitle => 'Medito en tu reloj';
+
+  @override
+  String get watchInstallSubtitle => 'Medita desde tu muñeca';
+
+  @override
+  String get watchInstallAndroidOpened => 'Mira tu reloj para instalar Medito';
+
+  @override
+  String get watchInstallAndroidFailed =>
+      'No se pudo conectar con tu reloj. Abre Play Store en el reloj y busca Medito.';
+
+  @override
+  String get watchInstallIosIntro =>
+      'Medito tiene app para Apple Watch. Para instalarla:';
+
+  @override
+  String get watchInstallIosStep1 => 'Abre la app Watch en tu iPhone';
+
+  @override
+  String get watchInstallIosStep2 => 'Desplázate hasta Apps disponibles';
+
+  @override
+  String get watchInstallIosStep3 => 'Toca Instalar junto a Medito';
+
+  @override
+  String get watchInstallOpenWatchApp => 'Abrir app Watch';
+
+  @override
   String get timerTitle => 'Temporizador';
 
   @override
@@ -3340,57 +3429,6 @@ class AppLocalizationsEs extends AppLocalizations {
 
   @override
   String get meditatedToday => 'Has meditado hoy';
-
-  @override
-  String get endScreenDone => 'Listo';
-
-  @override
-  String endScreenRestoredLastNight(String title) {
-    return 'Hola de nuevo. Terminaste «$title» anoche.';
-  }
-
-  @override
-  String endScreenRestoredEarlierToday(String title) {
-    return 'Hola de nuevo. Terminaste «$title» hoy más temprano.';
-  }
-
-  @override
-  String endScreenRestoredYesterday(String title) {
-    return 'Hola de nuevo. Terminaste «$title» ayer.';
-  }
-
-  @override
-  String endScreenRestoredTimerLastNight(int minutes) {
-    String _temp0 = intl.Intl.pluralLogic(
-      minutes,
-      locale: localeName,
-      other: '$minutes minutos',
-      one: '1 minuto',
-    );
-    return 'Hola de nuevo. Terminaste un temporizador de $_temp0 anoche.';
-  }
-
-  @override
-  String endScreenRestoredTimerEarlierToday(int minutes) {
-    String _temp0 = intl.Intl.pluralLogic(
-      minutes,
-      locale: localeName,
-      other: '$minutes minutos',
-      one: '1 minuto',
-    );
-    return 'Hola de nuevo. Terminaste un temporizador de $_temp0 hoy más temprano.';
-  }
-
-  @override
-  String endScreenRestoredTimerYesterday(int minutes) {
-    String _temp0 = intl.Intl.pluralLogic(
-      minutes,
-      locale: localeName,
-      other: '$minutes minutos',
-      one: '1 minuto',
-    );
-    return 'Hola de nuevo. Terminaste un temporizador de $_temp0 ayer.';
-  }
 
   @override
   String upNextVariant(String guide, int minutes) {
@@ -3539,4 +3577,55 @@ class AppLocalizationsEs extends AppLocalizations {
   @override
   String get analyticsReconsentInfoBody =>
       'Las versiones anteriores de Medito desactivaban las estadísticas de uso a quien rechazaba el rastreo, y eso fue más allá de lo necesario.\n\nLas estadísticas de uso registran cómo usas la app, vinculadas a tu ID de usuario de Medito, para ver qué sesiones ayudan y arreglar lo que falla. Nunca se usan para anuncios ni para rastrearte en otras apps.\n\nPuedes cambiarlo cuando quieras en Ajustes → Avanzado → Política de Privacidad.';
+
+  @override
+  String get endScreenDone => 'Listo';
+
+  @override
+  String endScreenRestoredLastNight(String title) {
+    return 'Hola de nuevo. Terminaste «$title» anoche.';
+  }
+
+  @override
+  String endScreenRestoredEarlierToday(String title) {
+    return 'Hola de nuevo. Terminaste «$title» hoy más temprano.';
+  }
+
+  @override
+  String endScreenRestoredYesterday(String title) {
+    return 'Hola de nuevo. Terminaste «$title» ayer.';
+  }
+
+  @override
+  String endScreenRestoredTimerLastNight(int minutes) {
+    String _temp0 = intl.Intl.pluralLogic(
+      minutes,
+      locale: localeName,
+      other: '$minutes minutos',
+      one: '1 minuto',
+    );
+    return 'Hola de nuevo. Terminaste un temporizador de $_temp0 anoche.';
+  }
+
+  @override
+  String endScreenRestoredTimerEarlierToday(int minutes) {
+    String _temp0 = intl.Intl.pluralLogic(
+      minutes,
+      locale: localeName,
+      other: '$minutes minutos',
+      one: '1 minuto',
+    );
+    return 'Hola de nuevo. Terminaste un temporizador de $_temp0 hoy más temprano.';
+  }
+
+  @override
+  String endScreenRestoredTimerYesterday(int minutes) {
+    String _temp0 = intl.Intl.pluralLogic(
+      minutes,
+      locale: localeName,
+      other: '$minutes minutos',
+      one: '1 minuto',
+    );
+    return 'Hola de nuevo. Terminaste un temporizador de $_temp0 ayer.';
+  }
 }

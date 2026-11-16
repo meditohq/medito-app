@@ -74,6 +74,7 @@ class AssetConstants {
   static const String iconSun = 'assets/images/sun-light.svg';
   static const String iconTelegram = 'assets/images/telegram.svg';
   static const String iconTimer = 'assets/images/timer-solid.svg';
+  static const String iconSmartwatch = 'assets/images/smartwatch.svg';
   static const String iconTimerOutline = 'assets/images/timer.svg';
   static const String iconWhatsapp = 'assets/images/whatsapp.svg';
   static const String iconXmark = 'assets/images/xmark.svg';

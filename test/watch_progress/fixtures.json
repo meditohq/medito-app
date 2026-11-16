@@ -1,0 +1,593 @@
+[
+  {
+    "name": "offline completion advances pack and streak",
+    "snapshot": {
+      "streak": 1,
+      "consistency": 50,
+      "dayBoundaryOffsetMs": 0,
+      "activityTimestamps": [
+        1790683200000
+      ],
+      "recordedSessions": [],
+      "upNext": {
+        "id": "a",
+        "title": "a",
+        "audioUrl": "https://example.com/a",
+        "packTrackIds": [
+          "a",
+          "b"
+        ],
+        "completedTrackIds": [],
+        "remainingTracks": [
+          {
+            "id": "a",
+            "title": "a",
+            "audioUrl": "https://example.com/a"
+          },
+          {
+            "id": "b",
+            "title": "b",
+            "audioUrl": "https://example.com/b"
+          }
+        ],
+        "completed": 0,
+        "total": 2
+      }
+    },
+    "pending": [
+      {
+        "trackId": "a",
+        "timestamp": 1790769600000,
+        "duration": 600000
+      }
+    ],
+    "now": 1790769600000,
+    "expected": {
+      "completed": 1,
+      "id": "b",
+      "canPlay": true,
+      "streak": 2,
+      "consistency": 100
+    }
+  },
+  {
+    "name": "replayed outbox gives identical progress",
+    "snapshot": {
+      "streak": 1,
+      "dayBoundaryOffsetMs": 0,
+      "activityTimestamps": [
+        1790683200000
+      ],
+      "recordedSessions": [],
+      "upNext": {
+        "id": "a",
+        "title": "a",
+        "audioUrl": "https://example.com/a",
+        "packTrackIds": [
+          "a",
+          "b"
+        ],
+        "completedTrackIds": [],
+        "remainingTracks": [
+          {
+            "id": "a",
+            "title": "a",
+            "audioUrl": "https://example.com/a"
+          },
+          {
+            "id": "b",
+            "title": "b",
+            "audioUrl": "https://example.com/b"
+          }
+        ],
+        "completed": 0,
+        "total": 2
+      }
+    },
+    "pending": [
+      {
+        "trackId": "a",
+        "timestamp": 1790769600000,
+        "duration": 600000
+      },
+      {
+        "trackId": "a",
+        "timestamp": 1790769600000,
+        "duration": 600000
+      }
+    ],
+    "now": 1790769600000,
+    "expected": {
+      "completed": 1,
+      "id": "b",
+      "canPlay": true,
+      "streak": 2
+    }
+  },
+  {
+    "name": "second session on same day does not add a streak day",
+    "snapshot": {
+      "streak": 1,
+      "dayBoundaryOffsetMs": 0,
+      "activityTimestamps": [
+        1790683200000
+      ],
+      "recordedSessions": [],
+      "upNext": {
+        "id": "a",
+        "title": "a",
+        "audioUrl": "https://example.com/a",
+        "packTrackIds": [
+          "a",
+          "b"
+        ],
+        "completedTrackIds": [],
+        "remainingTracks": [
+          {
+            "id": "a",
+            "title": "a",
+            "audioUrl": "https://example.com/a"
+          },
+          {
+            "id": "b",
+            "title": "b",
+            "audioUrl": "https://example.com/b"
+          }
+        ],
+        "completed": 0,
+        "total": 2
+      }
+    },
+    "pending": [
+      {
+        "trackId": "a",
+        "timestamp": 1790769600000,
+        "duration": 600000
+      },
+      {
+        "trackId": "b",
+        "timestamp": 1790769601000,
+        "duration": 600000
+      }
+    ],
+    "now": 1790769600000,
+    "expected": {
+      "completed": 2,
+      "id": "a",
+      "canPlay": false,
+      "streak": 2
+    }
+  },
+  {
+    "name": "acknowledged snapshot does not double count",
+    "snapshot": {
+      "streak": 1,
+      "dayBoundaryOffsetMs": 0,
+      "activityTimestamps": [
+        1790683200000,
+        1790769600000
+      ],
+      "recordedSessions": [
+        "a|1790769600000"
+      ],
+      "upNext": {
+        "id": "b",
+        "title": "b",
+        "audioUrl": "https://example.com/b",
+        "packTrackIds": [
+          "a",
+          "b"
+        ],
+        "completedTrackIds": [
+          "a"
+        ],
+        "remainingTracks": [
+          {
+            "id": "b",
+            "title": "b",
+            "audioUrl": "https://example.com/b"
+          }
+        ],
+        "completed": 1,
+        "total": 2
+      }
+    },
+    "pending": [
+      {
+        "trackId": "a",
+        "timestamp": 1790769600000,
+        "duration": 600000
+      }
+    ],
+    "now": 1790769600000,
+    "expected": {
+      "completed": 1,
+      "id": "b",
+      "canPlay": true,
+      "streak": 2
+    }
+  },
+  {
+    "name": "stale pre-completion snapshot still overlays pending",
+    "snapshot": {
+      "streak": 1,
+      "dayBoundaryOffsetMs": 0,
+      "activityTimestamps": [
+        1790683200000
+      ],
+      "recordedSessions": [],
+      "upNext": {
+        "id": "a",
+        "title": "a",
+        "audioUrl": "https://example.com/a",
+        "packTrackIds": [
+          "a",
+          "b"
+        ],
+        "completedTrackIds": [],
+        "remainingTracks": [
+          {
+            "id": "a",
+            "title": "a",
+            "audioUrl": "https://example.com/a"
+          },
+          {
+            "id": "b",
+            "title": "b",
+            "audioUrl": "https://example.com/b"
+          }
+        ],
+        "completed": 0,
+        "total": 2
+      }
+    },
+    "pending": [
+      {
+        "trackId": "a",
+        "timestamp": 1790769600000,
+        "duration": 600000
+      }
+    ],
+    "now": 1790769600000,
+    "expected": {
+      "completed": 1,
+      "id": "b",
+      "canPlay": true,
+      "streak": 2
+    }
+  },
+  {
+    "name": "favorite outside pack only updates streak",
+    "snapshot": {
+      "streak": 1,
+      "dayBoundaryOffsetMs": 0,
+      "activityTimestamps": [
+        1790683200000
+      ],
+      "recordedSessions": [],
+      "upNext": {
+        "id": "a",
+        "title": "a",
+        "audioUrl": "https://example.com/a",
+        "packTrackIds": [
+          "a",
+          "b"
+        ],
+        "completedTrackIds": [],
+        "remainingTracks": [
+          {
+            "id": "a",
+            "title": "a",
+            "audioUrl": "https://example.com/a"
+          },
+          {
+            "id": "b",
+            "title": "b",
+            "audioUrl": "https://example.com/b"
+          }
+        ],
+        "completed": 0,
+        "total": 2
+      }
+    },
+    "pending": [
+      {
+        "trackId": "favorite",
+        "timestamp": 1790769600000,
+        "duration": 600000
+      }
+    ],
+    "now": 1790769600000,
+    "expected": {
+      "completed": 0,
+      "id": "a",
+      "canPlay": true,
+      "streak": 2
+    }
+  },
+  {
+    "name": "missed days reset streak",
+    "snapshot": {
+      "streak": 1,
+      "dayBoundaryOffsetMs": 0,
+      "activityTimestamps": [
+        1790683200000
+      ],
+      "recordedSessions": [],
+      "upNext": {
+        "id": "a",
+        "title": "a",
+        "audioUrl": "https://example.com/a",
+        "packTrackIds": [
+          "a",
+          "b"
+        ],
+        "completedTrackIds": [],
+        "remainingTracks": [
+          {
+            "id": "a",
+            "title": "a",
+            "audioUrl": "https://example.com/a"
+          },
+          {
+            "id": "b",
+            "title": "b",
+            "audioUrl": "https://example.com/b"
+          }
+        ],
+        "completed": 0,
+        "total": 2
+      }
+    },
+    "pending": [
+      {
+        "trackId": "a",
+        "timestamp": 1790769600000,
+        "duration": 600000
+      }
+    ],
+    "now": 1791028800000,
+    "expected": {
+      "completed": 1,
+      "id": "b",
+      "canPlay": true,
+      "streak": 0
+    }
+  },
+  {
+    "name": "cross-midnight completion belongs to start day",
+    "snapshot": {
+      "streak": 1,
+      "dayBoundaryOffsetMs": 0,
+      "activityTimestamps": [
+        1790683200000
+      ],
+      "recordedSessions": [],
+      "upNext": {
+        "id": "a",
+        "title": "a",
+        "audioUrl": "https://example.com/a",
+        "packTrackIds": [
+          "a",
+          "b"
+        ],
+        "completedTrackIds": [],
+        "remainingTracks": [
+          {
+            "id": "a",
+            "title": "a",
+            "audioUrl": "https://example.com/a"
+          },
+          {
+            "id": "b",
+            "title": "b",
+            "audioUrl": "https://example.com/b"
+          }
+        ],
+        "completed": 0,
+        "total": 2
+      }
+    },
+    "pending": [
+      {
+        "trackId": "a",
+        "timestamp": 1790726640000,
+        "duration": 600000
+      }
+    ],
+    "now": 1790726700000,
+    "expected": {
+      "completed": 1,
+      "id": "b",
+      "canPlay": true,
+      "streak": 1
+    }
+  },
+  {
+    "name": "4am day boundary honored",
+    "snapshot": {
+      "streak": 1,
+      "dayBoundaryOffsetMs": 14400000,
+      "activityTimestamps": [
+        1790596800000
+      ],
+      "recordedSessions": [],
+      "upNext": {
+        "id": "a",
+        "title": "a",
+        "audioUrl": "https://example.com/a",
+        "packTrackIds": [
+          "a",
+          "b"
+        ],
+        "completedTrackIds": [],
+        "remainingTracks": [
+          {
+            "id": "a",
+            "title": "a",
+            "audioUrl": "https://example.com/a"
+          },
+          {
+            "id": "b",
+            "title": "b",
+            "audioUrl": "https://example.com/b"
+          }
+        ],
+        "completed": 0,
+        "total": 2
+      }
+    },
+    "pending": [
+      {
+        "trackId": "a",
+        "timestamp": 1790733600000,
+        "duration": 600000
+      }
+    ],
+    "now": 1790733660000,
+    "expected": {
+      "completed": 1,
+      "id": "b",
+      "canPlay": true,
+      "streak": 2
+    }
+  },
+  {
+    "name": "compressed production snapshot acknowledges completion",
+    "snapshot": {
+      "streak": 1,
+      "dayBoundaryOffsetMs": 0,
+      "upNext": {
+        "id": "b",
+        "title": "b",
+        "audioUrl": "https://example.com/b",
+        "packTrackIds": [
+          "a",
+          "b"
+        ],
+        "completedTrackIds": [
+          "a"
+        ],
+        "remainingTracks": [
+          {
+            "id": "b",
+            "title": "b",
+            "audioUrl": "https://example.com/b"
+          }
+        ],
+        "completed": 1,
+        "total": 2
+      },
+      "recordedSessionsGzip": "H4sIAAAAAAAC/4tWSqwxNLc0MDezNDMAASUdBaWCosz8IrCwmYWxEUQ4FgA4S2GRKgAAAA=="
+    },
+    "pending": [
+      {
+        "trackId": "a",
+        "timestamp": 1790769600000,
+        "duration": 600000
+      }
+    ],
+    "now": 1790769600000,
+    "expected": {
+      "completed": 1,
+      "id": "b",
+      "canPlay": true,
+      "streak": 2
+    }
+  },
+  {
+    "name": "persisted canonical timestamp survives timezone reinterpretation",
+    "snapshot": {
+      "streak": 1,
+      "dayBoundaryOffsetMs": 0,
+      "activityTimestamps": [
+        1790683200000
+      ],
+      "recordedSessions": [],
+      "upNext": {
+        "id": "a",
+        "title": "a",
+        "audioUrl": "https://example.com/a",
+        "packTrackIds": [
+          "a",
+          "b"
+        ],
+        "completedTrackIds": [],
+        "remainingTracks": [
+          {
+            "id": "a",
+            "title": "a",
+            "audioUrl": "https://example.com/a"
+          },
+          {
+            "id": "b",
+            "title": "b",
+            "audioUrl": "https://example.com/b"
+          }
+        ],
+        "completed": 0,
+        "total": 2
+      }
+    },
+    "pending": [
+      {
+        "trackId": "a",
+        "timestamp": 1790769600000,
+        "duration": 600000,
+        "statsTimestamp": 1790708400000
+      }
+    ],
+    "now": 1790769600000,
+    "expected": {
+      "completed": 1,
+      "id": "b",
+      "canPlay": true,
+      "streak": 1
+    }
+  },
+  {
+    "name": "legacy snapshot preserves streak until history arrives",
+    "snapshot": {
+      "streak": 7,
+      "dayBoundaryOffsetMs": 0,
+      "upNext": {
+        "id": "a",
+        "title": "a",
+        "audioUrl": "https://example.com/a",
+        "packTrackIds": [
+          "a",
+          "b"
+        ],
+        "completedTrackIds": [],
+        "remainingTracks": [
+          {
+            "id": "a",
+            "title": "a",
+            "audioUrl": "https://example.com/a"
+          },
+          {
+            "id": "b",
+            "title": "b",
+            "audioUrl": "https://example.com/b"
+          }
+        ],
+        "completed": 0,
+        "total": 2
+      }
+    },
+    "pending": [
+      {
+        "trackId": "a",
+        "timestamp": 1790769600000,
+        "duration": 600000
+      }
+    ],
+    "now": 1790769600000,
+    "expected": {
+      "completed": 1,
+      "id": "b",
+      "canPlay": true,
+      "streak": 7
+    }
+  }
+]

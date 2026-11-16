@@ -24,6 +24,7 @@ import 'package:medito/views/settings/health_sync_tile.dart';
 import 'package:medito/views/settings/widgets/account_section_widget.dart';
 import 'package:medito/views/settings/widgets/dnd_setting_tile.dart';
 import 'package:medito/views/settings/widgets/reminder_tile.dart';
+import 'package:medito/views/settings/widgets/watch_install_tile.dart';
 import 'package:medito/views/settings/widgets/zen_mode_tile.dart';
 import 'package:medito/l10n/app_localizations.dart';
 import 'package:medito/widgets/medito_icon.dart';
@@ -374,6 +375,10 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
           _buildSectionCard(tiles(_sectionSupport)),
           _buildSectionTitle(context, l10n.customization),
           _buildSectionCard([
+            // Collapses to nothing unless a watch is paired without the
+            // Medito app. Always followed by other rows, so it keeps its
+            // underline.
+            const WatchInstallTile(),
             RowItemWidget(
               icon: Icon(Icons.palette_outlined, color: onSurface),
               title: l10n.appearance,

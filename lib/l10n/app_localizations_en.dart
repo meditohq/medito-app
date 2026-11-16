@@ -3160,6 +3160,93 @@ class AppLocalizationsEn extends AppLocalizations {
   }
 
   @override
+  String get onPhone => 'On phone';
+
+  @override
+  String get onWatch => 'On watch';
+
+  @override
+  String get sendToWatch => 'Send to watch';
+
+  @override
+  String get removeFromWatch => 'Remove from watch';
+
+  @override
+  String get waitingForWatch => 'Waiting for watch';
+
+  @override
+  String get sendingToWatch => 'Sending…';
+
+  @override
+  String get readyOnWatch => 'Ready on watch';
+
+  @override
+  String get watchRemovalPending => 'Removal pending';
+
+  @override
+  String get watchStorageFull =>
+      'Not enough space on your watch. Remove some downloads and try again.';
+
+  @override
+  String get watchTransferFailed => 'Could not send this session. Try again.';
+
+  @override
+  String get emptyWatchDownloads =>
+      'Send sessions from On phone to listen offline on your watch.';
+
+  @override
+  String get watchStatusUnavailable => 'Could not check your watch. Try again.';
+
+  @override
+  String get watchCopyIndependent =>
+      'Removing a phone download keeps its watch copy.';
+
+  @override
+  String get cancelWatchTransfer => 'Cancel transfer';
+
+  @override
+  String get selectSessions => 'Select';
+
+  @override
+  String get checkingWatch => 'Checking watch…';
+
+  @override
+  String get watchSimulatorTransferUnavailable =>
+      'Sending downloads to Apple Watch requires a real paired iPhone and watch.';
+
+  @override
+  String get noWatchConnected => 'No watch connected';
+
+  @override
+  String get watchInstallTitle => 'Medito on your watch';
+
+  @override
+  String get watchInstallSubtitle => 'Meditate from your wrist';
+
+  @override
+  String get watchInstallAndroidOpened => 'Check your watch to install Medito';
+
+  @override
+  String get watchInstallAndroidFailed =>
+      'Couldn\'t reach your watch. Open the Play Store on your watch and search for Medito.';
+
+  @override
+  String get watchInstallIosIntro =>
+      'Medito has an Apple Watch app. To install it:';
+
+  @override
+  String get watchInstallIosStep1 => 'Open the Watch app on your iPhone';
+
+  @override
+  String get watchInstallIosStep2 => 'Scroll down to Available Apps';
+
+  @override
+  String get watchInstallIosStep3 => 'Tap Install next to Medito';
+
+  @override
+  String get watchInstallOpenWatchApp => 'Open Watch app';
+
+  @override
   String get timerTitle => 'Timer';
 
   @override
@@ -3303,39 +3390,6 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get meditatedToday => 'Meditated today';
-
-  @override
-  String get endScreenDone => 'Done';
-
-  @override
-  String endScreenRestoredLastNight(String title) {
-    return 'Welcome back. You finished “$title” last night.';
-  }
-
-  @override
-  String endScreenRestoredEarlierToday(String title) {
-    return 'Welcome back. You finished “$title” earlier today.';
-  }
-
-  @override
-  String endScreenRestoredYesterday(String title) {
-    return 'Welcome back. You finished “$title” yesterday.';
-  }
-
-  @override
-  String endScreenRestoredTimerLastNight(int minutes) {
-    return 'Welcome back. You finished a $minutes-minute timer last night.';
-  }
-
-  @override
-  String endScreenRestoredTimerEarlierToday(int minutes) {
-    return 'Welcome back. You finished a $minutes-minute timer earlier today.';
-  }
-
-  @override
-  String endScreenRestoredTimerYesterday(int minutes) {
-    return 'Welcome back. You finished a $minutes-minute timer yesterday.';
-  }
 
   @override
   String upNextVariant(String guide, int minutes) {
@@ -3483,4 +3537,37 @@ class AppLocalizationsEn extends AppLocalizations {
   @override
   String get analyticsReconsentInfoBody =>
       'Older versions of Medito switched usage stats off for anyone who declined tracking, which went further than it should have.\n\nUsage stats record how you use the app, linked to your Medito user ID, so we can see which sessions help and fix what breaks. They\'re never used for ads or to track you across other apps.\n\nYou can change this any time in Settings → Advanced → Privacy Policy.';
+
+  @override
+  String get endScreenDone => 'Done';
+
+  @override
+  String endScreenRestoredLastNight(String title) {
+    return 'Welcome back. You finished “$title” last night.';
+  }
+
+  @override
+  String endScreenRestoredEarlierToday(String title) {
+    return 'Welcome back. You finished “$title” earlier today.';
+  }
+
+  @override
+  String endScreenRestoredYesterday(String title) {
+    return 'Welcome back. You finished “$title” yesterday.';
+  }
+
+  @override
+  String endScreenRestoredTimerLastNight(int minutes) {
+    return 'Welcome back. You finished a $minutes-minute timer last night.';
+  }
+
+  @override
+  String endScreenRestoredTimerEarlierToday(int minutes) {
+    return 'Welcome back. You finished a $minutes-minute timer earlier today.';
+  }
+
+  @override
+  String endScreenRestoredTimerYesterday(int minutes) {
+    return 'Welcome back. You finished a $minutes-minute timer yesterday.';
+  }
 }

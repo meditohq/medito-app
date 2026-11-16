@@ -511,10 +511,11 @@ class StatsManager {
 
     var prefs = _prefs;
     if (_allStats != null) {
-      await prefs.setString(
+      final saved = await prefs.setString(
         SharedPreferenceConstants.localAllStatsKey,
         jsonEncode(_allStats!.toJson()),
       );
+      if (!saved) throw StateError('Could not persist local stats');
     }
   }
 
@@ -563,6 +564,8 @@ class StatsManager {
     LocalAudioCompleted audioCompleted,
     int duration, {
     bool skipPost = false,
+    bool deduplicate = false,
+    bool timestampIsNormalized = false,
   }) async {
     if (!_isInitialized) {
       await initialize();
@@ -572,17 +575,32 @@ class StatsManager {
     // Mark as dirty since we're about to modify stats
     _dirty = true;
 
-    if (AudioCompletionTracker.checkTrackCrossedMidnight(
-      endTimestamp: audioCompleted.timestamp,
-      duration: duration,
-      dayBoundaryOffset: _dayBoundaryOffset,
-    )) {
+    if (!timestampIsNormalized &&
+        AudioCompletionTracker.checkTrackCrossedMidnight(
+          endTimestamp: audioCompleted.timestamp,
+          duration: duration,
+          dayBoundaryOffset: _dayBoundaryOffset,
+        )) {
       audioCompleted = audioCompleted.copyWith(
         timestamp: audioCompleted.timestamp - duration,
       );
     }
 
+    // Watch deliveries can be replayed after a crash between saving and ack.
+    // Compare the normalized timestamp (sessions crossing midnight use start).
+    if (deduplicate &&
+        (_allStats?.audioCompleted ?? []).any(
+          (entry) =>
+              entry.id == audioCompleted.id &&
+              entry.timestamp == audioCompleted.timestamp,
+        )) {
+      // A previous attempt may have mutated memory before its disk write failed.
+      await _saveLocalAllStatsToSharedPrefs();
+      return;
+    }
+
     // Update stats with the completed audio
+    final previousStats = _allStats;
     _allStats = AudioCompletionTracker.updateStatsWithCompletedAudio(
       stats: _allStats,
       audioCompleted: audioCompleted,
@@ -591,11 +609,17 @@ class StatsManager {
 
     // Calculate streak and consistency score, then save stats
     if (_allStats != null) {
-      _allStats = calculateStreak(_allStats!);
-      final newConsistencyScore = calculateConsistencyScore(_allStats!);
-      _allStats = _allStats!.copyWith(consistencyScore: newConsistencyScore);
-      await saveConsistencyScoreHistory(newConsistencyScore);
-      await _saveLocalAllStatsToSharedPrefs();
+      try {
+        _allStats = calculateStreak(_allStats!);
+        final newConsistencyScore = calculateConsistencyScore(_allStats!);
+        _allStats = _allStats!.copyWith(consistencyScore: newConsistencyScore);
+        await saveConsistencyScoreHistory(newConsistencyScore);
+        await _saveLocalAllStatsToSharedPrefs();
+      } catch (_) {
+        // Never publish/acknowledge a completion whose local write failed.
+        _allStats = previousStats;
+        rethrow;
+      }
 
       if (skipPost) {
         // Caller is batching multiple inserts and will post + update the

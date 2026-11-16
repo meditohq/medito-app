@@ -1,3 +1,4 @@
+import 'package:medito/services/watch_sync_service.dart';
 // ignore_for_file: use_build_context_synchronously
 
 import 'dart:async';
@@ -383,6 +384,7 @@ class _ParentWidgetState extends ConsumerState<ParentWidget>
 
         // Initialize auth state listener to handle navigation on force logout
         ref.watch(authStateListenerProvider);
+        ref.watch(watchCompletionSyncProvider);
 
         // Listen for auth state events that require navigation
         ref.listen<AsyncValue<AuthStateEvent>>(

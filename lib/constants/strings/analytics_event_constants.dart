@@ -234,6 +234,11 @@ class AnalyticsEventConstants {
   /// denominator for completion rate. Same params as [audioSessionCompleted].
   static const String audioSessionStarted = 'audio_session_started';
 
+  /// Event logged when a session finished on the Apple Watch is recorded on
+  /// the phone. Kept separate from [audioSessionCompleted] so watch sessions
+  /// (which never log [audioSessionStarted]) don't skew phone completion rate.
+  static const String watchSessionCompleted = 'watch_session_completed';
+
   /// Event logged once when a started session ends WITHOUT completing
   /// (close, switch track, navigate-away-while-paused, background-while-paused,
   /// or replayed on next launch after a force-quit). Carries
@@ -606,6 +611,11 @@ class AnalyticsEventConstants {
   /// Medito watch app is on it ('true' / 'false'). Set on every Home launch.
   static const String userPropHasPairedWatch = 'has_paired_watch';
   static const String userPropWatchAppInstalled = 'watch_app_installed';
+
+  /// Settings "Medito on your watch" row (shown when a watch is paired but the
+  /// Medito watch app isn't on it). Tapped when the row is opened; `opened`
+  /// says whether the watch's store / the Watch app could be opened.
+  static const String watchInstallPromptTapped = 'watch_install_prompt_tapped';
 
   /// GA4 user property listing the home-screen widget kinds the user has
   /// placed, sorted and comma-joined ('consistency,up_next'), or 'none'.

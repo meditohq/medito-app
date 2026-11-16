@@ -363,6 +363,24 @@ Future<void> storeTrackCompletion(
   await storage.addCompletedTrack(payload);
 }
 
+/// Reschedules the Daily reminder series after a session recorded elsewhere
+/// (the Apple Watch), as [handleStats] does for sessions played on the phone
+/// — so today's reminder doesn't still fire, and the copy's streak is current.
+Future<void> rescheduleRemindersAfterSession({
+  required int endMs,
+  required int durationMs,
+}) => _rescheduleReminders(endMs: endMs, durationMs: durationMs);
+
+/// Writes a session recorded elsewhere (the Apple Watch) to Health, exactly
+/// as [handleStats] does for sessions played on the phone. Takes the same
+/// payload shape (timestamp = end, duration in ms).
+Future<bool> syncSessionToHealth(Map<String, dynamic> payload) async {
+  await _syncHealthKit(payload);
+  return HealthKitManager().isSessionSynced(
+    payload[TypeConstants.timestampIdKey],
+  );
+}
+
 Future<void> _syncHealthKit(Map<String, dynamic> payload) async {
   var healthKitManager = HealthKitManager();
 
