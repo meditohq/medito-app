@@ -32,10 +32,13 @@ class BlackFridayUtils {
 
   /// Dismissal lasts for the year it was made in, so closing the row one
   /// Black Friday doesn't hide it every Black Friday after.
-  static bool isBlackFridayDismissedSync(SharedPreferences prefs) {
+  static bool isBlackFridayDismissedSync(
+    SharedPreferences prefs, {
+    DateTime? now,
+  }) {
     if (_force) return false;
     return prefs.getInt(SharedPreferenceConstants.blackFridayDismissedYear) ==
-        DateTime.now().year;
+        (now ?? DateTime.now()).year;
   }
 
   static Future<void> dismissBlackFriday() async {
