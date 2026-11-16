@@ -265,6 +265,159 @@ void main() {
     });
 
     group('Custom order preservation during Black Friday', () {
+      // Black Friday lifts `products` to sit directly under Shortcuts. The
+      // visible order is what the user sees, not the order they own, so saving
+      // it as-is makes the promo layout permanent once the week ends.
+      const defaultBaseOrder = [
+        HomeWidgetType.upNext,
+        HomeWidgetType.shortcuts,
+        HomeWidgetType.carousel,
+        HomeWidgetType.quote,
+        HomeWidgetType.products,
+      ];
+      const defaultBlackFridayOrder = [
+        HomeWidgetType.upNext,
+        HomeWidgetType.shortcuts,
+        HomeWidgetType.products,
+        HomeWidgetType.carousel,
+        HomeWidgetType.quote,
+      ];
+
+      test('a reorder that moves nothing does not save the promo layout', () {
+        // The bug: the old slot guess reinserted products at index 2 for a
+        // default order, so the saved order equalled the Black Friday one and
+        // products stayed pinned under Shortcuts after the week ended.
+        expect(
+          restoreBaseOrderFromBlackFridayOrder(
+            defaultBlackFridayOrder,
+            baseOrder: defaultBaseOrder,
+          ),
+          defaultBaseOrder,
+        );
+      });
+
+      test('keeps the user reorder of the other sections', () {
+        // Quote dragged above carousel while the promo is on. Products must
+        // still return to the end, where it sat before the promo.
+        expect(
+          restoreBaseOrderFromBlackFridayOrder(const [
+            HomeWidgetType.upNext,
+            HomeWidgetType.shortcuts,
+            HomeWidgetType.products,
+            HomeWidgetType.quote,
+            HomeWidgetType.carousel,
+          ], baseOrder: defaultBaseOrder),
+          const [
+            HomeWidgetType.upNext,
+            HomeWidgetType.shortcuts,
+            HomeWidgetType.quote,
+            HomeWidgetType.carousel,
+            HomeWidgetType.products,
+          ],
+        );
+      });
+
+      test(
+        'a base order that already has products under shortcuts is kept',
+        () {
+          const baseOrder = [
+            HomeWidgetType.upNext,
+            HomeWidgetType.shortcuts,
+            HomeWidgetType.products,
+            HomeWidgetType.carousel,
+            HomeWidgetType.quote,
+          ];
+
+          expect(
+            restoreBaseOrderFromBlackFridayOrder(
+              baseOrder,
+              baseOrder: baseOrder,
+            ),
+            baseOrder,
+          );
+        },
+      );
+
+      test('a base order with products early keeps that slot', () {
+        const baseOrder = [
+          HomeWidgetType.products,
+          HomeWidgetType.upNext,
+          HomeWidgetType.shortcuts,
+          HomeWidgetType.carousel,
+          HomeWidgetType.quote,
+        ];
+        const visible = [
+          HomeWidgetType.upNext,
+          HomeWidgetType.shortcuts,
+          HomeWidgetType.products,
+          HomeWidgetType.carousel,
+          HomeWidgetType.quote,
+        ];
+
+        expect(
+          restoreBaseOrderFromBlackFridayOrder(visible, baseOrder: baseOrder),
+          baseOrder,
+        );
+      });
+
+      test(
+        'a products move the user made themselves is saved as they left it',
+        () {
+          // Products dragged to the end, away from Shortcuts: that is the user's
+          // own choice, not the promo injection.
+          expect(
+            restoreBaseOrderFromBlackFridayOrder(
+              defaultBaseOrder,
+              baseOrder: defaultBaseOrder,
+            ),
+            defaultBaseOrder,
+          );
+          // Products dragged to the top.
+          const productsFirst = [
+            HomeWidgetType.products,
+            HomeWidgetType.upNext,
+            HomeWidgetType.shortcuts,
+            HomeWidgetType.carousel,
+            HomeWidgetType.quote,
+          ];
+          expect(
+            restoreBaseOrderFromBlackFridayOrder(
+              productsFirst,
+              baseOrder: defaultBaseOrder,
+            ),
+            productsFirst,
+          );
+        },
+      );
+
+      test('an order without products or shortcuts is untouched', () {
+        const noProducts = [
+          HomeWidgetType.upNext,
+          HomeWidgetType.shortcuts,
+          HomeWidgetType.carousel,
+        ];
+        expect(
+          restoreBaseOrderFromBlackFridayOrder(
+            noProducts,
+            baseOrder: defaultBaseOrder,
+          ),
+          noProducts,
+        );
+
+        const noShortcuts = [
+          HomeWidgetType.upNext,
+          HomeWidgetType.products,
+          HomeWidgetType.carousel,
+        ];
+        expect(
+          restoreBaseOrderFromBlackFridayOrder(
+            noShortcuts,
+            baseOrder: defaultBaseOrder,
+          ),
+          noShortcuts,
+        );
+      });
+
       test(
         'updateOrder preserves custom order when saving during Black Friday',
         () async {

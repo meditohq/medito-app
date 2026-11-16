@@ -9,6 +9,44 @@ final homeWidgetOrderProvider =
       HomeWidgetOrderNotifier.new,
     );
 
+/// The order to store after the user arranges Home during Black Friday week.
+///
+/// Black Friday lifts `products` up to sit directly under Shortcuts. Saving the
+/// visible list as it stands therefore turns the promo arrangement into the
+/// user's own order, and it survives the week. Put `products` back in the slot
+/// it held in [baseOrder], the order that was on disk before the promo was
+/// applied, and keep the user's placement of every other section.
+///
+/// When `products` is not directly under Shortcuts, the user moved it there
+/// themselves, so the visible list is returned unchanged.
+///
+/// The previous version guessed the slot from the sections after Shortcuts, so
+/// for a default order (`products` last) it reinserted `products` exactly where
+/// Black Friday had put it: the saved order never changed.
+List<HomeWidgetType> restoreBaseOrderFromBlackFridayOrder(
+  List<HomeWidgetType> blackFridayOrder, {
+  required List<HomeWidgetType> baseOrder,
+}) {
+  final productsIndex = blackFridayOrder.indexOf(HomeWidgetType.products);
+  final shortcutsIndex = blackFridayOrder.indexOf(HomeWidgetType.shortcuts);
+  if (productsIndex == -1 ||
+      shortcutsIndex == -1 ||
+      productsIndex != shortcutsIndex + 1) {
+    return blackFridayOrder;
+  }
+
+  final baseProductsIndex = baseOrder.indexOf(HomeWidgetType.products);
+  if (baseProductsIndex == -1) return blackFridayOrder;
+
+  final restored = List<HomeWidgetType>.from(blackFridayOrder)
+    ..remove(HomeWidgetType.products);
+  restored.insert(
+    baseProductsIndex.clamp(0, restored.length),
+    HomeWidgetType.products,
+  );
+  return restored;
+}
+
 class HomeWidgetOrderNotifier extends Notifier<List<HomeWidgetType>> {
   @override
   List<HomeWidgetType> build() {
@@ -88,65 +126,16 @@ class HomeWidgetOrderNotifier extends Notifier<List<HomeWidgetType>> {
 
     List<HomeWidgetType> orderToSave;
     if (isBlackFriday && !isDismissed) {
-      orderToSave = _restoreBaseOrderFromBlackFridayOrder(newOrder);
+      orderToSave = restoreBaseOrderFromBlackFridayOrder(
+        newOrder,
+        baseOrder: _loadBaseOrder(),
+      );
     } else {
       orderToSave = newOrder;
     }
 
     state = [...newOrder];
     await _saveOrderToPrefs(orderToSave);
-  }
-
-  List<HomeWidgetType> _restoreBaseOrderFromBlackFridayOrder(
-    List<HomeWidgetType> blackFridayOrder,
-  ) {
-    final shortcutsIndex = blackFridayOrder.indexOf(HomeWidgetType.shortcuts);
-    final productsIndex = blackFridayOrder.indexOf(HomeWidgetType.products);
-
-    if (shortcutsIndex == -1 ||
-        productsIndex == -1 ||
-        productsIndex != shortcutsIndex + 1) {
-      return blackFridayOrder;
-    }
-
-    final restored = List<HomeWidgetType>.from(blackFridayOrder);
-    restored.removeAt(productsIndex);
-
-    final originalProductsPosition = _findOriginalProductsPosition(restored);
-
-    restored.insert(originalProductsPosition, HomeWidgetType.products);
-
-    return restored;
-  }
-
-  int _findOriginalProductsPosition(List<HomeWidgetType> orderWithoutProducts) {
-    final shortcutsIndex = orderWithoutProducts.indexOf(
-      HomeWidgetType.shortcuts,
-    );
-    final carouselIndex = orderWithoutProducts.indexOf(HomeWidgetType.carousel);
-    final quoteIndex = orderWithoutProducts.indexOf(HomeWidgetType.quote);
-
-    if (shortcutsIndex == -1) {
-      return orderWithoutProducts.length;
-    }
-
-    final widgetsAfterShortcuts = <HomeWidgetType>[];
-    if (carouselIndex != -1 && carouselIndex > shortcutsIndex) {
-      widgetsAfterShortcuts.add(HomeWidgetType.carousel);
-    }
-    if (quoteIndex != -1 && quoteIndex > shortcutsIndex) {
-      widgetsAfterShortcuts.add(HomeWidgetType.quote);
-    }
-
-    if (widgetsAfterShortcuts.isEmpty) {
-      return shortcutsIndex + 1;
-    }
-
-    final firstWidgetAfterShortcuts = widgetsAfterShortcuts
-        .map((widget) => orderWithoutProducts.indexOf(widget))
-        .reduce((a, b) => a < b ? a : b);
-
-    return firstWidgetAfterShortcuts;
   }
 
   Future<void> _saveOrderToPrefs(List<HomeWidgetType> order) async {
