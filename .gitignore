@@ -92,6 +92,9 @@ gen/
 /.vscode
 android/app/meditokey.jks
 **.g.dart
+# Vendored packages ship their generated parts; the app's build_runner
+# doesn't generate them.
+!third_party/**/*.g.dart
 *.freezed.dart
 ios/Flutter/flutter_export_environment.sh
 ios/Runner.xcodeproj/project.pbxproj
