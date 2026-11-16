@@ -31,6 +31,27 @@ String reminderPayload(int day, {DateTime? scheduledAt, int? notificationId}) =>
         ...NotificationTiming.planned(scheduledAt, notificationId),
     });
 
+/// Returns the local wall-clock time [dayOffset] calendar days after [anchor].
+///
+/// `add(Duration(days: 1))` adds exactly 24 hours. On a DST changeover day the
+/// clock moves by an hour, so every reminder after the change fired an hour
+/// early or late: a 09:00 reminder became 10:00 after spring-forward and 08:00
+/// after fall-back. Deriving the date from its fields keeps the time the user
+/// picked, and lets the platform resolve the UTC offset for that day.
+///
+/// Out-of-range values roll over: day 32 becomes the next month, as the
+/// `DateTime` constructor normalises them.
+DateTime sameLocalTimeAfterDays(DateTime anchor, int dayOffset) => DateTime(
+  anchor.year,
+  anchor.month,
+  anchor.day + dayOffset,
+  anchor.hour,
+  anchor.minute,
+  anchor.second,
+  anchor.millisecond,
+  anchor.microsecond,
+);
+
 /// The series re-anchors after every session so the streak and consistency
 /// numbers baked into each day's copy stay current. That part is deliberate.
 /// Moving the TIME OF DAY was not: it overwrote an hour the user had chosen at
@@ -96,7 +117,7 @@ class DailyRemindersService {
       time.minute,
     );
     final anchor = candidate.isBefore(now)
-        ? candidate.add(const Duration(days: 1))
+        ? sameLocalTimeAfterDays(candidate, 1)
         : candidate;
 
     final scheduler = DailyRemindersScheduler(
@@ -159,7 +180,7 @@ class DailyRemindersScheduler {
     }
 
     for (var i = 0; i < 15; i++) {
-      final when = anchorLocal.add(Duration(days: i));
+      final when = sameLocalTimeAfterDays(anchorLocal, i);
       final tzWhen = tz.TZDateTime.from(when, tz.local);
       final copy = _copyForDay(
         i + 1,
@@ -182,7 +203,7 @@ class DailyRemindersScheduler {
       );
     }
 
-    final day30When = anchorLocal.add(Duration(days: 29));
+    final day30When = sameLocalTimeAfterDays(anchorLocal, 29);
     final day30TzWhen = tz.TZDateTime.from(day30When, tz.local);
     final day30Copy = _copyForDay(
       30,
@@ -263,9 +284,10 @@ class DailyRemindersScheduler {
   }) async {
     final end = DateTime.fromMillisecondsSinceEpoch(endMs);
     final start = end.subtract(Duration(milliseconds: durationMs));
-    final sessionAnchor = start
-        .add(const Duration(days: 1))
-        .subtract(const Duration(minutes: 10));
+    final sessionAnchor = sameLocalTimeAfterDays(
+      start,
+      1,
+    ).subtract(const Duration(minutes: 10));
     final anchor = anchorPreferringSavedTime(
       sessionAnchor,
       prefs.getInt(SharedPreferenceConstants.savedHours),
