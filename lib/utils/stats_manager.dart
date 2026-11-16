@@ -807,7 +807,9 @@ class StatsManager {
     // force: removing the last session leaves a legitimately empty history,
     // and it must still be written or the session returns on the next launch.
     await _saveLocalAllStatsToSharedPrefs(force: true);
-    await _statsService.postStats(_allStats!);
+    // force: the empty history is the user's intent here. Without it the
+    // service skips the POST and the server keeps the deleted session.
+    await _statsService.postStats(_allStats!, force: true);
     _lastSyncedAt = _getCurrentDate();
     await _saveLastSyncedAt();
     _dirty = false;

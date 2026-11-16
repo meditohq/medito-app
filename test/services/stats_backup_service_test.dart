@@ -31,6 +31,44 @@ void main() {
       );
     });
 
+    test('should backup an empty snapshot when forced', () async {
+      final validStats = LocalAllStats(
+        streakCurrent: 1,
+        streakLongest: 1,
+        totalTracksCompleted: 1,
+        totalTimeListened: 600000,
+        audioCompleted: [
+          LocalAudioCompleted(
+            id: 'track-1',
+            timestamp: DateTime.now().millisecondsSinceEpoch,
+          ),
+        ],
+        freezeUsageDates: [],
+        tracksChecked: [],
+        updated: DateTime.now().millisecondsSinceEpoch,
+      );
+      expect(await backupService.backupStats(validStats, 'test-user'), true);
+
+      // Deleting the last session forces the empty history into the ring.
+      await Future<void>.delayed(const Duration(milliseconds: 5));
+      expect(
+        await backupService.backupStats(
+          LocalAllStats.empty(),
+          'test-user',
+          force: true,
+        ),
+        true,
+      );
+
+      final latest = await backupService.getLatestBackup('test-user');
+      expect(
+        latest?.totalTracksCompleted,
+        0,
+        reason: 'the newest snapshot is the deletion, not the old history',
+      );
+      expect(latest?.audioCompleted, isEmpty);
+    });
+
     test('should backup valid stats', () async {
       // Arrange
       final validStats = LocalAllStats(

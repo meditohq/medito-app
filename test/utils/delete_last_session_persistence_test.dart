@@ -61,6 +61,10 @@ void main() {
 
         await statsManager.removeAudioCompleted(session);
 
+        // The service must be told to send the empty history; without force
+        // the empty guard skips the POST and the server keeps the session.
+        verify(mockStatsService.postStats(any, force: true)).called(1);
+
         saved = await readSavedStats();
         expect(
           saved?['totalTracksCompleted'],
