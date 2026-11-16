@@ -139,13 +139,13 @@ abstract class AppLocalizations {
   /// No description provided for @autoDeleteCompletedDownloads.
   ///
   /// In en, this message translates to:
-  /// **'Delete completed downloads'**
+  /// **'Delete finished sessions'**
   String get autoDeleteCompletedDownloads;
 
   /// No description provided for @autoDeleteCompletedDownloadsDescription.
   ///
   /// In en, this message translates to:
-  /// **'Automatically remove sessions you\'ve finished listening to, including ones you downloaded yourself.'**
+  /// **'Includes manual downloads.'**
   String get autoDeleteCompletedDownloadsDescription;
 
   /// No description provided for @autoDownloadNextSession.
@@ -157,8 +157,8 @@ abstract class AppLocalizations {
   /// Explains which Home recommendation is downloaded, using the visible labels on Home.
   ///
   /// In en, this message translates to:
-  /// **'Automatically save the session shown under {upNext} on {home} so it\'s ready offline.'**
-  String autoDownloadNextSessionDescription(String upNext, String home);
+  /// **'The next session shown on {home}.'**
+  String autoDownloadNextSessionDescription(String home);
 
   /// No description provided for @downloadDefaultVoiceAndLength.
   ///
@@ -183,12 +183,6 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Wi-Fi and mobile data'**
   String get downloadWifiAndMobileData;
-
-  /// No description provided for @autoDownloadForegroundNote.
-  ///
-  /// In en, this message translates to:
-  /// **'Downloads happen while Medito is open and connected.'**
-  String get autoDownloadForegroundNote;
 
   /// No description provided for @volume.
   ///

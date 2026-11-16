@@ -3,6 +3,7 @@ import 'package:medito/providers/providers.dart';
 import 'package:medito/repositories/repositories.dart';
 import 'package:medito/utils/utils.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:medito/repositories/downloader/download_library.dart';
 
 class AudioDownloaderState {
   final Map<String, double> downloadingProgress;
@@ -73,8 +74,23 @@ class AudioDownloaderProvider extends Notifier<AudioDownloaderState> {
         audioDownloadState: finalDownloadState,
       );
 
-      final repository = ref.read(trackRepositoryProvider);
-      final tracks = await repository.fetchTrackFromPreference();
+      await saveDownloadedRequest(request);
+    } catch (e) {
+      if (ref.mounted) {
+        var errorDownloadState = Map<String, AudioDownloadState>.from(
+          state.audioDownloadState,
+        );
+        errorDownloadState[fileName] = AudioDownloadState.download;
+        state = state.copyWith(audioDownloadState: errorDownloadState);
+      }
+      rethrow;
+    }
+  }
+
+  /// Shared by foreground transfers and files completed by the native queue.
+  Future<void> saveDownloadedRequest(PlaybackRequest request) async {
+    if (!ref.mounted) return;
+    await ref.read(downloadLibraryProvider).update((tracks) {
       final updated = tracks
           .where(
             (track) => !track.voices.any(
@@ -106,19 +122,28 @@ class AudioDownloaderProvider extends Notifier<AudioDownloaderState> {
           ],
         ),
       );
-      await repository.addTrackInPreference(updated);
-      if (!ref.mounted) return;
-      ref.invalidate(downloadedTracksProvider);
-    } catch (e) {
-      if (ref.mounted) {
-        var errorDownloadState = Map<String, AudioDownloadState>.from(
-          state.audioDownloadState,
-        );
-        errorDownloadState[fileName] = AudioDownloadState.download;
-        state = state.copyWith(audioDownloadState: errorDownloadState);
-      }
-      rethrow;
-    }
+      return updated;
+    });
+    if (!ref.mounted) return;
+    ref.invalidate(downloadedTracksProvider);
+    reportBackgroundDownload(request, AudioDownloadState.downloaded);
+  }
+
+  void reportBackgroundDownload(
+    PlaybackRequest request,
+    AudioDownloadState status, {
+    double? progress,
+  }) {
+    if (!ref.mounted) return;
+    final fileName =
+        '${request.trackId}-${request.fileId}${getAudioFileExtension(request.remoteUrl)}';
+    final percentages = {...state.downloadingProgress};
+    if (progress != null) percentages[fileName] = progress * 100;
+    if (status != AudioDownloadState.downloading) percentages.remove(fileName);
+    state = state.copyWith(
+      audioDownloadState: {...state.audioDownloadState, fileName: status},
+      downloadingProgress: percentages,
+    );
   }
 
   /// Keep file removal and saved-download state in the same long-lived action,
@@ -130,16 +155,17 @@ class AudioDownloaderProvider extends Notifier<AudioDownloaderState> {
     await deleteTrackAudio(fileName);
     if (!ref.mounted) return;
 
-    final repository = ref.read(trackRepositoryProvider);
-    final tracks = await repository.fetchTrackFromPreference();
-    final remaining = tracks
-        .where(
-          (track) => !track.voices.any(
-            (voice) => voice.audioFiles.any((file) => file.id == fileId),
-          ),
-        )
-        .toList();
-    await repository.addTrackInPreference(remaining);
+    await ref
+        .read(downloadLibraryProvider)
+        .update(
+          (tracks) => tracks
+              .where(
+                (track) => !track.voices.any(
+                  (voice) => voice.audioFiles.any((file) => file.id == fileId),
+                ),
+              )
+              .toList(),
+        );
     if (!ref.mounted) return;
     ref.invalidate(downloadedTracksProvider);
   }

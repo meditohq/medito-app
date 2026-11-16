@@ -6,14 +6,13 @@
   "meditoUrl": "https://meditofoundation.org/",
   "downloads": "Downloads",
   "downloadOptions": "Download options",
-  "autoDeleteCompletedDownloads": "Delete completed downloads",
-  "autoDeleteCompletedDownloadsDescription": "Automatically remove sessions you've finished listening to, including ones you downloaded yourself.",
+  "autoDeleteCompletedDownloads": "Delete finished sessions",
+  "autoDeleteCompletedDownloadsDescription": "Includes manual downloads.",
   "autoDownloadNextSession": "Download next session",
-  "autoDownloadNextSessionDescription": "Automatically save the session shown under {upNext} on {home} so it's ready offline.",
+  "autoDownloadNextSessionDescription": "The next session shown on {home}.",
   "@autoDownloadNextSessionDescription": {
     "description": "Explains which Home recommendation is downloaded, using the visible labels on Home.",
     "placeholders": {
-      "upNext": { "type": "String" },
       "home": { "type": "String" }
     }
   },
@@ -21,7 +20,6 @@
   "downloadUsing": "Download using",
   "downloadWifiOnly": "Wi-Fi only",
   "downloadWifiAndMobileData": "Wi-Fi and mobile data",
-  "autoDownloadForegroundNote": "Downloads happen while Medito is open and connected.",
   "volume": "Volume",
   "home": "Home",
   "backgroundSoundDownloadFailed": "Couldn't download. Tap to try again.",

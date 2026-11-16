@@ -83,11 +83,13 @@ void main() {
       expect(container.read(downloadSettingsProvider).deleteCompleted, isFalse);
       expect(find.text('Wi-Fi only'), findsOneWidget);
       expect(container.read(downloadSettingsProvider).useMobileData, isFalse);
-    expect(find.textContaining('Continue on Home'), findsOneWidget);
+      expect(find.text('The next session shown on Home.'), findsOneWidget);
 
+      await tester.tap(find.text('Wi-Fi only'));
+      await _settle(tester);
       await tester.tap(find.text('Wi-Fi and mobile data'));
       await _settle(tester);
-      await tester.tap(find.text('Delete completed downloads'));
+      await tester.tap(find.text('Delete finished sessions'));
       await _settle(tester);
       await tester.tap(find.text('Download next session'));
       await _settle(tester);
@@ -129,7 +131,7 @@ void main() {
             .read(downloadSettingsProvider.notifier)
             .setDownloadNext(true);
         await _settle(tester);
-        await tester.ensureVisible(find.text('Wi-Fi and mobile data'));
+        await tester.ensureVisible(find.text('Default voice and length'));
         await _settle(tester);
         expect(tester.takeException(), isNull);
         await tester.pumpWidget(const SizedBox.shrink());
@@ -142,6 +144,8 @@ void main() {
     (tester) async {
       await _pumpDownloads(tester);
       await tester.tap(find.byTooltip('Download options'));
+      await _settle(tester);
+      await tester.tap(find.text('Download next session'));
       await _settle(tester);
       await tester.tap(find.text('Default voice and length'));
       await _settle(tester);

@@ -84,6 +84,7 @@ dependencies:
   dynamic_app_icon_flutter_plus: ^0.0.8
   flutter_slidable: ^4.0.3
   connectivity_plus: ^7.3.1
+  background_downloader: ^9.6.6
 
 dev_dependencies:
   flutter_test:

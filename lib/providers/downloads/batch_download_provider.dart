@@ -8,6 +8,7 @@ import 'package:medito/models/pack/pack_model.dart';
 import 'package:medito/models/track/track.dart';
 import 'package:medito/providers/providers.dart';
 import 'package:medito/repositories/downloader/downloader_repository.dart';
+import 'package:medito/repositories/downloader/download_library.dart';
 import 'package:medito/repositories/track/track_repository.dart';
 import 'package:medito/utils/logger.dart';
 import 'package:medito/utils/track_variant_selector.dart';
@@ -228,13 +229,13 @@ class BatchDownloadNotifier extends Notifier<BatchDownloadState> {
     // track cannot overwrite another, and read persisted data rather than cache.
     final write = _preferenceWrites.then((_) async {
       if (!ref.mounted) return;
-      final repository = ref.read(trackRepositoryProvider);
-      final current = await repository.fetchTrackFromPreference();
-      final trackMap = {for (final t in current) t.id: t};
-      for (final t in newTracks) {
-        trackMap.putIfAbsent(t.id, () => t);
-      }
-      await repository.addTrackInPreference(trackMap.values.toList());
+      await ref.read(downloadLibraryProvider).update((current) {
+        final trackMap = {for (final t in current) t.id: t};
+        for (final t in newTracks) {
+          trackMap.putIfAbsent(t.id, () => t);
+        }
+        return trackMap.values.toList();
+      });
       if (!ref.mounted) return;
       ref.invalidate(downloadedTracksProvider);
     });
@@ -285,8 +286,11 @@ class BatchDownloadNotifier extends Notifier<BatchDownloadState> {
         }
       }
 
-      final remaining = current.where((t) => !trackIds.contains(t.id)).toList();
-      await ref.read(trackRepositoryProvider).addTrackInPreference(remaining);
+      await ref
+          .read(downloadLibraryProvider)
+          .update(
+            (latest) => latest.where((t) => !trackIds.contains(t.id)).toList(),
+          );
       ref.invalidate(downloadedTracksProvider);
 
       unawaited(

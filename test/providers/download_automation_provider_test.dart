@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:convert';
 
 import 'package:connectivity_plus/connectivity_plus.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -10,6 +11,9 @@ import 'package:medito/models/pack/pack_model.dart';
 import 'package:medito/models/player/playback_request.dart';
 import 'package:medito/models/track/track.dart';
 import 'package:medito/providers/downloads/download_automation_provider.dart';
+import 'package:medito/providers/downloads/background_download_provider.dart';
+import 'package:medito/providers/player/download/audio_downloader_provider.dart';
+import 'package:medito/services/downloads/background_download_service.dart';
 import 'package:medito/providers/downloads/download_settings_provider.dart';
 import 'package:medito/providers/home/up_next_provider.dart';
 import 'package:medito/providers/pack/pack_provider.dart';
@@ -99,6 +103,79 @@ class _Files extends FakeDownloaderRepository {
   }
 }
 
+class _NativeQueue implements AutomaticDownloadQueue {
+  _NativeQueue(this.download, {required this.enabled});
+  final Future<void> Function(PlaybackRequest) download;
+  bool enabled;
+  bool requiresWiFi = true;
+  List<ConnectivityResult> network = [];
+  final pending = <String, PlaybackRequest>{};
+  final knownFiles = <String>{};
+  final inFlight = <String>{};
+  int enqueues = 0;
+  @override
+  Future<void> get ready => Future.value();
+  @override
+  bool owns(String fileName) => knownFiles.contains(fileName);
+  @override
+  Future<void> enqueue(
+    PlaybackRequest request, {
+    required bool requiresWiFi,
+  }) async {
+    if (!enabled || pending.containsKey(request.fileId)) return;
+    enqueues++;
+    this.requiresWiFi = requiresWiFi;
+    pending[request.fileId] = request;
+    knownFiles.add(BackgroundDownloadService.fileName(request));
+    await _completeIfAllowed();
+  }
+
+  Future<void> connect(List<ConnectivityResult> value) async {
+    network = value;
+    await _completeIfAllowed();
+  }
+
+  Future<void> _completeIfAllowed() async {
+    if (!network.contains(ConnectivityResult.wifi) &&
+        (requiresWiFi || !network.contains(ConnectivityResult.mobile))) {
+      return;
+    }
+    for (final request in pending.values.toList()) {
+      if (!inFlight.add(request.fileId)) continue;
+      try {
+        await download(request);
+      } finally {
+        pending.remove(request.fileId);
+        inFlight.remove(request.fileId);
+      }
+    }
+  }
+
+  @override
+  Future<void> configure({
+    required bool enabled,
+    required bool requiresWiFi,
+  }) async {
+    this.enabled = enabled;
+    this.requiresWiFi = requiresWiFi;
+    if (!enabled) pending.clear();
+  }
+
+  @override
+  Future<void> cancelExcept(String? trackId, {String? fileId}) async {
+    pending.removeWhere(
+      (_, request) =>
+          request.trackId != trackId ||
+          (fileId != null && request.fileId != fileId),
+    );
+  }
+
+  @override
+  Future<void> resume() async {}
+  @override
+  void dispose() {}
+}
+
 Future<void> _drain() async {
   // Lets stream events, Riverpod invalidations and serialized IO finish.
   for (var i = 0; i < 20; i++) {
@@ -113,6 +190,7 @@ void main() {
   late _Files files;
   late _Stats stats;
   late StreamController<List<ConnectivityResult>> network;
+  late _NativeQueue queue;
 
   Future<void> start({
     bool download = true,
@@ -127,6 +205,12 @@ void main() {
     files = _Files();
     stats = _Stats(LocalAllStats.empty().copyWith(tracksChecked: completed));
     network = StreamController<List<ConnectivityResult>>.broadcast();
+    queue = _NativeQueue(
+      (request) => container
+          .read(audioDownloaderProvider.notifier)
+          .downloadTrackAudio(request),
+      enabled: download,
+    );
     container = ProviderContainer(
       overrides: [
         sharedPreferencesProvider.overrideWithValue(
@@ -140,6 +224,7 @@ void main() {
         ),
         trackRepositoryProvider.overrideWithValue(tracks),
         downloaderRepositoryProvider.overrideWithValue(files),
+        backgroundDownloadProvider.overrideWithValue(queue),
         statsProvider.overrideWith(() => stats),
         audioStateProvider.overrideWith(AudioStateNotifier.new),
         upNextProvider.overrideWith(
@@ -164,10 +249,22 @@ void main() {
         ),
       ],
     );
+    final nativeSubscription = network.stream.listen((value) {
+      unawaited(queue.connect(value));
+    });
+    container.listen(downloadSettingsProvider, (previous, next) {
+      unawaited(
+        queue.configure(
+          enabled: next.downloadNext,
+          requiresWiFi: !next.useMobileData,
+        ),
+      );
+    });
     container.listen(downloadAutomationProvider, (_, _) {});
     await _drain();
     addTearDown(() async {
       container.dispose();
+      await nativeSubscription.cancel();
       await network.close();
     });
   }
@@ -323,6 +420,34 @@ void main() {
       await _drain();
       expect(tracks.downloadedTracks.map((t) => t.id), ['a']);
       expect(files.calls, 1);
+    },
+  );
+
+  test('Wi-Fi-only audio queues on mobile data and finishes without a foreground reconciliation', () async {
+    await start();
+    network.add([ConnectivityResult.mobile]);
+    await _drain();
+    expect(queue.pending.values.single.trackId, 'a');
+    expect(files.calls, 0);
+    await queue.connect([ConnectivityResult.wifi]);
+    await _drain();
+    expect(tracks.downloadedTracks.map((t) => t.id), ['a']);
+  });
+
+  test(
+    'an offline completion uses cached metadata to queue the next session',
+    () async {
+      await start();
+      final prefs = container.read(sharedPreferencesProvider);
+      await prefs.setString(
+        SharedPreferenceConstants.autoDownloadTrackCache,
+        jsonEncode({'b': _track('b').toJson()}),
+      );
+      network.add([ConnectivityResult.none]);
+      container.read(_recommendationProvider.notifier).set(_upNext('b'));
+      await _drain();
+      expect(queue.pending.values.single.trackId, 'b');
+      expect(files.calls, 0);
     },
   );
 }

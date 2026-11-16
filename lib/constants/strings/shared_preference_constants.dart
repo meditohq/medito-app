@@ -14,6 +14,7 @@ class SharedPreferenceConstants {
       'auto_delete_completed_downloads';
   static const String autoDownloadNextSession = 'auto_download_next_session';
   static const String autoDownloadOnMobileData = 'auto_download_on_mobile_data';
+  static const String autoDownloadTrackCache = 'auto_download_track_cache';
   static const String currentPlayingTrack = 'currentPlayingTrack';
   static const String shortcuts = 'shortcuts';
   static const String savedHours = 'savedHours';
