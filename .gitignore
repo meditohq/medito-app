@@ -28,6 +28,7 @@
 # Flutter/Dart/Pub related
 **/doc/api/
 .dart_tool/
+.fvm/
 .flutter-plugins
 .packages
 .pub-cache/
