@@ -4,11 +4,13 @@ import 'package:medito/services/audio/session_bell_schedule.dart';
 
 void main() {
   const duration = Duration(minutes: 10);
+  const start = SessionBellSchedule.beginningDelay;
   late SessionBellSchedule cues;
   setUp(() => cues = SessionBellSchedule());
 
   test('start and midpoint ring only once, based on media position', () {
-    expect(cues.update(Duration.zero, duration), isTrue);
+    expect(cues.update(Duration.zero, duration), isFalse);
+    expect(cues.update(start, duration), isTrue);
     expect(cues.update(Duration.zero, duration), isFalse);
     expect(cues.update(const Duration(minutes: 4), duration), isFalse);
     expect(cues.update(const Duration(minutes: 5), duration), isTrue);
@@ -18,7 +20,20 @@ void main() {
 
   test('unknown duration does not consume the opening cue', () {
     expect(cues.update(Duration.zero, Duration.zero), isFalse);
-    expect(cues.update(Duration.zero, duration), isTrue);
+    expect(cues.update(Duration.zero, duration), isFalse);
+    expect(cues.update(start, duration), isTrue);
+  });
+
+  test('opening bell waits two seconds, then rings once', () {
+    expect(cues.update(Duration.zero, duration), isFalse);
+    expect(cues.update(const Duration(milliseconds: 1900), duration), isFalse);
+    expect(cues.update(start, duration), isTrue);
+    expect(cues.update(const Duration(seconds: 3), duration), isFalse);
+  });
+
+  test('bells switched on a few seconds in have missed the opening bell', () {
+    expect(cues.update(const Duration(seconds: 5), duration), isFalse);
+    expect(cues.update(const Duration(seconds: 6), duration), isFalse);
   });
 
   test('selection late in a session skips elapsed cues', () {
@@ -28,6 +43,7 @@ void main() {
 
   test('seek forward skips midpoint and rewind rearms it', () {
     cues.update(Duration.zero, duration);
+    cues.update(start, duration);
     cues.seek(const Duration(minutes: 6), duration);
     expect(cues.update(const Duration(minutes: 6), duration), isFalse);
     cues.seek(const Duration(minutes: 4), duration);
@@ -37,16 +53,20 @@ void main() {
 
   test('restart or repeat rearms opening and midpoint', () {
     cues.update(Duration.zero, duration);
+    cues.update(start, duration);
     cues.update(const Duration(minutes: 5), duration);
     cues.seek(Duration.zero, duration);
-    expect(cues.update(Duration.zero, duration), isTrue);
+    expect(cues.update(Duration.zero, duration), isFalse);
+    expect(cues.update(start, duration), isTrue);
     expect(cues.update(const Duration(minutes: 5), duration), isTrue);
     cues.reset();
-    expect(cues.update(Duration.zero, duration), isTrue);
+    expect(cues.update(Duration.zero, duration), isFalse);
+    expect(cues.update(start, duration), isTrue);
   });
 
   test('final bell starts six wall-clock seconds before completion', () {
     cues.update(Duration.zero, duration);
+    cues.update(start, duration);
     cues.update(const Duration(minutes: 5), duration);
     expect(cues.update(const Duration(seconds: 593), duration), isFalse);
     expect(cues.update(const Duration(seconds: 594), duration), isTrue);
@@ -58,6 +78,7 @@ void main() {
     for (final speed in [.5, 2.0]) {
       cues.reset();
       cues.update(Duration.zero, duration, speed: speed);
+      cues.update(start, duration, speed: speed);
       cues.update(const Duration(minutes: 5), duration, speed: speed);
       final cue = duration - Duration(milliseconds: (6000 * speed).round());
       expect(
@@ -81,7 +102,8 @@ void main() {
 
   test('very short sessions merge middle and final cues', () {
     const short = Duration(seconds: 10);
-    expect(cues.update(Duration.zero, short), isTrue);
+    expect(cues.update(Duration.zero, short), isFalse);
+    expect(cues.update(start, short), isTrue);
     expect(cues.update(const Duration(seconds: 5), short), isTrue);
     expect(cues.update(const Duration(seconds: 6), short), isFalse);
     expect(cues.update(short, short), isFalse);
@@ -89,7 +111,8 @@ void main() {
 
   test('beginning and end omits the midpoint', () {
     cues = SessionBellSchedule(pattern: SessionBellPattern.beginningEnd);
-    expect(cues.update(Duration.zero, duration), isTrue);
+    expect(cues.update(Duration.zero, duration), isFalse);
+    expect(cues.update(start, duration), isTrue);
     expect(cues.update(const Duration(minutes: 5), duration), isFalse);
     expect(cues.update(const Duration(seconds: 594), duration), isTrue);
     expect(cues.update(const Duration(seconds: 595), duration), isFalse);
@@ -98,8 +121,9 @@ void main() {
   test('every combination rings only its selected cues', () {
     for (final pattern in SessionBellPattern.values) {
       cues = SessionBellSchedule(pattern: pattern);
+      expect(cues.update(Duration.zero, duration), isFalse);
       expect(
-        cues.update(Duration.zero, duration),
+        cues.update(start, duration),
         pattern.hasBeginning,
         reason: pattern.name,
       );

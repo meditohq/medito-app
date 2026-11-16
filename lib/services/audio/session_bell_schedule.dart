@@ -4,8 +4,15 @@ import '../../models/background_sounds/session_bell_pattern.dart';
 /// consumes it; seeking to the beginning starts a fresh session.
 ///
 /// [intervalSeconds] optionally rings every N seconds on top of the pattern —
-/// the first tick is at N seconds in, the beginning cue covers position 0.
+/// the first tick is at N seconds in, the beginning cue covers the start.
 class SessionBellSchedule {
+  /// The opening bell rings this far in, so the session settles first.
+  static const beginningDelay = Duration(seconds: 2);
+
+  /// A session first seen later than this (bells switched on mid-session)
+  /// has missed its opening bell.
+  static const _beginningWindow = Duration(seconds: 4);
+
   SessionBellSchedule({
     this.pattern = SessionBellPattern.beginningMiddleEnd,
     this.intervalSeconds = 0,
@@ -14,6 +21,7 @@ class SessionBellSchedule {
   SessionBellPattern pattern;
   int intervalSeconds;
   bool _started = false;
+  bool _beginning = false;
   bool _middle = false;
   bool _end = false;
   int _intervalTicksFired = 0;
@@ -28,6 +36,7 @@ class SessionBellSchedule {
 
   void reset() {
     _started = false;
+    _beginning = false;
     _middle = false;
     _end = false;
     _intervalTicksFired = 0;
@@ -38,6 +47,7 @@ class SessionBellSchedule {
       reset();
     } else {
       _started = true;
+      _beginning = true;
       _middle = duration > Duration.zero && position >= duration ~/ 2;
       _end =
           duration > Duration.zero && position >= _endPosition(duration, speed);
@@ -56,7 +66,11 @@ class SessionBellSchedule {
       if (intervalSeconds > 0) {
         _intervalTicksFired = position.inSeconds ~/ intervalSeconds;
       }
-      return pattern.hasBeginning && position < const Duration(seconds: 2);
+      _beginning = !pattern.hasBeginning || position >= _beginningWindow;
+    }
+    if (!_beginning && position >= beginningDelay) {
+      _beginning = true;
+      return true;
     }
     if (!_end && position >= _endPosition(duration, speed)) {
       _end = true;

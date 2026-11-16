@@ -7,7 +7,8 @@ class SessionBellScheduleTest {
     @Test fun cuesFollowMediaTimeWithoutDuplicates() {
         val cues = SessionBellSchedule()
         assertFalse(cues.update(0, -1))
-        assertTrue(cues.update(0, 600000))
+        assertFalse(cues.update(0, 600000))
+        assertTrue(cues.update(2000, 600000))
         assertFalse(cues.update(0, 600000))
         assertTrue(cues.update(300000, 600000))
         assertFalse(cues.update(300000, 600000))
@@ -23,7 +24,8 @@ class SessionBellScheduleTest {
         cues.seek(360000, 600000)
         assertFalse(cues.update(360000, 600000))
         cues.seek(0, 600000)
-        assertTrue(cues.update(0, 600000))
+        assertFalse(cues.update(0, 600000))
+        assertTrue(cues.update(2000, 600000))
         assertTrue(cues.update(300000, 600000))
     }
 
@@ -31,6 +33,7 @@ class SessionBellScheduleTest {
         for (speed in listOf(0.5, 1.0, 2.0)) {
             val cues = SessionBellSchedule()
             cues.update(0, 600000, speed)
+            cues.update(2000, 600000, speed)
             cues.update(300000, 600000, speed)
             val cue = 600000 - (6000 * speed).toLong()
             assertFalse(cues.update(cue - 1, 600000, speed))
@@ -51,7 +54,8 @@ class SessionBellScheduleTest {
 
     @Test fun beginningAndEndOmitsMidpoint() {
         val cues = SessionBellSchedule("beginningEnd")
-        assertTrue(cues.update(0, 600000))
+        assertFalse(cues.update(0, 600000))
+        assertTrue(cues.update(2000, 600000))
         assertFalse(cues.update(300000, 600000))
         assertTrue(cues.update(594000, 600000))
         assertFalse(cues.update(595000, 600000))
@@ -71,7 +75,8 @@ class SessionBellScheduleTest {
         )
         for ((pattern, selected) in patterns) {
             val cues = SessionBellSchedule(pattern)
-            assertEquals(pattern, selected[0], cues.update(0, 600000))
+            assertFalse(cues.update(0, 600000))
+            assertEquals(pattern, selected[0], cues.update(2000, 600000))
             assertFalse(cues.update(60000, 600000))
             assertEquals(pattern, selected[1], cues.update(300000, 600000))
             assertFalse(cues.update(300000, 600000))
@@ -98,5 +103,16 @@ class SessionBellScheduleTest {
         assertFalse(cues.update(0, 10000))
         assertTrue(cues.update(5000, 10000))
         assertFalse(cues.update(6000, 10000))
+    }
+
+    @Test fun openingBellWaitsTwoSecondsAndIsMissedWhenEnabledLate() {
+        val cues = SessionBellSchedule("beginning")
+        assertFalse(cues.update(0, 600000))
+        assertFalse(cues.update(1900, 600000))
+        assertTrue(cues.update(2000, 600000))
+        assertFalse(cues.update(3000, 600000))
+        val late = SessionBellSchedule("beginning")
+        assertFalse(late.update(5000, 600000))
+        assertFalse(late.update(6000, 600000))
     }
 }

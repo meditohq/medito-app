@@ -7,6 +7,7 @@ import 'package:just_audio/just_audio.dart';
 import 'package:mocktail/mocktail.dart';
 import 'package:medito/models/background_sounds/background_sounds_model.dart';
 import 'package:medito/services/audio/ios_session_bells.dart';
+import 'package:medito/services/audio/session_bell_schedule.dart';
 
 class _Player extends Mock implements AudioPlayer {}
 
@@ -24,7 +25,8 @@ void main() {
     primary = _Player();
     bell = _Player();
     positions = StreamController<Duration>.broadcast(sync: true);
-    position = Duration.zero;
+    // Where the opening bell is due.
+    position = SessionBellSchedule.beginningDelay;
     playing = false;
     processing = ProcessingState.ready;
     when(() => primary.positionStream).thenAnswer((_) => positions.stream);
@@ -166,7 +168,7 @@ void main() {
 
       when(() => bell.seek(Duration.zero)).thenAnswer((_) async {});
       processing = ProcessingState.ready;
-      position = const Duration(milliseconds: 400);
+      position = const Duration(milliseconds: 2400);
       positions.add(position);
       await flush();
       verify(() => bell.play()).called(1);

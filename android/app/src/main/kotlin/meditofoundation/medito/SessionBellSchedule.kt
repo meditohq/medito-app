@@ -22,6 +22,9 @@ internal class SessionBellSchedule(pattern: String = "beginningMiddleEnd") {
     private val hasMiddle get() = baseName in setOf("middle", "beginningMiddle", "middleEnd", "beginningMiddleEnd", "everyMinute")
     private val hasEnd get() = baseName in setOf("end", "beginningEnd", "middleEnd", "beginningMiddleEnd", "everyMinute")
     private var started = false
+    // The opening bell rings 2s in, so the session settles first. A session
+    // first seen after 4s (bells switched on mid-session) has missed it.
+    private var beginning = false
     private var middle = false
     private var end = false
     private var intervalTicksFired = 0
@@ -29,11 +32,12 @@ internal class SessionBellSchedule(pattern: String = "beginningMiddleEnd") {
     private fun endPosition(duration: Long, speed: Double): Long =
         maxOf(duration / 2, duration - (6000 * speed).toLong())
 
-    fun reset() { started = false; middle = false; end = false; intervalTicksFired = 0 }
+    fun reset() { started = false; beginning = false; middle = false; end = false; intervalTicksFired = 0 }
 
     fun seek(position: Long, duration: Long, speed: Double = 1.0) {
         if (position == 0L) reset() else {
             started = true
+            beginning = true
             middle = duration > 0 && position >= duration / 2
             end = duration > 0 && position >= endPosition(duration, speed)
             if (intervalSeconds > 0) {
@@ -51,7 +55,11 @@ internal class SessionBellSchedule(pattern: String = "beginningMiddleEnd") {
             if (intervalSeconds > 0) {
                 intervalTicksFired = (position / 1000L / intervalSeconds).toInt()
             }
-            return hasBeginning && position < 2000
+            beginning = !hasBeginning || position >= 4000
+        }
+        if (!beginning && position >= 2000) {
+            beginning = true
+            return true
         }
         if (!end && position >= endPosition(duration, speed)) {
             end = true
