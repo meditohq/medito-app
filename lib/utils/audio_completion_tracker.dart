@@ -25,7 +25,24 @@ class AudioCompletionTracker {
     return startDay.isBefore(endDay);
   }
 
-  /// Updates stats with a new completed audio track
+  /// Whether [audioCompleted] is already part of [stats]'s history.
+  ///
+  /// A session's identity here is its id plus its timestamp (the same pair
+  /// `removeAudioCompleted` and `replaceAudioCompleted` match on). The
+  /// platform replays a completion that it still has on disk when the process
+  /// died before acknowledging it, so the same pair arrives again in a fresh
+  /// process and must not be recorded twice.
+  static bool isAlreadyRecorded(
+    LocalAllStats? stats,
+    LocalAudioCompleted audioCompleted,
+  ) => (stats?.audioCompleted ?? const <LocalAudioCompleted>[]).any(
+    (entry) =>
+        entry.id == audioCompleted.id &&
+        entry.timestamp == audioCompleted.timestamp,
+  );
+
+  /// Updates stats with a new completed audio track. Callers that must not
+  /// record the same session twice check [isAlreadyRecorded] first.
   static LocalAllStats updateStatsWithCompletedAudio({
     required LocalAllStats? stats,
     required LocalAudioCompleted audioCompleted,

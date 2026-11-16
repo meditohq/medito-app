@@ -560,20 +560,26 @@ class StatsManager {
     _allStats ??= fromDisk;
   }
 
-  Future<void> addAudioCompleted(
+  /// Records one completed session. Returns `false` when this exact session
+  /// (id + timestamp) is already in the history, which happens when the
+  /// platform replays a completion that was not acknowledged before the
+  /// process died; the caller then skips the one-off side effects (analytics)
+  /// instead of reporting the session twice.
+  ///
+  /// [allowDuplicate] keeps user-authored entries repeatable: the manual-add
+  /// sheet filters the days it already has, and an identical manual entry is
+  /// the caller's decision, not a platform replay.
+  Future<bool> addAudioCompleted(
     LocalAudioCompleted audioCompleted,
     int duration, {
     bool skipPost = false,
-    bool deduplicate = false,
     bool timestampIsNormalized = false,
+    bool allowDuplicate = false,
   }) async {
     if (!_isInitialized) {
       await initialize();
     }
     await _ensureStatsLoaded();
-
-    // Mark as dirty since we're about to modify stats
-    _dirty = true;
 
     if (!timestampIsNormalized &&
         AudioCompletionTracker.checkTrackCrossedMidnight(
@@ -586,18 +592,24 @@ class StatsManager {
       );
     }
 
-    // Watch deliveries can be replayed after a crash between saving and ack.
-    // Compare the normalized timestamp (sessions crossing midnight use start).
-    if (deduplicate &&
-        (_allStats?.audioCompleted ?? []).any(
-          (entry) =>
-              entry.id == audioCompleted.id &&
-              entry.timestamp == audioCompleted.timestamp,
-        )) {
+    // The durable history is the authority on "already recorded". The
+    // in-memory guard in handleStats is gone after a restart, so the replay
+    // of a completion that was saved locally but never acknowledged by the
+    // platform would otherwise add a second copy of the same session.
+    if (!allowDuplicate &&
+        AudioCompletionTracker.isAlreadyRecorded(_allStats, audioCompleted)) {
       // A previous attempt may have mutated memory before its disk write failed.
       await _saveLocalAllStatsToSharedPrefs();
-      return;
+      AppLogger.d(
+        'STATS_MANAGER',
+        'Completion ${audioCompleted.id} at ${audioCompleted.timestamp} '
+            'already recorded; ignoring the replay',
+      );
+      return false;
     }
+
+    // Mark as dirty since we're about to modify stats
+    _dirty = true;
 
     // Update stats with the completed audio
     final previousStats = _allStats;
@@ -625,7 +637,7 @@ class StatsManager {
         // Caller is batching multiple inserts and will post + update the
         // widget once at the end. Leave _dirty=true so flushPendingPost()
         // knows there's unsynced state.
-        return;
+        return true;
       }
 
       await _statsService.postStats(_allStats!);
@@ -639,6 +651,8 @@ class StatsManager {
         // Silently fail - widget updates are not critical
       });
     }
+
+    return true;
   }
 
   /// Adds the listening time of a repeated play-through without recording a

@@ -1,6 +1,7 @@
 import 'dart:async';
 
 import 'package:flutter_test/flutter_test.dart';
+import 'package:medito/constants/types/type_constants.dart';
 import 'package:medito/models/local_all_stats.dart';
 import 'package:medito/models/local_audio_completed.dart';
 import 'package:medito/services/stats_service.dart';
@@ -800,24 +801,25 @@ void main() {
     );
 
     test(
-      'addAudioCompleted - handles duplicate audio completion correctly',
+      'addAudioCompleted - counts a second play-through of the same track',
       () async {
         // Arrange
         var stats = LocalAllStats.empty();
         statsManager.setStatsForTesting(stats);
         when(mockStatsService.postStats(any)).thenAnswer((_) async => {});
 
-        var audio = LocalAudioCompleted(
+        final firstPlay = LocalAudioCompleted(
           id: '1',
           timestamp: DateTime.now().millisecondsSinceEpoch,
         );
+        final secondPlay = firstPlay.copyWith(
+          timestamp:
+              firstPlay.timestamp + const Duration(hours: 2).inMilliseconds,
+        );
 
         // Act
-        await statsManager.addAudioCompleted(audio, 300);
-        await statsManager.addAudioCompleted(
-          audio,
-          200,
-        ); // Same ID, different duration
+        await statsManager.addAudioCompleted(firstPlay, 300);
+        await statsManager.addAudioCompleted(secondPlay, 200);
 
         // Assert
         var result = statsManager.currentStats;
@@ -826,6 +828,57 @@ void main() {
           2,
         ); // Should count as two completions
         expect(result?.totalTimeListened, 500); // Should add both durations
+        expect(result?.audioCompleted?.length, 2);
+      },
+    );
+
+    test(
+      'addAudioCompleted - ignores a replayed copy of the same session',
+      () async {
+        // Arrange
+        var stats = LocalAllStats.empty();
+        statsManager.setStatsForTesting(stats);
+        when(mockStatsService.postStats(any)).thenAnswer((_) async => {});
+
+        final audio = LocalAudioCompleted(
+          id: '1',
+          timestamp: DateTime.now().millisecondsSinceEpoch,
+        );
+
+        // Act
+        final first = await statsManager.addAudioCompleted(audio, 300);
+        final replay = await statsManager.addAudioCompleted(audio, 300);
+
+        // Assert
+        expect(first, isTrue);
+        expect(replay, isFalse);
+        final result = statsManager.currentStats;
+        expect(result?.totalTracksCompleted, 1);
+        expect(result?.totalTimeListened, 300);
+        expect(result?.audioCompleted?.length, 1);
+      },
+    );
+
+    test(
+      'addAudioCompleted - allowDuplicate keeps manual entries repeatable',
+      () async {
+        // Arrange
+        var stats = LocalAllStats.empty();
+        statsManager.setStatsForTesting(stats);
+        when(mockStatsService.postStats(any)).thenAnswer((_) async => {});
+
+        final manual = LocalAudioCompleted(
+          id: TypeConstants.manual1,
+          timestamp: DateTime.now().millisecondsSinceEpoch,
+        );
+
+        // Act
+        await statsManager.addAudioCompleted(manual, 300, allowDuplicate: true);
+        await statsManager.addAudioCompleted(manual, 300, allowDuplicate: true);
+
+        // Assert
+        final result = statsManager.currentStats;
+        expect(result?.totalTracksCompleted, 2);
         expect(result?.audioCompleted?.length, 2);
       },
     );
