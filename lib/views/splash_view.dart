@@ -177,19 +177,14 @@ class SplashViewState extends ConsumerState<SplashView>
   Future<void> _initializeAnalytics() async {
     try {
       // Initialize Firebase Analytics with consent enabled using consent mode v2
-      // Don't request ATT permission yet - we'll do that later for better UX
-      await FirebaseAnalyticsService()
-          .initialize(requestAttPermissionImmediately: false)
-          .timeout(
-            const Duration(seconds: 5),
-            onTimeout: () {
-              AppLogger.w(
-                'SPLASH',
-                'Firebase Analytics initialization timed out',
-              );
-              throw Exception('Firebase Analytics initialization timeout');
-            },
-          );
+      // (ATT is asked later, on the onboarding tracking screen)
+      await FirebaseAnalyticsService().initialize().timeout(
+        const Duration(seconds: 5),
+        onTimeout: () {
+          AppLogger.w('SPLASH', 'Firebase Analytics initialization timed out');
+          throw Exception('Firebase Analytics initialization timeout');
+        },
+      );
       AppLogger.i(
         'SPLASH',
         'Firebase Analytics initialized with consent mode v2',

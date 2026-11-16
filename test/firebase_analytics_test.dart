@@ -32,7 +32,7 @@ void main() {
       final analytics = FirebaseAnalyticsService();
 
       // This should not throw any exceptions
-      await analytics.initialize(requestAttPermissionImmediately: false);
+      await analytics.initialize();
 
       // Test passed if no exceptions were thrown
       expect(true, true);
@@ -42,7 +42,7 @@ void main() {
       final analytics = FirebaseAnalyticsService();
 
       // Initialize the service
-      await analytics.initialize(requestAttPermissionImmediately: false);
+      await analytics.initialize();
 
       // This should not throw any exceptions
       await analytics.logEvent(name: 'test_event');
@@ -55,7 +55,7 @@ void main() {
       final analytics = FirebaseAnalyticsService();
 
       // Initialize the service first
-      await analytics.initialize(requestAttPermissionImmediately: false);
+      await analytics.initialize();
 
       // This should not throw any exceptions
       await analytics.setConsent(

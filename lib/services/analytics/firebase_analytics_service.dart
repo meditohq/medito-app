@@ -1,4 +1,5 @@
 import 'dart:io';
+
 import 'package:medito/providers/donation/announcement_donation_experiment.dart';
 import 'package:medito/providers/donation/supporter_appeal_experiment.dart';
 
@@ -49,6 +50,7 @@ class FirebaseAnalyticsService {
   dynamic
   _analytics; // FirebaseAnalytics or _NoopAnalytics - not late final anymore
   bool _initialized = false;
+  Future<void>? _initializing;
 
   // Analytics event names - These reference shared constants for consistency across all analytics platforms
   // For new code, prefer using AnalyticsEventConstants directly
@@ -134,9 +136,19 @@ class FirebaseAnalyticsService {
     // before Firebase is fully initialized
   }
 
-  /// Initialize the Firebase Analytics service and check for user consent preferences
-  /// [requestAttPermissionImmediately] - If true, will request App Tracking Transparency permission right away (iOS only)
-  Future<void> initialize({bool requestAttPermissionImmediately = true}) async {
+  /// Initialize the Firebase Analytics service and check for user consent
+  /// preferences. Never shows the iOS ATT dialog: that is asked only on the
+  /// onboarding tracking screen. Lazy callers (logEvent, user properties) used
+  /// to prompt here, which put the dialog over the splash screen.
+  /// Concurrent callers share one in-flight initialization.
+  Future<void> initialize() {
+    if (_initialized) return Future.value();
+    return _initializing ??= _initialize().whenComplete(
+      () => _initializing = null,
+    );
+  }
+
+  Future<void> _initialize() async {
     if (_initialized) return;
 
     try {
@@ -153,16 +165,14 @@ class FirebaseAnalyticsService {
         _analytics = FirebaseAnalytics.instance;
       }
 
-      // For iOS, request App Tracking Transparency authorization if requested.
-      // IMPORTANT: ATT governs cross-app *advertising* tracking only (IDFA,
-      // ad attribution). First-party product analytics does NOT require ATT,
-      // so a denial must not disable analytics — it only revokes ad consent
-      // below. Previously we flipped analyticsFirebaseEnabled=false here, which
-      // blinded us to the ~80% of iOS users who decline tracking.
+      // Read (never request) the iOS ATT status. ATT governs cross-app
+      // *advertising* tracking only (IDFA, ad attribution). First-party
+      // product analytics does NOT require ATT, so a denial must not disable
+      // analytics — it only revokes ad consent below.
       TrackingStatus attStatus = TrackingStatus.notSupported;
-      if (Platform.isIOS && requestAttPermissionImmediately) {
+      if (Platform.isIOS) {
         attStatus = await AppTrackingTransparencyService.instance
-            .requestTrackingPermission();
+            .getTrackingStatus();
       }
 
       // Product-analytics consent follows the user's in-app setting only.
