@@ -575,6 +575,7 @@ class StatsManager {
     if (AudioCompletionTracker.checkTrackCrossedMidnight(
       endTimestamp: audioCompleted.timestamp,
       duration: duration,
+      dayBoundaryOffset: _dayBoundaryOffset,
     )) {
       audioCompleted = audioCompleted.copyWith(
         timestamp: audioCompleted.timestamp - duration,
