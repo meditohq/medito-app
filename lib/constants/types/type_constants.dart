@@ -10,6 +10,7 @@ class TypeConstants {
   static const String timestampIdKey = 'timestamp';
   static const String guideIdKey = 'guide';
   static const String durationIdKey = 'duration';
+  static const String titleKey = 'title';
   static const String account = 'account';
   static const String downloads = 'downloads';
   static const String customiseHomeLayout = 'customiseHomeLayout';

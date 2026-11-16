@@ -288,6 +288,7 @@ class IosAudioHandler extends BaseAudioHandler {
       if (duration == null) return;
       await handleRepeatPlaythrough({
         TypeConstants.trackIdKey: trackState.id,
+        TypeConstants.titleKey: trackState.title,
         TypeConstants.durationIdKey: duration!.inMilliseconds,
         TypeConstants.fileIdKey: trackState.fileId,
         TypeConstants.guideIdKey: trackState.artist ?? '',
@@ -323,6 +324,7 @@ class IosAudioHandler extends BaseAudioHandler {
   Future<Map<String, dynamic>> _createTrackCompletionPayload() async {
     return {
       TypeConstants.trackIdKey: trackState.id,
+      TypeConstants.titleKey: trackState.title,
       TypeConstants.durationIdKey: duration?.inMilliseconds ?? 0,
       TypeConstants.fileIdKey: trackState.fileId,
       TypeConstants.guideIdKey: trackState.artist ?? '',

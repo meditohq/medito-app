@@ -8,6 +8,7 @@ import AppTrackingTransparency
 import AdServices
 import FBSDKCoreKit
 import WatchConnectivity
+import HealthKit
 
 @main
 class AppDelegate: FlutterAppDelegate {
@@ -142,6 +143,7 @@ class AppDelegate: FlutterAppDelegate {
         }
 
         WatchPresence.shared.register(with: controller.binaryMessenger)
+        MindfulnessHealthWriter.shared.register(with: controller.binaryMessenger)
     }
 
     private func presentAddVoiceShortcutUI(title: String, id: String, url: String) {
@@ -171,6 +173,76 @@ class AppDelegate: FlutterAppDelegate {
             .compactMap { $0 as? UIWindowScene }
             .flatMap { $0.windows }
             .first(where: { $0.isKeyWindow })
+    }
+}
+
+/// Writes mindfulness metadata that the health plugin cannot currently export.
+/// Dart uses the plugin's existing authorization flow before calling this writer.
+final class MindfulnessHealthWriter {
+    static let shared = MindfulnessHealthWriter()
+    private let healthStore = HKHealthStore()
+
+    func register(with messenger: FlutterBinaryMessenger) {
+        let channel = FlutterMethodChannel(
+            name: "com.medito.app/health",
+            binaryMessenger: messenger
+        )
+        channel.setMethodCallHandler { [self] call, result in
+            guard call.method == "writeMindfulnessSession" else {
+                result(FlutterMethodNotImplemented)
+                return
+            }
+            guard HKHealthStore.isHealthDataAvailable() else {
+                result(false)
+                return
+            }
+            guard let arguments = call.arguments as? [String: Any],
+                  let sample = Self.makeSample(arguments: arguments) else {
+                result(FlutterError(code: "INVALID_ARGUMENT", message: "Invalid mindfulness session", details: nil))
+                return
+            }
+
+            healthStore.save(sample) { success, error in
+                DispatchQueue.main.async {
+                    if let error = error {
+                        result(FlutterError(code: "HEALTH_WRITE_FAILED", message: error.localizedDescription, details: nil))
+                    } else {
+                        result(success)
+                    }
+                }
+            }
+        }
+    }
+
+    static func makeSample(arguments: [String: Any]) -> HKCategorySample? {
+        guard let startEpochMs = arguments["startEpochMs"] as? Int64,
+              let endEpochMs = arguments["endEpochMs"] as? Int64,
+              startEpochMs <= endEpochMs,
+              let type = HKCategoryType.categoryType(forIdentifier: .mindfulSession) else {
+            return nil
+        }
+
+        let title = (arguments["title"] as? String)?.trimmingCharacters(in: .whitespacesAndNewlines)
+        var metadata: [String: Any] = [
+            "org.meditofoundation.title": title.flatMap { $0.isEmpty ? nil : $0 } ?? "Medito",
+            HKMetadataKeyWasUserEntered: false,
+            // HealthKit deduplicates samples with the same sync identifier/version.
+            HKMetadataKeySyncIdentifier: "medito-\(endEpochMs)",
+            HKMetadataKeySyncVersion: 1,
+        ]
+        for key in ["trackId", "fileId"] {
+            if let value = arguments[key] as? String, !value.isEmpty {
+                metadata["org.meditofoundation.\(key)"] = value
+            }
+        }
+
+        return HKCategorySample(
+            type: type,
+            value: HKCategoryValue.notApplicable.rawValue,
+            start: Date(timeIntervalSince1970: Double(startEpochMs) / 1000),
+            end: Date(timeIntervalSince1970: Double(endEpochMs) / 1000),
+            metadata: metadata
+        )
     }
 }
 

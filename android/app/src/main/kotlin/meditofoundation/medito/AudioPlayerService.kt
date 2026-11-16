@@ -208,7 +208,8 @@ class AudioPlayerService : MediaSessionService(), Player.Listener, MeditoAudioSe
             duration = state.duration,
             fileId = state.track.fileId,
             guideId = state.track.artist,
-            timestamp = System.currentTimeMillis()
+            timestamp = System.currentTimeMillis(),
+            title = state.track.title
         )
     }
 
@@ -248,7 +249,8 @@ class AudioPlayerService : MediaSessionService(), Player.Listener, MeditoAudioSe
             duration = primaryPlayer.duration.takeIf { it != C.TIME_UNSET } ?: 0L,
             fileId = metadata?.extras?.getString(KEY_FILE_ID) ?: "",
             guideId = metadata?.artist?.toString(),
-            timestamp = System.currentTimeMillis()
+            timestamp = System.currentTimeMillis(),
+            title = metadata?.title?.toString()
         )
     }
 

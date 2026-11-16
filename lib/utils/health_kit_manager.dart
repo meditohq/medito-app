@@ -3,6 +3,7 @@ import 'dart:io';
 import 'package:health/health.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
+import '../services/apple_health_writer.dart';
 import '../src/audio_pigeon.g.dart';
 
 class HealthKitManager {
@@ -110,7 +111,16 @@ class HealthKitManager {
     await prefs.setStringList('syncedSessions', syncedSessions);
   }
 
-  Future<bool> writeMindfulnessData(DateTime start, DateTime end) async {
+  /// Writes a completed session with its title and content IDs to Apple Health
+  /// or Health Connect. Export formats are documented in docs/APPLE_HEALTH_EXPORT.md
+  /// and docs/HEALTH_CONNECT_EXPORT.md.
+  Future<bool> writeMindfulnessData(
+    DateTime start,
+    DateTime end, {
+    String? title,
+    String? trackId,
+    String? fileId,
+  }) async {
     try {
       await _ensureConfigured();
 
@@ -124,6 +134,9 @@ class HealthKitManager {
         return await _androidBridge.writeMindfulnessSession(
           start.millisecondsSinceEpoch,
           end.millisecondsSinceEpoch,
+          healthConnectTitle(title),
+          healthConnectNotes(trackId: trackId, fileId: fileId),
+          healthConnectClientRecordId(end),
         );
       }
 
@@ -136,16 +149,46 @@ class HealthKitManager {
       }
       if (!hasPermissions) return false;
 
-      return await health.writeHealthData(
-        value: 0,
-        type: HealthDataType.MINDFULNESS,
-        startTime: start,
-        endTime: end,
-        unit: HealthDataUnit.NO_UNIT,
-        recordingMethod: RecordingMethod.automatic,
+      return await AppleHealthWriter().writeMindfulnessSession(
+        start,
+        end,
+        title: title,
+        trackId: trackId,
+        fileId: fileId,
       );
     } catch (error) {
       return false;
     }
   }
 }
+
+/// Fallback Health Connect title when the track name isn't known (e.g. timer
+/// sessions, or completions stored before titles were recorded).
+const String kHealthConnectDefaultTitle = 'Medito';
+
+/// Title of the exported Health Connect record: the track name, or
+/// [kHealthConnectDefaultTitle].
+String healthConnectTitle(String? title) {
+  final trimmed = title?.trim();
+  return (trimmed == null || trimmed.isEmpty)
+      ? kHealthConnectDefaultTitle
+      : trimmed;
+}
+
+/// Machine-readable notes for the exported Health Connect record, e.g.
+/// `trackId=abc;fileId=def`. Only ids that are present are included; returns
+/// null when there are none. Format documented in
+/// docs/HEALTH_CONNECT_EXPORT.md.
+String? healthConnectNotes({String? trackId, String? fileId}) {
+  final parts = <String>[
+    if (trackId != null && trackId.isNotEmpty) 'trackId=$trackId',
+    if (fileId != null && fileId.isNotEmpty) 'fileId=$fileId',
+  ];
+  return parts.isEmpty ? null : parts.join(';');
+}
+
+/// Stable id for a session so re-syncing it updates the existing Health
+/// Connect record instead of creating a duplicate. Keyed by the completion
+/// timestamp, which is also what [HealthKitManager.isSessionSynced] uses.
+String healthConnectClientRecordId(DateTime end) =>
+    'medito-${end.millisecondsSinceEpoch}';
