@@ -1,10 +1,17 @@
 import 'dart:convert';
 
+import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:medito/constants/strings/analytics_event_constants.dart';
+import 'package:medito/constants/strings/shared_preference_constants.dart';
+import 'package:medito/providers/notification/reminder_provider.dart';
 import 'package:medito/services/reminders/daily_reminders_service.dart';
+import 'package:mocktail/mocktail.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:timezone/data/latest.dart' as tzdata;
 import 'package:timezone/timezone.dart' as tz;
+
+class _Reminder extends Mock implements ReminderProvider {}
 
 /// Returns the first local date in [year] whose noon-to-noon window is
 /// [length], or null when the host timezone never changes that year. A short
@@ -74,6 +81,115 @@ void main() {
     });
   });
 
+  group('firstReminderAnchor', () {
+    test('uses today when the chosen time is still ahead', () {
+      expect(
+        firstReminderAnchor(
+          DateTime(2026, 3, 7, 8, 0),
+          const TimeOfDay(hour: 9, minute: 0),
+        ),
+        DateTime(2026, 3, 7, 9, 0),
+      );
+    });
+
+    test('moves to tomorrow without losing the chosen minute', () {
+      expect(
+        firstReminderAnchor(
+          DateTime(2026, 3, 7, 10, 0),
+          const TimeOfDay(hour: 9, minute: 0),
+        ),
+        DateTime(2026, 3, 8, 9, 0),
+      );
+      // A time that has already passed by seconds counts as passed.
+      expect(
+        firstReminderAnchor(
+          DateTime(2026, 3, 7, 9, 0, 30),
+          const TimeOfDay(hour: 9, minute: 0),
+        ),
+        DateTime(2026, 3, 8, 9, 0),
+      );
+    });
+
+    // The onboarding and Settings paths both go through this helper, so this
+    // is where the passed-today arm is proved to survive a transition.
+    final springForward = _firstDayOfLength(2026, const Duration(hours: 23));
+    final fallBack = _firstDayOfLength(2026, const Duration(hours: 25));
+
+    test(
+      'keeps the chosen time on the day after spring-forward',
+      () {
+        final spring = springForward!;
+        final dayBefore = DateTime(spring.year, spring.month, spring.day - 1);
+
+        // 23:00 the night before, with 07:00 already passed that day.
+        final anchor = firstReminderAnchor(
+          DateTime(dayBefore.year, dayBefore.month, dayBefore.day, 23, 0),
+          const TimeOfDay(hour: 7, minute: 0),
+        );
+
+        expect(anchor, DateTime(spring.year, spring.month, spring.day, 7, 0));
+      },
+      skip: springForward == null
+          ? 'host timezone (${DateTime(2026, 1, 1).timeZoneName}) has no '
+                'spring-forward in 2026'
+          : false,
+    );
+
+    test(
+      'keeps the chosen time on the day after fall-back',
+      () {
+        final fall = fallBack!;
+        final dayBefore = DateTime(fall.year, fall.month, fall.day - 1);
+
+        final anchor = firstReminderAnchor(
+          DateTime(dayBefore.year, dayBefore.month, dayBefore.day, 23, 0),
+          const TimeOfDay(hour: 7, minute: 0),
+        );
+
+        expect(anchor, DateTime(fall.year, fall.month, fall.day, 7, 0));
+      },
+      skip: fallBack == null
+          ? 'host timezone (${DateTime(2026, 1, 1).timeZoneName}) has no '
+                'fall-back in 2026'
+          : false,
+    );
+  });
+
+  group('anchorAfterSession', () {
+    test('keeps the session wall clock across a DST changeover', () {
+      // A TZDateTime is used so the proof holds on a host without DST too.
+      tzdata.initializeTimeZones();
+      final ny = tz.getLocation('America/New_York');
+
+      // US transitions in 2026: 8 March and 1 November.
+      final springStart = tz.TZDateTime(ny, 2026, 3, 7, 21, 10);
+      final springAnchor = anchorAfterSession(springStart);
+      final springByDuration = springStart
+          .add(const Duration(days: 1))
+          .subtract(const Duration(minutes: 10));
+
+      expect(springAnchor, DateTime(2026, 3, 8, 21, 0));
+      expect(
+        springByDuration.hour,
+        22,
+        reason: 'the old 24h step moved 21:00 to 22:00',
+      );
+
+      final fallStart = tz.TZDateTime(ny, 2026, 10, 31, 21, 10);
+      final fallAnchor = anchorAfterSession(fallStart);
+      final fallByDuration = fallStart
+          .add(const Duration(days: 1))
+          .subtract(const Duration(minutes: 10));
+
+      expect(fallAnchor, DateTime(2026, 11, 1, 21, 0));
+      expect(
+        fallByDuration.hour,
+        20,
+        reason: 'the old 24h step moved 21:00 to 20:00',
+      );
+    });
+  });
+
   group('DST drift', () {
     // A DST regression only shows up on an hour-changing day. Each test below
     // is skipped on a host timezone without DST; the explicit-zone test after
@@ -86,13 +202,8 @@ void main() {
       () {
         // 09:00 the day before the clock jumps forward. `add(Duration(days: 1))`
         // used to land on 10:00 and then carry 10:00 for every later day.
-        final anchor = DateTime(
-          springForward!.year,
-          springForward.month,
-          springForward.day,
-          9,
-          0,
-        );
+        final spring = springForward!;
+        final anchor = DateTime(spring.year, spring.month, spring.day, 9, 0);
 
         final when = sameLocalTimeAfterDays(anchor, 1);
 
@@ -109,13 +220,8 @@ void main() {
     test(
       'fall-back keeps the chosen hour, so the day is 25 hours long',
       () {
-        final anchor = DateTime(
-          fallBack!.year,
-          fallBack.month,
-          fallBack.day,
-          9,
-          0,
-        );
+        final fall = fallBack!;
+        final anchor = DateTime(fall.year, fall.month, fall.day, 9, 0);
 
         final when = sameLocalTimeAfterDays(anchor, 1);
 
@@ -153,43 +259,138 @@ void main() {
   });
 
   group('DailyRemindersScheduler', () {
-    test('rescheduleAfterSession calculates correct anchor time', () {
-      final endMs = DateTime(
-        2025,
-        10,
-        24,
-        10,
-        15,
-      ).millisecondsSinceEpoch; // End at 10:15 AM
-      const durationMs = 300000; // 5 minutes
+    late SharedPreferences prefs;
+    late _Reminder reminders;
 
-      // Expected anchor: (end - duration) + 24h - 10m
-      // end - duration = 10:15 - 5m = 10:10 AM
-      // + 24h = Oct 25, 10:10 AM
-      // - 10m = Oct 25, 10:00 AM
-      final expectedAnchor = DateTime(2025, 10, 25, 10, 0);
-
-      final end = DateTime.fromMillisecondsSinceEpoch(endMs);
-      final start = end.subtract(Duration(milliseconds: durationMs));
-      final actualAnchor = start
-          .add(const Duration(days: 1))
-          .subtract(const Duration(minutes: 10));
-
-      expect(actualAnchor, expectedAnchor);
+    setUp(() async {
+      SharedPreferences.setMockInitialValues({});
+      prefs = await SharedPreferences.getInstance();
+      reminders = _Reminder();
+      registerFallbackValue(<ScheduledReminder>[]);
+      when(() => reminders.cancelReminderSeries()).thenAnswer((_) async {});
+      when(() => reminders.cancelDailyNotification()).thenAnswer((_) async {});
+      when(
+        () => reminders.scheduleReminderSeries(any()),
+      ).thenAnswer((_) async {});
+      // The scheduler converts each anchor to tz.local, so pin it: the
+      // assertions must not depend on the machine's zone data being loaded.
+      tzdata.initializeTimeZones();
+      tz.setLocalLocation(tz.getLocation('America/New_York'));
     });
 
-    test('series timing calculation works correctly', () {
-      final anchor = DateTime(2025, 10, 24, 9, 30);
-      // The series walks calendar days, not 24h steps, so the wall clock holds.
-      final expectedDates = List.generate(
-        15,
-        (i) => sameLocalTimeAfterDays(anchor, i),
+    /// Runs the production reschedule path and returns what it handed to the
+    /// notification layer. Rebuilding the arithmetic inline would pass even
+    /// with the fix reverted, so the method itself is called.
+    Future<List<ScheduledReminder>> reschedule({
+      required DateTime sessionEnd,
+      Duration duration = const Duration(minutes: 5),
+    }) async {
+      final scheduler = DailyRemindersScheduler(
+        prefs: prefs,
+        reminders: reminders,
+      );
+      await scheduler.rescheduleAfterSession(
+        endMs: sessionEnd.millisecondsSinceEpoch,
+        durationMs: duration.inMilliseconds,
       );
 
-      expect(expectedDates.length, 15);
-      expect(expectedDates[0], anchor);
-      expect(expectedDates[14], DateTime(2025, 11, 7, 9, 30));
-    });
+      final captured = verify(
+        () => reminders.scheduleReminderSeries(captureAny()),
+      ).captured;
+
+      return captured.single as List<ScheduledReminder>;
+    }
+
+    test(
+      'anchors the series one calendar day on, at the session time',
+      () async {
+        final items = await reschedule(
+          sessionEnd: DateTime(2026, 10, 24, 10, 15),
+        );
+
+        expect(items, hasLength(16));
+        expect(
+          items.first.scheduledDate.toLocal(),
+          DateTime(2026, 10, 25, 10, 0),
+        );
+        expect(items[14].scheduledDate.toLocal(), DateTime(2026, 11, 8, 10, 0));
+        expect(
+          items.last.scheduledDate.toLocal(),
+          DateTime(2026, 11, 23, 10, 0),
+        );
+        expect(prefs.getInt(SharedPreferenceConstants.savedHours), 10);
+        expect(prefs.getInt(SharedPreferenceConstants.savedMinutes), 0);
+      },
+    );
+
+    // A DST regression only shows up on an hour-changing day, so these two are
+    // skipped on a host timezone without DST.
+    final springForward = _firstDayOfLength(2026, const Duration(hours: 23));
+    final fallBack = _firstDayOfLength(2026, const Duration(hours: 25));
+
+    test(
+      'keeps the session hour across spring-forward',
+      () async {
+        final spring = springForward!;
+        final dayBefore = DateTime(spring.year, spring.month, spring.day - 1);
+
+        final items = await reschedule(
+          sessionEnd: DateTime(
+            dayBefore.year,
+            dayBefore.month,
+            dayBefore.day,
+            9,
+            15,
+          ),
+        );
+
+        // The session started 09:10; a 24h step would anchor at 10:00.
+        expect(
+          items.first.scheduledDate.toLocal(),
+          DateTime(spring.year, spring.month, spring.day, 9, 0),
+        );
+        expect(
+          items[1].scheduledDate.toLocal(),
+          DateTime(spring.year, spring.month, spring.day + 1, 9, 0),
+        );
+      },
+      skip: springForward == null
+          ? 'host timezone (${DateTime(2026, 1, 1).timeZoneName}) has no '
+                'spring-forward in 2026'
+          : false,
+    );
+
+    test(
+      'keeps the session hour across fall-back',
+      () async {
+        final fall = fallBack!;
+        final dayBefore = DateTime(fall.year, fall.month, fall.day - 1);
+
+        final items = await reschedule(
+          sessionEnd: DateTime(
+            dayBefore.year,
+            dayBefore.month,
+            dayBefore.day,
+            9,
+            15,
+          ),
+        );
+
+        // The session started 09:10; a 24h step would anchor at 08:00.
+        expect(
+          items.first.scheduledDate.toLocal(),
+          DateTime(fall.year, fall.month, fall.day, 9, 0),
+        );
+        expect(
+          items[1].scheduledDate.toLocal(),
+          DateTime(fall.year, fall.month, fall.day + 1, 9, 0),
+        );
+      },
+      skip: fallBack == null
+          ? 'host timezone (${DateTime(2026, 1, 1).timeZoneName}) has no '
+                'fall-back in 2026'
+          : false,
+    );
   });
 
   group('anchorPreferringSavedTime', () {

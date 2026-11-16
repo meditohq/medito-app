@@ -254,21 +254,15 @@ class _NotificationsScreenState extends ConsumerState<NotificationsScreen>
     final savedHour = prefs.getInt(SharedPreferenceConstants.savedHours);
     final savedMinute = prefs.getInt(SharedPreferenceConstants.savedMinutes);
     final now = DateTime.now();
-    DateTime anchorLocal;
-    if (savedHour != null && savedMinute != null) {
-      final candidate = DateTime(
-        now.year,
-        now.month,
-        now.day,
-        savedHour,
-        savedMinute,
-      );
-      anchorLocal = candidate.isBefore(now)
-          ? candidate.add(const Duration(days: 1))
-          : candidate;
-    } else {
-      anchorLocal = now.add(const Duration(days: 1));
-    }
+    // A calendar day, not 24 hours: on a DST changeover day the chosen time
+    // would otherwise shift by an hour for the whole series. The same helper
+    // backs the Settings path, so both entry points agree.
+    final anchorLocal = savedHour != null && savedMinute != null
+        ? firstReminderAnchor(
+            now,
+            TimeOfDay(hour: savedHour, minute: savedMinute),
+          )
+        : sameLocalTimeAfterDays(now, 1);
 
     // Logged after the anchor is resolved rather than on entry, so the hour
     // reported is the one the reminder series is actually scheduled for. That

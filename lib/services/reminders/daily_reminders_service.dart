@@ -52,6 +52,32 @@ DateTime sameLocalTimeAfterDays(DateTime anchor, int dayOffset) => DateTime(
   anchor.microsecond,
 );
 
+/// The first reminder for a time the user chose: today at [time] while it is
+/// still ahead, otherwise the same wall clock tomorrow. Onboarding kept its own
+/// copy of this and stepped with `add(Duration(days: 1))`, which moved the
+/// chosen hour by one on a DST changeover day; both paths now share this.
+DateTime firstReminderAnchor(DateTime now, TimeOfDay time) {
+  final candidate = DateTime(
+    now.year,
+    now.month,
+    now.day,
+    time.hour,
+    time.minute,
+  );
+
+  return candidate.isBefore(now)
+      ? sameLocalTimeAfterDays(candidate, 1)
+      : candidate;
+}
+
+/// The anchor a finished session hands to the series: the same local time the
+/// session started, one calendar day later, ten minutes earlier. Built from
+/// calendar fields so a DST changeover does not move the hour.
+DateTime anchorAfterSession(DateTime sessionStart) => sameLocalTimeAfterDays(
+  sessionStart,
+  1,
+).subtract(const Duration(minutes: 10));
+
 /// The series re-anchors after every session so the streak and consistency
 /// numbers baked into each day's copy stay current. That part is deliberate.
 /// Moving the TIME OF DAY was not: it overwrote an hour the user had chosen at
@@ -109,16 +135,7 @@ class DailyRemindersService {
     unawaited(SupporterCampaignApi.updatePreferences(prefs));
 
     final now = DateTime.now();
-    final candidate = DateTime(
-      now.year,
-      now.month,
-      now.day,
-      time.hour,
-      time.minute,
-    );
-    final anchor = candidate.isBefore(now)
-        ? sameLocalTimeAfterDays(candidate, 1)
-        : candidate;
+    final anchor = firstReminderAnchor(now, time);
 
     final scheduler = DailyRemindersScheduler(
       prefs: prefs,
@@ -139,9 +156,11 @@ class DailyRemindersService {
     );
   }
 
+  /// "Same time tomorrow" for the silent default: tomorrow's wall clock, not
+  /// now plus 24 hours, which lands an hour off on a DST changeover day.
   TimeOfDay _computeDefaultTimeFromNow() {
-    final nowPlus24 = DateTime.now().add(const Duration(days: 1));
-    return TimeOfDay(hour: nowPlus24.hour, minute: nowPlus24.minute);
+    final tomorrow = sameLocalTimeAfterDays(DateTime.now(), 1);
+    return TimeOfDay(hour: tomorrow.hour, minute: tomorrow.minute);
   }
 
   Future<void> _saveTime(TimeOfDay time) async {
@@ -284,10 +303,7 @@ class DailyRemindersScheduler {
   }) async {
     final end = DateTime.fromMillisecondsSinceEpoch(endMs);
     final start = end.subtract(Duration(milliseconds: durationMs));
-    final sessionAnchor = sameLocalTimeAfterDays(
-      start,
-      1,
-    ).subtract(const Duration(minutes: 10));
+    final sessionAnchor = anchorAfterSession(start);
     final anchor = anchorPreferringSavedTime(
       sessionAnchor,
       prefs.getInt(SharedPreferenceConstants.savedHours),
