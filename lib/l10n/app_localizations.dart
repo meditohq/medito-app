@@ -6123,6 +6123,54 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Could not update this session. Please try again.'**
   String get editSessionError;
+
+  /// Title of the one-time end-screen card asking iOS users to turn anonymous usage stats back on
+  ///
+  /// In en, this message translates to:
+  /// **'Turn usage stats back on?'**
+  String get analyticsReconsentTitle;
+
+  /// One-line body of the usage-stats re-consent card; the full explanation is behind its info icon. Must stay neutral: both answers are equally fine
+  ///
+  /// In en, this message translates to:
+  /// **'Only to see what helps and what breaks. Never used for ads.'**
+  String get analyticsReconsentBody;
+
+  /// Button that turns usage stats back on. Same visual weight as the decline button
+  ///
+  /// In en, this message translates to:
+  /// **'I\'m in'**
+  String get analyticsReconsentAccept;
+
+  /// Button that leaves usage stats off. Same visual weight as the accept button
+  ///
+  /// In en, this message translates to:
+  /// **'Keep them off'**
+  String get analyticsReconsentDecline;
+
+  /// Snackbar after accepting the usage-stats re-consent card
+  ///
+  /// In en, this message translates to:
+  /// **'Thank you. Usage stats are on.'**
+  String get analyticsReconsentAcceptedMessage;
+
+  /// Snackbar after declining the usage-stats re-consent card
+  ///
+  /// In en, this message translates to:
+  /// **'No problem. They\'ll stay off.'**
+  String get analyticsReconsentDeclinedMessage;
+
+  /// Title of the dialog behind the info icon on the usage-stats re-consent card; also the icon's tooltip
+  ///
+  /// In en, this message translates to:
+  /// **'About usage stats'**
+  String get analyticsReconsentInfoTitle;
+
+  /// Full explanation behind the info icon on the usage-stats re-consent card: why stats were off, what they record (incl. user ID), and where to change it
+  ///
+  /// In en, this message translates to:
+  /// **'Older versions of Medito switched usage stats off for anyone who declined tracking, which went further than it should have.\n\nUsage stats record how you use the app, linked to your Medito user ID, so we can see which sessions help and fix what breaks. They\'re never used for ads or to track you across other apps.\n\nYou can change this any time in Settings → Advanced → Privacy Policy.'**
+  String get analyticsReconsentInfoBody;
 }
 
 class _AppLocalizationsDelegate

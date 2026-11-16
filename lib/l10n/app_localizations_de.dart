@@ -3514,4 +3514,33 @@ class AppLocalizationsDe extends AppLocalizations {
   @override
   String get editSessionError =>
       'Diese Sitzung konnte nicht aktualisiert werden. Bitte versuche es erneut.';
+
+  @override
+  String get analyticsReconsentTitle =>
+      'Nutzungsstatistiken wieder einschalten?';
+
+  @override
+  String get analyticsReconsentBody =>
+      'Nur um zu sehen, was hilft und was nicht funktioniert. Nie für Werbung.';
+
+  @override
+  String get analyticsReconsentAccept => 'Bin dabei';
+
+  @override
+  String get analyticsReconsentDecline => 'Ausgeschaltet lassen';
+
+  @override
+  String get analyticsReconsentAcceptedMessage =>
+      'Danke. Nutzungsstatistiken sind eingeschaltet.';
+
+  @override
+  String get analyticsReconsentDeclinedMessage =>
+      'Kein Problem. Sie bleiben ausgeschaltet.';
+
+  @override
+  String get analyticsReconsentInfoTitle => 'Über Nutzungsstatistiken';
+
+  @override
+  String get analyticsReconsentInfoBody =>
+      'Ältere Versionen von Medito haben Nutzungsstatistiken bei allen ausgeschaltet, die Tracking abgelehnt haben – das ging weiter als nötig.\n\nNutzungsstatistiken erfassen, wie du die App nutzt, verknüpft mit deiner Medito-Nutzer-ID, damit wir sehen, welche Sessions helfen, und beheben können, was nicht funktioniert. Sie werden nie für Werbung oder App-übergreifendes Tracking verwendet.\n\nDu kannst das jederzeit unter Einstellungen → Erweitert → Datenschutzerklärung ändern.';
 }

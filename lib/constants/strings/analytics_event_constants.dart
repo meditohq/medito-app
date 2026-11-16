@@ -748,6 +748,16 @@ class AnalyticsEventConstants {
   static const String endScreenAccountPromptTapped =
       'end_screen_account_prompt_tapped';
 
+  /// Logged once the user turns usage stats back on from the end-screen
+  /// re-consent card (iOS users opted out by the old ATT path). Params:
+  /// [paramSource], [paramImpression]. Nothing is logged for impressions or
+  /// "Keep them off": analytics is off for these users and stays off.
+  static const String analyticsReconsentAccepted =
+      'analytics_reconsent_accepted';
+
+  /// Which showing of a capped ask was answered (1-based).
+  static const String paramImpression = 'impression';
+
   /// Event logged when the user taps "Turn on reminders", the time-choice
   /// sheet (or the custom time picker it leads to) opens, and they close it
   /// without picking a time. Before this the card scheduled "same time

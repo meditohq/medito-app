@@ -18,6 +18,10 @@ class CrashlyticsService {
 
   var _analyticsEnabled = false;
 
+  /// False when main() skipped [initialize] because analytics was off, so the
+  /// error handlers are not hooked up yet.
+  bool get isEnabled => _analyticsEnabled;
+
   static const _imageRelatedKeywords = [
     'Image',
     'CachedNetworkImage',

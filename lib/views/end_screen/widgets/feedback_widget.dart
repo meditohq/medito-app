@@ -6,6 +6,8 @@ import 'package:medito/constants/constants.dart';
 import 'package:medito/services/analytics/firebase_analytics_service.dart';
 import 'package:medito/l10n/app_localizations.dart';
 
+import 'end_screen_card.dart';
+
 class FeedbackWidget extends ConsumerStatefulWidget {
   const FeedbackWidget({super.key});
 
@@ -18,77 +20,60 @@ class FeedbackWidgetState extends ConsumerState<FeedbackWidget> {
 
   @override
   Widget build(BuildContext context) {
-    return Card(
-      margin: const EdgeInsets.only(bottom: 16),
+    return Padding(
+      padding: const EdgeInsets.only(bottom: 16),
       child: AnimatedSize(
         duration: MediaQuery.disableAnimationsOf(context)
             ? Duration.zero
             : const Duration(milliseconds: 300),
         curve: Curves.easeOutCubic,
         alignment: Alignment.topCenter,
-        child: Padding(
-          padding: const EdgeInsets.all(16),
-          child: _buildFeedback(),
-        ),
+        child: _buildFeedback(),
       ),
     );
   }
 
   Widget _buildFeedback() {
-    return Column(
-      spacing: 16,
-      crossAxisAlignment: CrossAxisAlignment.center,
-      children: [
-        Semantics(
-          container: true,
-          header: true,
-          child: Text(
-            AppLocalizations.of(context)!.howDoYouFeel,
-            textAlign: TextAlign.center,
-            style: context.text.headline,
-          ),
-        ),
-        _showThankYouMessage
-            ? _buildThanksMessage()
-            : Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                spacing: 16,
-                children: [
-                  Semantics(
-                    button: true,
-                    label: AppLocalizations.of(context)!.thanksForSharingSad,
-                    child: _buildEmotionButton(
-                      context,
-                      '☹️',
-                      AppLocalizations.of(context)!.thanksForSharing,
-                      _handleNegativeFeedback,
-                    ),
+    return EndScreenCard(
+      title: AppLocalizations.of(context)!.howDoYouFeel,
+      child: _showThankYouMessage
+          ? _buildThanksMessage()
+          : Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              spacing: 16,
+              children: [
+                Semantics(
+                  button: true,
+                  label: AppLocalizations.of(context)!.thanksForSharingSad,
+                  child: _buildEmotionButton(
+                    context,
+                    '☹️',
+                    AppLocalizations.of(context)!.thanksForSharing,
+                    _handleNegativeFeedback,
                   ),
-                  Semantics(
-                    button: true,
-                    label: AppLocalizations.of(
-                      context,
-                    )!.thanksForSharingNeutral,
-                    child: _buildEmotionButton(
-                      context,
-                      '😐',
-                      AppLocalizations.of(context)!.thanksForSharing,
-                      _handleNeutralFeedback,
-                    ),
+                ),
+                Semantics(
+                  button: true,
+                  label: AppLocalizations.of(context)!.thanksForSharingNeutral,
+                  child: _buildEmotionButton(
+                    context,
+                    '😐',
+                    AppLocalizations.of(context)!.thanksForSharing,
+                    _handleNeutralFeedback,
                   ),
-                  Semantics(
-                    button: true,
-                    label: AppLocalizations.of(context)!.thanksForSharingHappy,
-                    child: _buildEmotionButton(
-                      context,
-                      '😊',
-                      AppLocalizations.of(context)!.thanksForSharing,
-                      _handlePositiveFeedback,
-                    ),
+                ),
+                Semantics(
+                  button: true,
+                  label: AppLocalizations.of(context)!.thanksForSharingHappy,
+                  child: _buildEmotionButton(
+                    context,
+                    '😊',
+                    AppLocalizations.of(context)!.thanksForSharing,
+                    _handlePositiveFeedback,
                   ),
-                ],
-              ),
-      ],
+                ),
+              ],
+            ),
     );
   }
 
@@ -105,7 +90,7 @@ class FeedbackWidgetState extends ConsumerState<FeedbackWidget> {
           l10n.thanksForSharing,
           semanticsLabel: l10n.thanksForSharingSpoken,
           textAlign: TextAlign.center,
-          style: context.text.title,
+          style: EndScreenCard.bodyStyle(context),
         ),
       ),
     );

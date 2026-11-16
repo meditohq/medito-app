@@ -1503,5 +1503,13 @@
   "openSession": "Abrir sesión",
   "editSessionDateTime": "Editar fecha y hora",
   "editSessionExplanation": "Corrige cuándo tuvo lugar esta sesión. Tu tiempo de escucha no cambiará.",
-  "editSessionError": "No se pudo actualizar esta sesión. Inténtalo de nuevo."
+  "editSessionError": "No se pudo actualizar esta sesión. Inténtalo de nuevo.",
+  "analyticsReconsentTitle": "¿Volver a activar las estadísticas de uso?",
+  "analyticsReconsentBody": "Solo para ver qué ayuda y qué falla. Nunca para anuncios.",
+  "analyticsReconsentAccept": "Me apunto",
+  "analyticsReconsentDecline": "Mantenerlas desactivadas",
+  "analyticsReconsentAcceptedMessage": "Gracias. Las estadísticas de uso están activadas.",
+  "analyticsReconsentDeclinedMessage": "De acuerdo. Seguirán desactivadas.",
+  "analyticsReconsentInfoTitle": "Sobre las estadísticas de uso",
+  "analyticsReconsentInfoBody": "Las versiones anteriores de Medito desactivaban las estadísticas de uso a quien rechazaba el rastreo, y eso fue más allá de lo necesario.\n\nLas estadísticas de uso registran cómo usas la app, vinculadas a tu ID de usuario de Medito, para ver qué sesiones ayudan y arreglar lo que falla. Nunca se usan para anuncios ni para rastrearte en otras apps.\n\nPuedes cambiarlo cuando quieras en Ajustes → Avanzado → Política de Privacidad."
 }

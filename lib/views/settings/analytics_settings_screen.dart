@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:medito/constants/strings/shared_preference_constants.dart';
 import 'package:medito/l10n/app_localizations.dart';
+import 'package:medito/providers/settings/analytics_reconsent_provider.dart';
 import 'package:medito/providers/shared_preference/shared_preference_provider.dart';
 import 'package:medito/routes/routes.dart';
 import 'package:medito/services/analytics/crashlytics_service.dart';
@@ -58,18 +59,37 @@ class AnalyticsSettingsScreen extends ConsumerWidget {
                             context,
                           )!.analyticsTrackingContent,
                     onChanged: (value) async {
-                      await ref
-                          .read(sharedPreferencesProvider)
-                          .setBool(
-                            SharedPreferenceConstants.analyticsFirebaseEnabled,
-                            value,
-                          );
-                      // Disable/enable the SDKs at the native level
-                      await FirebaseAnalyticsService().setCollectionEnabled(
+                      final prefs = ref.read(sharedPreferencesProvider);
+                      await prefs.setBool(
+                        SharedPreferenceConstants.analyticsFirebaseEnabled,
                         value,
                       );
+                      // Record that this opt-out is the user's own, so the
+                      // end-screen re-consent ask never second-guesses it.
+                      if (value) {
+                        await prefs.remove(
+                          SharedPreferenceConstants.analyticsOptOutSource,
+                        );
+                      } else {
+                        await prefs.setString(
+                          SharedPreferenceConstants.analyticsOptOutSource,
+                          SharedPreferenceConstants
+                              .analyticsOptOutSourceSettings,
+                        );
+                      }
+                      // Disable/enable the SDKs at the native level. Turning
+                      // on keeps ad consent behind ATT, as at launch.
+                      if (value) {
+                        await FirebaseAnalyticsService()
+                            .enableProductAnalytics();
+                      } else {
+                        await FirebaseAnalyticsService().setCollectionEnabled(
+                          false,
+                        );
+                      }
                       await CrashlyticsService().setCollectionEnabled(value);
                       ref.invalidate(_firebaseEnabledProvider);
+                      ref.invalidate(analyticsReconsentProvider);
                     },
                   ),
                   _SwitchTile(
