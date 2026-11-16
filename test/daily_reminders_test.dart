@@ -290,10 +290,12 @@ void main() {
     Future<List<ScheduledReminder>> reschedule({
       required DateTime sessionEnd,
       Duration duration = const Duration(minutes: 5),
+      DateTime? now,
     }) async {
       final scheduler = DailyRemindersScheduler(
         prefs: prefs,
         reminders: reminders,
+        now: now == null ? null : () => now,
       );
       await scheduler.rescheduleAfterSession(
         endMs: sessionEnd.millisecondsSinceEpoch,
@@ -346,11 +348,14 @@ void main() {
     );
 
     test('a backdated session never schedules reminders in the past', () async {
-      final now = DateTime.now();
+      // A pinned clock keeps the expectation away from the 10:00 boundary: a
+      // real clock captured here can move past 10:00 before the scheduler
+      // reads its own "now", which made this test flaky.
+      final now = DateTime(2026, 5, 20, 14, 30);
       // Manual entry for three days ago, or a completion replayed days late.
       final sessionEnd = DateTime(now.year, now.month, now.day - 3, 10, 15);
 
-      final items = await reschedule(sessionEnd: sessionEnd);
+      final items = await reschedule(sessionEnd: sessionEnd, now: now);
 
       final todayAt10 = DateTime(now.year, now.month, now.day, 10, 0);
       final expectedFirst = todayAt10.isBefore(now)
@@ -388,6 +393,9 @@ void main() {
             9,
             15,
           ),
+          // Pinned after the anchor and before the DST day, so the series is
+          // moved by the guard exactly as this test expects.
+          now: DateTime(dayBefore.year, dayBefore.month, dayBefore.day, 20),
         );
 
         // The session started 09:10; a 24h step would anchor at 10:00.
@@ -420,6 +428,9 @@ void main() {
             9,
             15,
           ),
+          // Pinned after the anchor and before the DST day, so the series is
+          // moved by the guard exactly as this test expects.
+          now: DateTime(dayBefore.year, dayBefore.month, dayBefore.day, 20),
         );
 
         // The session started 09:10; a 24h step would anchor at 08:00.

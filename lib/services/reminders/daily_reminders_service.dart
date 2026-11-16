@@ -204,7 +204,15 @@ class DailyRemindersScheduler {
   final SharedPreferences prefs;
   final ReminderProvider reminders;
 
-  DailyRemindersScheduler({required this.prefs, required this.reminders});
+  /// Clock seam: tests pin it so a run that crosses a reminder time cannot
+  /// change whether the series is still ahead of "now".
+  final DateTime Function() _now;
+
+  DailyRemindersScheduler({
+    required this.prefs,
+    required this.reminders,
+    DateTime Function()? now,
+  }) : _now = now ?? DateTime.now;
 
   Future<void> scheduleSeriesFromAnchor(
     DateTime anchorLocal, {
@@ -214,7 +222,7 @@ class DailyRemindersScheduler {
     // A backdated session hands over an anchor in the past. Scheduling from
     // it put all 16 reminders before "now", where the platform never fires
     // them, so keep the wall clock and move the series to its next occurrence.
-    final anchor = firstFutureOccurrence(anchorLocal, DateTime.now());
+    final anchor = firstFutureOccurrence(anchorLocal, _now());
     final items = <_SeriesItem>[];
 
     var streakCount = '1';
@@ -365,7 +373,7 @@ class DailyRemindersScheduler {
           (l10n.reminderDay1TitleVar4, l10n.reminderDay1BodyVar4),
           (l10n.reminderDay1TitleVar5, l10n.reminderDay1BodyVar5),
         ];
-        final idx = DateTime.now().day % variants.length;
+        final idx = _now().day % variants.length;
         return variants[idx];
       case 2:
         final variants = [
@@ -375,7 +383,7 @@ class DailyRemindersScheduler {
           (l10n.reminderDay2TitleVar4, l10n.reminderDay2BodyVar4),
           (l10n.reminderDay2TitleVar5, l10n.reminderDay2BodyVar5),
         ];
-        final idx = (DateTime.now().day + 1) % variants.length;
+        final idx = (_now().day + 1) % variants.length;
         return variants[idx];
       case 3:
         final variants = [
@@ -385,7 +393,7 @@ class DailyRemindersScheduler {
           (l10n.reminderDay3TitleVar4, l10n.reminderDay3BodyVar4),
           (l10n.reminderDay3TitleVar5, l10n.reminderDay3BodyVar5),
         ];
-        final idx = (DateTime.now().day + 2) % variants.length;
+        final idx = (_now().day + 2) % variants.length;
         return variants[idx];
       case 4:
         return (l10n.reminderDay4Title, l10n.reminderDay4Body);
