@@ -18,7 +18,9 @@ publish_to: none
 version: 2611.11.0+302489
 
 environment:
-  sdk: ">=3.13.2 <3.14.0"
+  # The lower bound also selects the package language version. Keep Dart 3.8
+  # syntax while Freezed 3.x emits final constructor parameters (invalid in 3.13).
+  sdk: ">=3.8.0 <3.14.0"
   # Match the 3.47 toolchain used by CI and .fvmrc. Newer Flutter minors
   # change flutter_test's pinned packages and need a coordinated upgrade.
   flutter: ">=3.47.2 <3.48.0"

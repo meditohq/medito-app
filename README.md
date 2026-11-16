@@ -21,6 +21,11 @@ run `fvm install` and prefix the commands below with `fvm` (for example,
 `fvm flutter pub get` and `fvm dart run build_runner build --delete-conflicting-outputs`).
 Alternatively, put a Flutter 3.47.2 installation on your `PATH`.
 
+The Dart SDK lower bound stays at 3.8 because it also selects the app's language
+version. Freezed 3.x generates constructor parameters that Dart 3.13 language
+rules reject. The Flutter constraint and `.fvmrc` select the supported toolchain;
+raising the Dart language version requires a coordinated generator upgrade.
+
 Flutter 3.50 changes the test packages pinned by the SDK and cannot resolve
 the current Riverpod/code-generator dependencies. Upgrade the SDK and those
 dependencies together; `flutter pub upgrade` alone does not fix that mismatch.
