@@ -187,7 +187,7 @@ flutter {
 
 dependencies {
     implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk8"
-    implementation platform('com.google.firebase:firebase-bom:33.2.0')
+    implementation platform('com.google.firebase:firebase-bom:34.13.0')
     implementation 'com.google.firebase:firebase-analytics'
     coreLibraryDesugaring 'com.android.tools:desugar_jdk_libs:2.1.4'
 
@@ -211,9 +211,9 @@ dependencies {
     implementation "com.google.android.material:material:1.12.0"
 
     // Glance App Widget
-    implementation "androidx.glance:glance-appwidget:1.2.0-beta01"
-    implementation "androidx.glance:glance:1.2.0-beta01"
-    implementation "androidx.glance:glance-material:1.2.0-beta01"
+    implementation "androidx.glance:glance-appwidget:1.2.0"
+    implementation "androidx.glance:glance:1.2.0"
+    implementation "androidx.glance:glance-material:1.2.0"
 
     // Health Connect (MindfulnessSessionRecord added in 1.1.0, Oct 2025)
     implementation "androidx.health.connect:connect-client:1.1.0"
