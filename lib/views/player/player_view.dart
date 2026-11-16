@@ -397,7 +397,6 @@ class _PlayerViewState extends ConsumerState<PlayerView> {
     unawaited(
       handleStats({
         TypeConstants.trackIdKey: timerSessionId(elapsed),
-        TypeConstants.titleKey: request.title,
         TypeConstants.durationIdKey: elapsed.inMilliseconds,
         TypeConstants.fileIdKey: request.fileId,
         TypeConstants.guideIdKey: '',
