@@ -75,19 +75,17 @@ void main() {
       final container = ProviderScope.containerOf(context);
       expect(container.read(downloadSettingsProvider).deleteCompleted, isFalse);
       expect(container.read(downloadSettingsProvider).downloadNext, isFalse);
-      expect(find.text('Wi-Fi only'), findsNothing);
+      expect(find.text('Use mobile data'), findsNothing);
 
       await tester.tap(find.text('Download next session'));
       await _settle(tester);
       expect(container.read(downloadSettingsProvider).downloadNext, isTrue);
       expect(container.read(downloadSettingsProvider).deleteCompleted, isFalse);
-      expect(find.text('Wi-Fi only'), findsOneWidget);
+      expect(find.text('Use mobile data'), findsOneWidget);
       expect(container.read(downloadSettingsProvider).useMobileData, isFalse);
       expect(find.text('The next session shown on Home.'), findsOneWidget);
 
-      await tester.tap(find.text('Wi-Fi only'));
-      await _settle(tester);
-      await tester.tap(find.text('Wi-Fi and mobile data'));
+      await tester.tap(find.text('Use mobile data'));
       await _settle(tester);
       await tester.tap(find.text('Delete finished sessions'));
       await _settle(tester);

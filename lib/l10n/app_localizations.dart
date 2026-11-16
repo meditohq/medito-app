@@ -166,23 +166,23 @@ abstract class AppLocalizations {
   /// **'Default voice and length'**
   String get downloadDefaultVoiceAndLength;
 
-  /// No description provided for @downloadUsing.
+  /// No description provided for @downloadUseMobileData.
   ///
   /// In en, this message translates to:
-  /// **'Download using'**
-  String get downloadUsing;
+  /// **'Use mobile data'**
+  String get downloadUseMobileData;
 
-  /// No description provided for @downloadWifiOnly.
+  /// No description provided for @downloadUseMobileDataDescription.
   ///
   /// In en, this message translates to:
-  /// **'Wi-Fi only'**
-  String get downloadWifiOnly;
+  /// **'When off, downloads wait for Wi-Fi.'**
+  String get downloadUseMobileDataDescription;
 
-  /// No description provided for @downloadWifiAndMobileData.
+  /// No description provided for @downloadChangeDefaults.
   ///
   /// In en, this message translates to:
-  /// **'Wi-Fi and mobile data'**
-  String get downloadWifiAndMobileData;
+  /// **'Change'**
+  String get downloadChangeDefaults;
 
   /// No description provided for @volume.
   ///

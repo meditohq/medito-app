@@ -60,32 +60,35 @@ class DownloadOptionsSheet extends ConsumerWidget {
               onChanged: notifier.setDownloadNext,
             ),
             if (settings.downloadNext) ...[
-              ListTile(
-                contentPadding: const EdgeInsets.only(left: 12),
-                dense: true,
+              SwitchListTile.adaptive(
+                contentPadding: EdgeInsets.zero,
                 title: Text(
-                  settings.useMobileData
-                      ? l10n.downloadWifiAndMobileData
-                      : l10n.downloadWifiOnly,
-                  style: context.text.bodySmall,
+                  l10n.downloadUseMobileData,
+                  style: context.text.body,
                 ),
-                trailing: const Icon(Icons.chevron_right_rounded, size: 20),
-                onTap: () => _showNetworkOptions(context),
+                subtitle: Text(
+                  l10n.downloadUseMobileDataDescription,
+                  style: context.text.muted.bodySmall,
+                ),
+                value: settings.useMobileData,
+                onChanged: notifier.setUseMobileData,
               ),
               ListTile(
-                contentPadding: const EdgeInsets.only(left: 12),
-                dense: true,
+                contentPadding: EdgeInsets.zero,
                 title: Text(
                   l10n.downloadDefaultVoiceAndLength,
-                  style: context.text.bodySmall,
+                  style: context.text.body,
                 ),
                 subtitle: defaults.isEmpty
                     ? null
                     : Text(
                         defaults.join(' · '),
-                        style: context.text.muted.caption,
+                        style: context.text.muted.bodySmall,
                       ),
-                trailing: const Icon(Icons.chevron_right_rounded, size: 20),
+                trailing: Text(
+                  l10n.downloadChangeDefaults,
+                  style: context.text.label,
+                ),
                 onTap: () => Navigator.of(context).push(
                   MaterialPageRoute<void>(
                     builder: (_) => const ManageDefaultsScreen(),
@@ -117,65 +120,3 @@ class DownloadOptionsSheet extends ConsumerWidget {
     );
   }
 }
-
-Future<void> _showNetworkOptions(BuildContext context) =>
-    showModalBottomSheet<void>(
-      context: context,
-      showDragHandle: true,
-      isScrollControlled: true,
-      useSafeArea: true,
-      builder: (context) => Consumer(
-        builder: (context, ref, _) {
-          final l10n = AppLocalizations.of(context)!;
-          return SafeArea(
-            top: false,
-            child: SingleChildScrollView(
-              padding: const EdgeInsets.fromLTRB(24, 0, 24, 20),
-              child: Column(
-                mainAxisSize: MainAxisSize.min,
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Semantics(
-                    header: true,
-                    child: Text(l10n.downloadUsing, style: context.text.title),
-                  ),
-                  const SizedBox(height: 12),
-                  RadioGroup<bool>(
-                    groupValue: ref
-                        .watch(downloadSettingsProvider)
-                        .useMobileData,
-                    onChanged: (value) async {
-                      if (value == null) return;
-                      await ref
-                          .read(downloadSettingsProvider.notifier)
-                          .setUseMobileData(value);
-                      if (context.mounted) Navigator.of(context).pop();
-                    },
-                    child: Column(
-                      children: [
-                        RadioListTile<bool>(
-                          contentPadding: EdgeInsets.zero,
-                          value: false,
-                          title: Text(
-                            l10n.downloadWifiOnly,
-                            style: context.text.body,
-                          ),
-                        ),
-                        RadioListTile<bool>(
-                          contentPadding: EdgeInsets.zero,
-                          value: true,
-                          title: Text(
-                            l10n.downloadWifiAndMobileData,
-                            style: context.text.body,
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                ],
-              ),
-            ),
-          );
-        },
-      ),
-    );

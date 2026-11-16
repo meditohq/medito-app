@@ -17,9 +17,9 @@
     }
   },
   "downloadDefaultVoiceAndLength": "Default voice and length",
-  "downloadUsing": "Download using",
-  "downloadWifiOnly": "Wi-Fi only",
-  "downloadWifiAndMobileData": "Wi-Fi and mobile data",
+  "downloadUseMobileData": "Use mobile data",
+  "downloadUseMobileDataDescription": "When off, downloads wait for Wi-Fi.",
+  "downloadChangeDefaults": "Change",
   "volume": "Volume",
   "home": "Home",
   "backgroundSoundDownloadFailed": "Couldn't download. Tap to try again.",

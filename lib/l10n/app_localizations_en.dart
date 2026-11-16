@@ -46,13 +46,14 @@ class AppLocalizationsEn extends AppLocalizations {
   String get downloadDefaultVoiceAndLength => 'Default voice and length';
 
   @override
-  String get downloadUsing => 'Download using';
+  String get downloadUseMobileData => 'Use mobile data';
 
   @override
-  String get downloadWifiOnly => 'Wi-Fi only';
+  String get downloadUseMobileDataDescription =>
+      'When off, downloads wait for Wi-Fi.';
 
   @override
-  String get downloadWifiAndMobileData => 'Wi-Fi and mobile data';
+  String get downloadChangeDefaults => 'Change';
 
   @override
   String get volume => 'Volume';

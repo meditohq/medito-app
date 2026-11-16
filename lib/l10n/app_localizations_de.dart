@@ -47,13 +47,14 @@ class AppLocalizationsDe extends AppLocalizations {
   String get downloadDefaultVoiceAndLength => 'Standardstimme und -dauer';
 
   @override
-  String get downloadUsing => 'Herunterladen über';
+  String get downloadUseMobileData => 'Mobile Daten verwenden';
 
   @override
-  String get downloadWifiOnly => 'Nur WLAN';
+  String get downloadUseMobileDataDescription =>
+      'Wenn aus, warten Downloads auf WLAN.';
 
   @override
-  String get downloadWifiAndMobileData => 'WLAN und mobile Daten';
+  String get downloadChangeDefaults => 'Ändern';
 
   @override
   String get volume => 'Lautstärke';
