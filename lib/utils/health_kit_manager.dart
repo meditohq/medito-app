@@ -3,6 +3,7 @@ import 'dart:io';
 import 'package:health/health.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
+import '../services/apple_health_writer.dart';
 import '../src/audio_pigeon.g.dart';
 
 class HealthKitManager {
@@ -110,11 +111,9 @@ class HealthKitManager {
     await prefs.setStringList('syncedSessions', syncedSessions);
   }
 
-  /// Writes a completed session to Apple Health / Health Connect.
-  ///
-  /// On Android, [title], [trackId] and [fileId] are exported to Health
-  /// Connect so other apps can tell which meditation was completed (see
-  /// docs/HEALTH_CONNECT_EXPORT.md). iOS currently ignores them.
+  /// Writes a completed session with its title and content IDs to Apple Health
+  /// or Health Connect. Export formats are documented in docs/APPLE_HEALTH_EXPORT.md
+  /// and docs/HEALTH_CONNECT_EXPORT.md.
   Future<bool> writeMindfulnessData(
     DateTime start,
     DateTime end, {
@@ -150,13 +149,12 @@ class HealthKitManager {
       }
       if (!hasPermissions) return false;
 
-      return await health.writeHealthData(
-        value: 0,
-        type: HealthDataType.MINDFULNESS,
-        startTime: start,
-        endTime: end,
-        unit: HealthDataUnit.NO_UNIT,
-        recordingMethod: RecordingMethod.automatic,
+      return await AppleHealthWriter().writeMindfulnessSession(
+        start,
+        end,
+        title: title,
+        trackId: trackId,
+        fileId: fileId,
       );
     } catch (error) {
       return false;

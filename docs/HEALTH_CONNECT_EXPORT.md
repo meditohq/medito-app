@@ -21,4 +21,4 @@ For tracks, both are stable ids from the Medito content API, so they're safe to 
 on `;` and then on the first `=`, and ignore keys you don't recognise: more keys may be added later.
 
 This format is informational and may change between app versions; there is no backwards-compatibility
-guarantee. Only Android exports this metadata today; Apple Health records are unchanged.
+guarantee. Apple Health exports equivalent metadata as documented in [APPLE_HEALTH_EXPORT.md](APPLE_HEALTH_EXPORT.md).
