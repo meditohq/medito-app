@@ -116,10 +116,10 @@ void main() {
     final fallBack = _firstDayOfLength(2026, const Duration(hours: 25));
 
     test(
-      'keeps the chosen time on the day after spring-forward',
+      'keeps the chosen time across spring-forward',
       () {
-        final spring = springForward!;
-        final dayBefore = DateTime(spring.year, spring.month, spring.day - 1);
+        // The noon-to-noon search already returns the day before the change.
+        final dayBefore = springForward!;
 
         // 23:00 the night before, with 07:00 already passed that day.
         final anchor = firstReminderAnchor(
@@ -127,7 +127,10 @@ void main() {
           const TimeOfDay(hour: 7, minute: 0),
         );
 
-        expect(anchor, DateTime(spring.year, spring.month, spring.day, 7, 0));
+        expect(
+          anchor,
+          DateTime(dayBefore.year, dayBefore.month, dayBefore.day + 1, 7, 0),
+        );
       },
       skip: springForward == null
           ? 'host timezone (${DateTime(2026, 1, 1).timeZoneName}) has no '
@@ -136,17 +139,20 @@ void main() {
     );
 
     test(
-      'keeps the chosen time on the day after fall-back',
+      'keeps the chosen time across fall-back',
       () {
-        final fall = fallBack!;
-        final dayBefore = DateTime(fall.year, fall.month, fall.day - 1);
+        // The noon-to-noon search already returns the day before the change.
+        final dayBefore = fallBack!;
 
         final anchor = firstReminderAnchor(
           DateTime(dayBefore.year, dayBefore.month, dayBefore.day, 23, 0),
           const TimeOfDay(hour: 7, minute: 0),
         );
 
-        expect(anchor, DateTime(fall.year, fall.month, fall.day, 7, 0));
+        expect(
+          anchor,
+          DateTime(dayBefore.year, dayBefore.month, dayBefore.day + 1, 7, 0),
+        );
       },
       skip: fallBack == null
           ? 'host timezone (${DateTime(2026, 1, 1).timeZoneName}) has no '
@@ -269,9 +275,8 @@ void main() {
       registerFallbackValue(<ScheduledReminder>[]);
       when(() => reminders.cancelReminderSeries()).thenAnswer((_) async {});
       when(() => reminders.cancelDailyNotification()).thenAnswer((_) async {});
-      when(
-        () => reminders.scheduleReminderSeries(any()),
-      ).thenAnswer((_) async {});
+      when(() => reminders.scheduleReminderSeries(any()))
+          .thenAnswer((_) async {});
       // The scheduler converts each anchor to tz.local, so pin it: the
       // assertions must not depend on the machine's zone data being loaded.
       tzdata.initializeTimeZones();
@@ -331,8 +336,8 @@ void main() {
     test(
       'keeps the session hour across spring-forward',
       () async {
-        final spring = springForward!;
-        final dayBefore = DateTime(spring.year, spring.month, spring.day - 1);
+        // The noon-to-noon search already returns the day before the change.
+        final dayBefore = springForward!;
 
         final items = await reschedule(
           sessionEnd: DateTime(
@@ -347,11 +352,11 @@ void main() {
         // The session started 09:10; a 24h step would anchor at 10:00.
         expect(
           items.first.scheduledDate.toLocal(),
-          DateTime(spring.year, spring.month, spring.day, 9, 0),
+          DateTime(dayBefore.year, dayBefore.month, dayBefore.day + 1, 9, 0),
         );
         expect(
           items[1].scheduledDate.toLocal(),
-          DateTime(spring.year, spring.month, spring.day + 1, 9, 0),
+          DateTime(dayBefore.year, dayBefore.month, dayBefore.day + 2, 9, 0),
         );
       },
       skip: springForward == null
@@ -363,8 +368,8 @@ void main() {
     test(
       'keeps the session hour across fall-back',
       () async {
-        final fall = fallBack!;
-        final dayBefore = DateTime(fall.year, fall.month, fall.day - 1);
+        // The noon-to-noon search already returns the day before the change.
+        final dayBefore = fallBack!;
 
         final items = await reschedule(
           sessionEnd: DateTime(
@@ -379,11 +384,11 @@ void main() {
         // The session started 09:10; a 24h step would anchor at 08:00.
         expect(
           items.first.scheduledDate.toLocal(),
-          DateTime(fall.year, fall.month, fall.day, 9, 0),
+          DateTime(dayBefore.year, dayBefore.month, dayBefore.day + 1, 9, 0),
         );
         expect(
           items[1].scheduledDate.toLocal(),
-          DateTime(fall.year, fall.month, fall.day + 1, 9, 0),
+          DateTime(dayBefore.year, dayBefore.month, dayBefore.day + 2, 9, 0),
         );
       },
       skip: fallBack == null
