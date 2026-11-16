@@ -31,9 +31,8 @@ void main() {
   Future<void> boot() async {
     mockStatsService = MockStatsService();
     when(mockStatsService.postStats(any)).thenAnswer((_) async {});
-    when(
-      mockStatsService.fetchAllStats(),
-    ).thenAnswer((_) async => LocalAllStats.empty());
+    when(mockStatsService.fetchAllStats())
+        .thenAnswer((_) async => LocalAllStats.empty());
 
     statsManager = StatsManager();
     statsManager.resetForTesting();
@@ -182,6 +181,91 @@ void main() {
       expect(stats.audioCompleted, hasLength(1));
       expect(stats.totalTracksCompleted, 1);
       expect(stats.totalTimeListened, durationMs);
+    });
+
+    test(
+      'a replay retries the POST that failed after the local save',
+      () async {
+        final recorded = LocalAudioCompleted(
+          id: trackId,
+          timestamp: completedAt.millisecondsSinceEpoch,
+        );
+
+        // The session reaches the disk, then the server call fails.
+        var postAttempts = 0;
+        when(mockStatsService.postStats(any)).thenAnswer((_) async {
+          postAttempts++;
+          if (postAttempts == 1) throw Exception('offline');
+        });
+
+        // Seed the in-memory copy so loading does not run a network sync first.
+        statsManager.setStatsForTesting(LocalAllStats.empty());
+
+        await expectLater(
+          statsManager.addAudioCompleted(recorded, durationMs),
+          throwsA(isA<Exception>()),
+        );
+        expect(postAttempts, 1);
+
+        var stats = await statsManager.localAllStats;
+        expect(stats.audioCompleted, hasLength(1));
+        expect(stats.totalTracksCompleted, 1);
+
+        // The app dies before the platform retries; the replay arrives later.
+        await restartProcess();
+
+        final recordedAgain = await statsManager.addAudioCompleted(
+          recorded,
+          durationMs,
+        );
+
+        expect(recordedAgain, isFalse, reason: 'the replay adds no session');
+        expect(postAttempts, 2, reason: 'the replay flushed the pending post');
+
+        stats = await statsManager.localAllStats;
+        expect(stats.audioCompleted, hasLength(1));
+        expect(stats.totalTracksCompleted, 1);
+        expect(stats.totalTimeListened, durationMs);
+
+        // The flush cleared the pending state, so nothing is left to push.
+        await statsManager.flushPendingPost();
+        expect(postAttempts, 2);
+      },
+    );
+
+    test('a replay whose retry fails again stays pending', () async {
+      final recorded = LocalAudioCompleted(
+        id: trackId,
+        timestamp: completedAt.millisecondsSinceEpoch,
+      );
+
+      var postAttempts = 0;
+      when(mockStatsService.postStats(any)).thenAnswer((_) async {
+        postAttempts++;
+        throw Exception('offline');
+      });
+
+      // Seed the in-memory copy so loading does not run a network sync first.
+      statsManager.setStatsForTesting(LocalAllStats.empty());
+
+      await expectLater(
+        statsManager.addAudioCompleted(recorded, durationMs),
+        throwsA(isA<Exception>()),
+      );
+
+      await restartProcess();
+
+      // The replay throws instead of acknowledging, so handleStats returns
+      // false and the native payload is retried again.
+      await expectLater(
+        statsManager.addAudioCompleted(recorded, durationMs),
+        throwsA(isA<Exception>()),
+      );
+      expect(postAttempts, 2);
+
+      final stats = await statsManager.localAllStats;
+      expect(stats.audioCompleted, hasLength(1));
+      expect(stats.totalTracksCompleted, 1);
     });
   });
 }

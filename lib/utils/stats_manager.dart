@@ -600,6 +600,18 @@ class StatsManager {
         AudioCompletionTracker.isAlreadyRecorded(_allStats, audioCompleted)) {
       // A previous attempt may have mutated memory before its disk write failed.
       await _saveLocalAllStatsToSharedPrefs();
+      // The session is saved on disk but may not be on the server: the local
+      // write runs before the POST, and a failed POST leaves the history
+      // dirty. This replay is a second chance to push it. Without the flush,
+      // returning false tells the platform the work is done and it clears its
+      // payload, so the server never gets the session. A flush that still
+      // fails throws, and handleStats keeps the payload pending.
+      if (_needsServerFlush(audioCompleted)) {
+        await _statsService.postStats(_allStats!);
+        _lastSyncedAt = _getCurrentDate();
+        await _saveLastSyncedAt();
+        _dirty = false;
+      }
       AppLogger.d(
         'STATS_MANAGER',
         'Completion ${audioCompleted.id} at ${audioCompleted.timestamp} '
@@ -653,6 +665,19 @@ class StatsManager {
     }
 
     return true;
+  }
+
+  /// True when [audioCompleted] may not have reached the server yet.
+  ///
+  /// [_dirty] covers a POST that failed in this process. After a restart the
+  /// flag is gone, so the durable sync marker is compared with the session
+  /// time: a successful POST stamps [_lastSyncedAt] afterwards, and any
+  /// session newer than that stamp was never confirmed.
+  bool _needsServerFlush(LocalAudioCompleted audioCompleted) {
+    if (_dirty) return true;
+    final lastSyncedAt = _lastSyncedAt;
+    if (lastSyncedAt == null) return true;
+    return lastSyncedAt.millisecondsSinceEpoch < audioCompleted.timestamp;
   }
 
   /// Adds the listening time of a repeated play-through without recording a
