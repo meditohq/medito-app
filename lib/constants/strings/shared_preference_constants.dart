@@ -10,6 +10,10 @@ class SharedPreferenceConstants {
   // pickers can list sounds offline and grey out the ones not downloaded.
   static const String bgSoundCatalog = 'bgSoundCatalog';
   static const String downloads = 'downloads';
+  static const String autoDeleteCompletedDownloads =
+      'auto_delete_completed_downloads';
+  static const String autoDownloadNextSession = 'auto_download_next_session';
+  static const String autoDownloadOnMobileData = 'auto_download_on_mobile_data';
   static const String currentPlayingTrack = 'currentPlayingTrack';
   static const String shortcuts = 'shortcuts';
   static const String savedHours = 'savedHours';

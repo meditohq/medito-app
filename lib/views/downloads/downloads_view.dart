@@ -12,6 +12,7 @@ import 'package:medito/utils/duration_extensions.dart';
 import 'package:medito/utils/utils.dart';
 import 'package:medito/scaffold_messenger_key.dart';
 import 'package:medito/views/downloads/widgets/download_list_item.dart';
+import 'package:medito/views/downloads/widgets/download_options_sheet.dart';
 import 'package:medito/views/player/widgets/bottom_actions/single_back_action_bar.dart';
 import 'package:medito/widgets/headers/medito_app_bar_small.dart';
 import 'package:medito/widgets/widgets.dart';
@@ -67,6 +68,14 @@ class _DownloadsViewState extends ConsumerState<DownloadsView>
         },
         isTransparent: true,
         hasCloseButton: !widget.isRoot,
+        actions: [
+          IconButton(
+            tooltip: AppLocalizations.of(context)!.downloadOptions,
+            icon: const Icon(Icons.more_horiz_rounded),
+            onPressed: () => showDownloadOptionsSheet(context),
+          ),
+          const SizedBox(width: 8),
+        ],
       ),
       key: scaffoldKey,
       body: AdaptivePageBody(

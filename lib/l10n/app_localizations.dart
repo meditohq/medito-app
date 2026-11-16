@@ -130,6 +130,66 @@ abstract class AppLocalizations {
   /// **'Downloads'**
   String get downloads;
 
+  /// No description provided for @downloadOptions.
+  ///
+  /// In en, this message translates to:
+  /// **'Download options'**
+  String get downloadOptions;
+
+  /// No description provided for @autoDeleteCompletedDownloads.
+  ///
+  /// In en, this message translates to:
+  /// **'Delete completed downloads'**
+  String get autoDeleteCompletedDownloads;
+
+  /// No description provided for @autoDeleteCompletedDownloadsDescription.
+  ///
+  /// In en, this message translates to:
+  /// **'Automatically remove sessions you\'ve finished listening to, including ones you downloaded yourself.'**
+  String get autoDeleteCompletedDownloadsDescription;
+
+  /// No description provided for @autoDownloadNextSession.
+  ///
+  /// In en, this message translates to:
+  /// **'Download next session'**
+  String get autoDownloadNextSession;
+
+  /// Explains which Home recommendation is downloaded, using the visible labels on Home.
+  ///
+  /// In en, this message translates to:
+  /// **'Automatically save the session shown under {upNext} on {home} so it\'s ready offline.'**
+  String autoDownloadNextSessionDescription(String upNext, String home);
+
+  /// No description provided for @downloadDefaultVoiceAndLength.
+  ///
+  /// In en, this message translates to:
+  /// **'Default voice and length'**
+  String get downloadDefaultVoiceAndLength;
+
+  /// No description provided for @downloadUsing.
+  ///
+  /// In en, this message translates to:
+  /// **'Download using'**
+  String get downloadUsing;
+
+  /// No description provided for @downloadWifiOnly.
+  ///
+  /// In en, this message translates to:
+  /// **'Wi-Fi only'**
+  String get downloadWifiOnly;
+
+  /// No description provided for @downloadWifiAndMobileData.
+  ///
+  /// In en, this message translates to:
+  /// **'Wi-Fi and mobile data'**
+  String get downloadWifiAndMobileData;
+
+  /// No description provided for @autoDownloadForegroundNote.
+  ///
+  /// In en, this message translates to:
+  /// **'Downloads happen while Medito is open and connected.'**
+  String get autoDownloadForegroundNote;
+
   /// No description provided for @volume.
   ///
   /// In en, this message translates to:

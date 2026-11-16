@@ -18,6 +18,7 @@ import 'package:medito/firebase_options.dart';
 import 'package:medito/providers/auth/auth_state_provider.dart';
 import 'package:medito/providers/notification/reminder_provider.dart';
 import 'package:medito/providers/locale_provider.dart';
+import 'package:medito/providers/downloads/download_automation_provider.dart';
 import 'package:medito/providers/providers.dart';
 import 'package:medito/providers/stats_provider.dart';
 import 'package:medito/providers/theme_provider.dart';
@@ -330,6 +331,7 @@ class _ParentWidgetState extends ConsumerState<ParentWidget>
 
   @override
   Widget build(BuildContext context) {
+    ref.watch(downloadAutomationProvider);
     final authRepo = ref.watch(authRepositoryProvider);
 
     return authRepo.when(

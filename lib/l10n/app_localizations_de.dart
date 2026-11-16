@@ -26,6 +26,40 @@ class AppLocalizationsDe extends AppLocalizations {
   String get downloads => 'Downloads';
 
   @override
+  String get downloadOptions => 'Download-Optionen';
+
+  @override
+  String get autoDeleteCompletedDownloads => 'Abgeschlossene Downloads löschen';
+
+  @override
+  String get autoDeleteCompletedDownloadsDescription =>
+      'Entfernt automatisch vollständig angehörte Sitzungen, auch solche, die du selbst heruntergeladen hast.';
+
+  @override
+  String get autoDownloadNextSession => 'Nächste Sitzung herunterladen';
+
+  @override
+  String autoDownloadNextSessionDescription(String upNext, String home) {
+    return 'Speichert automatisch die unter $upNext auf $home angezeigte Sitzung, damit sie offline verfügbar ist.';
+  }
+
+  @override
+  String get downloadDefaultVoiceAndLength => 'Standardstimme und -dauer';
+
+  @override
+  String get downloadUsing => 'Herunterladen über';
+
+  @override
+  String get downloadWifiOnly => 'Nur WLAN';
+
+  @override
+  String get downloadWifiAndMobileData => 'WLAN und mobile Daten';
+
+  @override
+  String get autoDownloadForegroundNote =>
+      'Downloads werden ausgeführt, während Medito geöffnet und verbunden ist.';
+
+  @override
   String get volume => 'Lautstärke';
 
   @override
