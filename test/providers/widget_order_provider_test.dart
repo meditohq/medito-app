@@ -15,7 +15,12 @@ void main() {
       SharedPreferences.setMockInitialValues({});
       prefs = await SharedPreferences.getInstance();
       container = ProviderContainer(
-        overrides: [sharedPreferencesProvider.overrideWithValue(prefs)],
+        overrides: [
+          sharedPreferencesProvider.overrideWithValue(prefs),
+          homeWidgetOrderClockProvider.overrideWithValue(
+            () => DateTime(DateTime.now().year, 1, 1),
+          ),
+        ],
       );
     });
 
@@ -136,7 +141,7 @@ void main() {
         ];
 
         final notifier = container.read(homeWidgetOrderProvider.notifier);
-        await notifier.updateOrder(newOrder);
+        await notifier.updateOrder(newOrder, movedWidget: HomeWidgetType.quote);
 
         final savedOrder = prefs.getStringList(
           SharedPreferenceConstants.homeWidgetOrder,
@@ -153,7 +158,7 @@ void main() {
         ];
 
         final notifier = container.read(homeWidgetOrderProvider.notifier);
-        await notifier.updateOrder(newOrder);
+        await notifier.updateOrder(newOrder, movedWidget: HomeWidgetType.quote);
 
         final order = container.read(homeWidgetOrderProvider);
         expect(order, newOrder);
@@ -265,45 +270,258 @@ void main() {
     });
 
     group('Custom order preservation during Black Friday', () {
+      const baseOrder = [
+        HomeWidgetType.upNext,
+        HomeWidgetType.shortcuts,
+        HomeWidgetType.carousel,
+        HomeWidgetType.quote,
+        HomeWidgetType.products,
+      ];
+      const promoOrder = [
+        HomeWidgetType.upNext,
+        HomeWidgetType.shortcuts,
+        HomeWidgetType.products,
+        HomeWidgetType.carousel,
+        HomeWidgetType.quote,
+      ];
+
+      late DateTime now;
+
+      setUp(() async {
+        now = DateTime(2026, 11, 27);
+        await prefs.setStringList(
+          SharedPreferenceConstants.homeWidgetOrder,
+          baseOrder.map((e) => e.name).toList(),
+        );
+        container.dispose();
+        container = ProviderContainer(
+          overrides: [
+            sharedPreferencesProvider.overrideWithValue(prefs),
+            homeWidgetOrderClockProvider.overrideWithValue(() => now),
+          ],
+        );
+      });
+
+      List<String>? savedOrder() =>
+          prefs.getStringList(SharedPreferenceConstants.homeWidgetOrder);
+
       test(
-        'updateOrder preserves custom order when saving during Black Friday',
+        'does not persist the promotional position on a no-op drag',
         () async {
-          final originalCustomOrder = [
-            HomeWidgetType.carousel,
-            HomeWidgetType.shortcuts,
-            HomeWidgetType.quote,
-            HomeWidgetType.products,
-          ];
-          await prefs.setStringList(
-            SharedPreferenceConstants.homeWidgetOrder,
-            originalCustomOrder.map((e) => e.name).toList(),
-          );
-
+          expect(container.read(homeWidgetOrderProvider), promoOrder);
           final notifier = container.read(homeWidgetOrderProvider.notifier);
-
-          final reorderedOrder = [
-            HomeWidgetType.carousel,
-            HomeWidgetType.shortcuts,
-            HomeWidgetType.products,
-            HomeWidgetType.quote,
-          ];
-
-          await notifier.updateOrder(reorderedOrder);
-
-          final savedOrder = prefs.getStringList(
-            SharedPreferenceConstants.homeWidgetOrder,
+          await notifier.updateOrder(
+            promoOrder,
+            movedWidget: HomeWidgetType.quote,
           );
-          final savedOrderTypes = savedOrder!
-              .map((e) => HomeWidgetType.fromString(e))
-              .toList();
+          expect(savedOrder(), baseOrder.map((e) => e.name).toList());
+          notifier.refreshOrder();
+          expect(container.read(homeWidgetOrderProvider), promoOrder);
 
-          expect(savedOrderTypes.length, 4);
-          expect(savedOrderTypes.contains(HomeWidgetType.shortcuts), true);
-          expect(savedOrderTypes.contains(HomeWidgetType.products), true);
-          expect(savedOrderTypes.contains(HomeWidgetType.carousel), true);
-          expect(savedOrderTypes.contains(HomeWidgetType.quote), true);
+          await prefs.setInt(
+            SharedPreferenceConstants.blackFridayDismissedYear,
+            2026,
+          );
+          notifier.refreshOrder();
+          expect(container.read(homeWidgetOrderProvider), baseOrder);
         },
       );
+
+      test(
+        'a products drag to the same position does not save the promo',
+        () async {
+          final notifier = container.read(homeWidgetOrderProvider.notifier);
+          await notifier.updateOrder(
+            promoOrder,
+            movedWidget: HomeWidgetType.products,
+          );
+          expect(savedOrder(), baseOrder.map((e) => e.name).toList());
+          final reordered = [...promoOrder]..remove(HomeWidgetType.shortcuts);
+          reordered.add(HomeWidgetType.shortcuts);
+          await notifier.updateOrder(
+            reordered,
+            movedWidget: HomeWidgetType.shortcuts,
+          );
+          expect(savedOrder(), [
+            'upNext',
+            'carousel',
+            'quote',
+            'shortcuts',
+            'products',
+          ]);
+        },
+      );
+
+      test('restores the saved order when the promotion ends', () async {
+        final notifier = container.read(homeWidgetOrderProvider.notifier);
+        final reordered = [...promoOrder]..remove(HomeWidgetType.quote);
+        reordered.insert(3, HomeWidgetType.quote);
+        await notifier.updateOrder(
+          reordered,
+          movedWidget: HomeWidgetType.quote,
+        );
+        now = DateTime(2026, 12, 5);
+        notifier.refreshOrder();
+        expect(
+          container.read(homeWidgetOrderProvider).map((e) => e.name).toList(),
+          ['upNext', 'shortcuts', 'quote', 'carousel', 'products'],
+        );
+      });
+
+      test(
+        'preserves other section reorders while restoring products',
+        () async {
+          final notifier = container.read(homeWidgetOrderProvider.notifier);
+          final reordered = [...promoOrder]..remove(HomeWidgetType.quote);
+          reordered.insert(3, HomeWidgetType.quote);
+          await notifier.updateOrder(
+            reordered,
+            movedWidget: HomeWidgetType.quote,
+          );
+          expect(container.read(homeWidgetOrderProvider), reordered);
+          expect(savedOrder(), [
+            'upNext',
+            'shortcuts',
+            'quote',
+            'carousel',
+            'products',
+          ]);
+        },
+      );
+
+      test(
+        'moving Shortcuts away does not persist promoted products',
+        () async {
+          final notifier = container.read(homeWidgetOrderProvider.notifier);
+          final reordered = [...promoOrder]..remove(HomeWidgetType.shortcuts);
+          reordered.add(HomeWidgetType.shortcuts);
+          await notifier.updateOrder(
+            reordered,
+            movedWidget: HomeWidgetType.shortcuts,
+          );
+          expect(savedOrder(), [
+            'upNext',
+            'carousel',
+            'quote',
+            'shortcuts',
+            'products',
+          ]);
+        },
+      );
+
+      test(
+        'moving a section between Shortcuts and products restores products',
+        () async {
+          final notifier = container.read(homeWidgetOrderProvider.notifier);
+          final reordered = [...promoOrder]..remove(HomeWidgetType.quote);
+          reordered.insert(2, HomeWidgetType.quote);
+          await notifier.updateOrder(
+            reordered,
+            movedWidget: HomeWidgetType.quote,
+          );
+          expect(savedOrder(), [
+            'upNext',
+            'shortcuts',
+            'quote',
+            'carousel',
+            'products',
+          ]);
+        },
+      );
+
+      test(
+        'explicit products drag survives subsequent section drags',
+        () async {
+          final notifier = container.read(homeWidgetOrderProvider.notifier);
+          final reordered = [...promoOrder]..remove(HomeWidgetType.products);
+          reordered.insert(3, HomeWidgetType.products);
+          await notifier.updateOrder(
+            reordered,
+            movedWidget: HomeWidgetType.products,
+          );
+          final secondOrder = [...reordered]..remove(HomeWidgetType.quote);
+          secondOrder.insert(0, HomeWidgetType.quote);
+          await notifier.updateOrder(
+            secondOrder,
+            movedWidget: HomeWidgetType.quote,
+          );
+          expect(savedOrder(), secondOrder.map((e) => e.name).toList());
+        },
+      );
+
+      test('preserves a base order that was not promoted', () async {
+        for (final productsIndex in [0, 2]) {
+          final custom = [...baseOrder]..remove(HomeWidgetType.products);
+          custom.insert(productsIndex, HomeWidgetType.products);
+          await prefs.setStringList(
+            SharedPreferenceConstants.homeWidgetOrder,
+            custom.map((e) => e.name).toList(),
+          );
+          final notifier = container.read(homeWidgetOrderProvider.notifier);
+          notifier.refreshOrder();
+          expect(container.read(homeWidgetOrderProvider), custom);
+          final reordered = [...custom]..remove(HomeWidgetType.quote);
+          reordered.insert(0, HomeWidgetType.quote);
+          await notifier.updateOrder(
+            reordered,
+            movedWidget: HomeWidgetType.quote,
+          );
+          expect(savedOrder(), reordered.map((e) => e.name).toList());
+        }
+      });
+
+      test('keeps a custom products slot through repeated reorders', () async {
+        await prefs.setStringList(SharedPreferenceConstants.homeWidgetOrder, [
+          'upNext',
+          'shortcuts',
+          'carousel',
+          'products',
+          'quote',
+        ]);
+        final notifier = container.read(homeWidgetOrderProvider.notifier);
+        await notifier.updateOrder([
+          HomeWidgetType.quote,
+          HomeWidgetType.upNext,
+          HomeWidgetType.shortcuts,
+          HomeWidgetType.products,
+          HomeWidgetType.carousel,
+        ], movedWidget: HomeWidgetType.quote);
+        expect(savedOrder(), [
+          'quote',
+          'upNext',
+          'shortcuts',
+          'products',
+          'carousel',
+        ]);
+        await notifier.updateOrder([
+          HomeWidgetType.upNext,
+          HomeWidgetType.quote,
+          HomeWidgetType.shortcuts,
+          HomeWidgetType.products,
+          HomeWidgetType.carousel,
+        ], movedWidget: HomeWidgetType.upNext);
+        expect(savedOrder(), [
+          'upNext',
+          'quote',
+          'shortcuts',
+          'products',
+          'carousel',
+        ]);
+      });
+
+      test('dismissed promotion saves the actual drag', () async {
+        await prefs.setInt(
+          SharedPreferenceConstants.blackFridayDismissedYear,
+          2026,
+        );
+        final notifier = container.read(homeWidgetOrderProvider.notifier);
+        expect(container.read(homeWidgetOrderProvider), baseOrder);
+        await notifier.updateOrder(
+          promoOrder,
+          movedWidget: HomeWidgetType.products,
+        );
+        expect(savedOrder(), promoOrder.map((e) => e.name).toList());
+      });
     });
   });
 }

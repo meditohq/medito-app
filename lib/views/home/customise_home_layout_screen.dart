@@ -95,7 +95,7 @@ class CustomiseHomeLayoutScreenState
                       var newOrder = List.of(order);
                       var item = newOrder.removeAt(oldIndex);
                       newOrder.insert(newIndex, item);
-                      notifier.updateOrder(newOrder);
+                      notifier.updateOrder(newOrder, movedWidget: item);
                     },
                   ),
                 ),
