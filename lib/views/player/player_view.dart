@@ -345,7 +345,7 @@ class _PlayerViewState extends ConsumerState<PlayerView> {
       onPopInvokedWithResult: (didPop, result) {
         if (didPop) {
           _resetState();
-          _stopAudio();
+          unawaited(_stopAudio());
         }
       },
       child: PlayerScreenLayout(
@@ -422,13 +422,19 @@ class _PlayerViewState extends ConsumerState<PlayerView> {
     );
     final bell = ref.read(sessionBellPreviewProvider);
     _openEndScreen(
-      // Rung just after the player has stopped: on iOS stop() releases the
-      // audio session asynchronously, which would clip a bell started in the
-      // same frame. The bell's own player reactivates the session.
+      // Rung once the player has really stopped: on iOS stop() releases the
+      // audio session asynchronously, and a release landing after the bell
+      // started silenced it. (A fixed 400ms wait used to stand in for this and
+      // lost the race on a slow stop.) The bell's own player reactivates the
+      // session.
       afterStop: bellsOn
-          ? () => Future.delayed(
-              const Duration(milliseconds: 400),
-              () => bell.play(volume),
+          ? () => unawaited(
+              bell
+                  .play(volume)
+                  .catchError(
+                    (Object e) =>
+                        AppLogger.w('BELLS', 'Closing bell failed: $e'),
+                  ),
             )
           : null,
     );
@@ -464,7 +470,7 @@ class _PlayerViewState extends ConsumerState<PlayerView> {
 
     WidgetsBinding.instance.addPostFrameCallback((_) async {
       _resetState();
-      _stopAudio();
+      unawaited(_stopAudio());
 
       await ref.read(dndProvider.notifier).setDndMode(false);
       _endScreenOpened = false;
@@ -477,9 +483,11 @@ class _PlayerViewState extends ConsumerState<PlayerView> {
     });
   }
 
-  void _stopAudio() {
-    ref.read(playerProvider.notifier).stop();
+  /// Completes when the primary player has finished stopping.
+  Future<void> _stopAudio() {
+    final stopped = ref.read(playerProvider.notifier).stop();
     ref.read(backgroundSoundsNotifierProvider.notifier).stopBackgroundSound();
+    return stopped;
   }
 
   void _resetState() {
@@ -492,8 +500,8 @@ class _PlayerViewState extends ConsumerState<PlayerView> {
     WidgetsBinding.instance.addPostFrameCallback((_) {
       if (!_endScreenOpened && mounted) {
         _resetState();
-        _stopAudio();
-        afterStop?.call();
+        final stopped = _stopAudio();
+        if (afterStop != null) unawaited(stopped.then((_) => afterStop()));
         final currentlyPlayingTrack = ref.read(playerProvider);
         if (currentlyPlayingTrack == null) return;
 

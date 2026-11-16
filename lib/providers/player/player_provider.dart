@@ -252,14 +252,21 @@ class PlayerProvider extends Notifier<PlaybackRequest?> {
     }
   }
 
-  void stop() {
+  /// Completes once the platform player has actually stopped (on iOS that
+  /// includes releasing the audio session), so a caller can safely start
+  /// other audio afterwards. Never throws.
+  Future<void> stop() async {
     // Analytics: closing the player ends the session. No-op if it already
     // completed (the completion path also calls stop()).
     unawaited(AudioSessionTracker.instance.onStopped());
-    if (Platform.isAndroid) {
-      _api.stopAudio();
-    } else {
-      iosAudioHandler.stop();
+    try {
+      if (Platform.isAndroid) {
+        await _api.stopAudio();
+      } else {
+        await iosAudioHandler.stop();
+      }
+    } catch (e) {
+      AppLogger.w('PLAYER', 'Stopping playback failed: $e');
     }
   }
 

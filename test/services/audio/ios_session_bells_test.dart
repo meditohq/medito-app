@@ -1,5 +1,7 @@
 import 'package:medito/models/background_sounds/session_bell_pattern.dart';
+
 import 'dart:async';
+
 import 'package:flutter_test/flutter_test.dart';
 import 'package:just_audio/just_audio.dart';
 import 'package:mocktail/mocktail.dart';
@@ -26,20 +28,17 @@ void main() {
     playing = false;
     processing = ProcessingState.ready;
     when(() => primary.positionStream).thenAnswer((_) => positions.stream);
-    when(
-      () => primary.playerStateStream,
-    ).thenAnswer((_) => const Stream.empty());
-    when(
-      () => primary.positionDiscontinuityStream,
-    ).thenAnswer((_) => const Stream.empty());
+    when(() => primary.playerStateStream)
+        .thenAnswer((_) => const Stream.empty());
+    when(() => primary.positionDiscontinuityStream)
+        .thenAnswer((_) => const Stream.empty());
     when(() => primary.position).thenAnswer((_) => position);
     when(() => primary.speed).thenReturn(1.0);
     when(() => primary.playing).thenAnswer((_) => playing);
     when(() => primary.processingState).thenAnswer((_) => processing);
     when(() => primary.duration).thenReturn(const Duration(minutes: 10));
-    when(
-      () => bell.setAsset(kSessionBellAsset),
-    ).thenAnswer((_) async => const Duration(seconds: 6));
+    when(() => bell.setAsset(kSessionBellAsset))
+        .thenAnswer((_) async => const Duration(seconds: 6));
     when(() => bell.setVolume(any())).thenAnswer((_) async {});
     when(() => bell.seek(Duration.zero)).thenAnswer((_) async {});
     when(() => bell.play()).thenAnswer((_) async {});
@@ -93,9 +92,8 @@ void main() {
   test('deselecting while asset loads prevents stale playback', () async {
     playing = true;
     final loading = Completer<Duration?>();
-    when(
-      () => bell.setAsset(kSessionBellAsset),
-    ).thenAnswer((_) => loading.future);
+    when(() => bell.setAsset(kSessionBellAsset))
+        .thenAnswer((_) => loading.future);
     final enabling = controller.enable(.5);
     await controller.disable();
     loading.complete(const Duration(seconds: 6));
@@ -126,9 +124,8 @@ void main() {
 
   test('preloading while paused keeps the opening cue ready', () async {
     final loading = Completer<Duration?>();
-    when(
-      () => bell.setAsset(kSessionBellAsset),
-    ).thenAnswer((_) => loading.future);
+    when(() => bell.setAsset(kSessionBellAsset))
+        .thenAnswer((_) => loading.future);
     final preparing = controller.enable(
       .5,
       pattern: SessionBellPattern.beginningEnd,
@@ -151,6 +148,52 @@ void main() {
     await flush();
     verify(() => bell.play()).called(1);
   });
+
+  test(
+    'a cue interrupted by a momentary stall still rings once playback resumes',
+    () async {
+      await controller.enable(.5, pattern: SessionBellPattern.beginningEnd);
+      // The primary stalls while the bell is still seeking to its start.
+      final seeking = Completer<void>();
+      when(() => bell.seek(Duration.zero)).thenAnswer((_) => seeking.future);
+      playing = true;
+      positions.add(Duration.zero);
+      processing = ProcessingState.buffering;
+      positions.add(Duration.zero);
+      seeking.complete();
+      await flush();
+      verifyNever(() => bell.play());
+
+      when(() => bell.seek(Duration.zero)).thenAnswer((_) async {});
+      processing = ProcessingState.ready;
+      position = const Duration(milliseconds: 400);
+      positions.add(position);
+      await flush();
+      verify(() => bell.play()).called(1);
+      // Rung once only.
+      position = const Duration(seconds: 3);
+      positions.add(position);
+      await flush();
+      verifyNever(() => bell.play());
+    },
+  );
+
+  test(
+    'a failed bell load is retried instead of silencing the session',
+    () async {
+      var loads = 0;
+      when(() => bell.setAsset(kSessionBellAsset)).thenAnswer((_) async {
+        if (loads++ == 0) throw PlayerInterruptedException('interrupted');
+        return const Duration(seconds: 6);
+      });
+      await controller.enable(.5);
+      playing = true;
+      positions.add(Duration.zero);
+      await flush();
+      expect(loads, 2);
+      verify(() => bell.play()).called(1);
+    },
+  );
 
   test(
     'changing to middle only during playback skips the opening cue',

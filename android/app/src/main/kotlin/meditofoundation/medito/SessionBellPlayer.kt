@@ -23,11 +23,22 @@ internal class SessionBellPlayer(context: Context, private val primary: Player) 
         setWakeMode(C.WAKE_MODE_LOCAL)
         addListener(object : Player.Listener {
             override fun onPlayerError(error: PlaybackException) {
+                ringing = false
                 Log.e("BELLS", "Bell playback failed", error)
+            }
+
+            override fun onPlaybackStateChanged(playbackState: Int) {
+                if (playbackState == Player.STATE_ENDED) ringing = false
             }
         })
     }
     private var enabled = false
+
+    // A cue has fired and its bell has not finished sounding. The schedule
+    // consumes a cue as it reports it, so a bell paused before it made any
+    // progress (the primary stalled just as it rang) has to be resumed from
+    // this flag; its position is still zero.
+    private var ringing = false
     private val tick = object : Runnable {
         override fun run() {
             update()
@@ -53,16 +64,19 @@ internal class SessionBellPlayer(context: Context, private val primary: Player) 
 
     fun disable() {
         enabled = false
+        ringing = false
         handler.removeCallbacks(tick)
         bell.stop()
     }
 
     fun reset() {
+        ringing = false
         schedule.reset()
         bell.pause()
     }
 
     private fun ring() {
+        ringing = true
         bell.seekTo(0)
         if (bell.playbackState == Player.STATE_IDLE) bell.prepare()
         bell.play()
@@ -71,12 +85,16 @@ internal class SessionBellPlayer(context: Context, private val primary: Player) 
     private fun update() {
         if (!enabled) return
         if (primary.playbackState == Player.STATE_ENDED) {
+            ringing = false
             bell.pause()
             return
         }
         if (!primary.isPlaying) { bell.pause(); return }
         if (schedule.update(primary.currentPosition, primary.duration, primary.playbackParameters.speed.toDouble())) ring()
-        else if (bell.playbackState == Player.STATE_READY && bell.currentPosition > 0) bell.play()
+        else if (ringing && !bell.playWhenReady) {
+            if (bell.playbackState == Player.STATE_IDLE) bell.prepare()
+            bell.play()
+        }
     }
 
     override fun onEvents(player: Player, events: Player.Events) { update() }
@@ -84,6 +102,7 @@ internal class SessionBellPlayer(context: Context, private val primary: Player) 
     override fun onPositionDiscontinuity(old: Player.PositionInfo, new: Player.PositionInfo, reason: Int) {
         if (reason == Player.DISCONTINUITY_REASON_AUTO_TRANSITION) schedule.reset()
         else if (reason == Player.DISCONTINUITY_REASON_SEEK) {
+            ringing = false
             bell.pause()
             schedule.seek(new.positionMs, primary.duration, primary.playbackParameters.speed.toDouble())
         }

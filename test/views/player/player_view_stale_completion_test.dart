@@ -86,7 +86,7 @@ class _FakePlayer extends PlayerProvider {
   Future<void> play(PlaybackRequest request) => loaded.future;
 
   @override
-  void stop() => stops++;
+  Future<void> stop() async => stops++;
 
   @override
   void setSpeed(double speed) {}

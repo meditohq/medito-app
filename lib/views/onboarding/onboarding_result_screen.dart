@@ -198,7 +198,7 @@ class _OnboardingResultScreenState
               parameters: _meditationEventParams,
             ),
       );
-      ref.read(playerProvider.notifier).stop();
+      unawaited(ref.read(playerProvider.notifier).stop());
     } else if (widget.showMeditation && !_started) {
       unawaited(
         ref
