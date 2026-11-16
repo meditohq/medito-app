@@ -391,6 +391,11 @@ class WatchCompletionSync {
       'accountId': account,
       TypeConstants.timestampIdKey: session['timestamp'],
       TypeConstants.durationIdKey: session['duration'] as int? ?? 0,
+      if (session['trackId'] is String)
+        TypeConstants.trackIdKey: session['trackId'],
+      if (session['fileId'] is String)
+        TypeConstants.fileIdKey: session['fileId'],
+      if (session['title'] is String) TypeConstants.titleKey: session['title'],
     });
     await _savePendingHealth(pending);
   }

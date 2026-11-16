@@ -1,0 +1,52 @@
+{
+  "v": 2,
+  "accountId": "store-example",
+  "sentAt": 0,
+  "streak": 7,
+  "consistency": 67,
+  "showStreak": false,
+  "upNext": {
+    "id": "capture-learning-to-sit",
+    "title": "Learning to sit",
+    "subtitle": "4 min",
+    "audioUrl": "https://example.invalid/unused.mp3",
+    "fileId": "capture-learning-to-sit-4min",
+    "durationMs": 240000,
+    "guide": "Will",
+    "packTitle": "The Medito course",
+    "coverUrl": "medito-capture://course",
+    "completed": 2,
+    "total": 10
+  },
+  "daily": {
+    "id": "capture-daily",
+    "title": "Your Daily",
+    "subtitle": "4 min",
+    "audioUrl": "https://example.invalid/unused.mp3",
+    "fileId": "capture-learning-to-sit-4min",
+    "durationMs": 240000,
+    "guide": "Will"
+  },
+  "favorites": [
+    {
+      "id": "capture-learning-to-sit",
+      "title": "Learning to sit",
+      "subtitle": "4 min",
+      "audioUrl": "https://example.invalid/unused.mp3",
+      "fileId": "capture-learning-to-sit-4min",
+      "durationMs": 240000,
+      "guide": "Will",
+      "packTitle": "The Medito course"
+    },
+    {
+      "id": "capture-learning",
+      "title": "Learning to sit",
+      "subtitle": "4 min",
+      "audioUrl": "https://example.invalid/unused.mp3",
+      "fileId": "capture-learning-to-sit-4min",
+      "durationMs": 240000,
+      "guide": "Will",
+      "packTitle": "Learning to sit"
+    }
+  ]
+}

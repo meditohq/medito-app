@@ -1,5 +1,13 @@
 Unreleased
--
+- [ios] Medito, now on Apple Watch: continue your course, play your Daily or choose a favourite from your wrist.
+- [android] Take Medito to your Wear OS watch: continue your course, play your Daily or choose a favourite from your wrist.
+- Add Home Screen widgets for your streak, consistency and next meditation.
+- [ios] Keep your progress close with a Lock Screen widget.
+- [ios] Make room for calm with spacious iPad layouts.
+- [android] Make room for calm with spacious tablet layouts.
+- Try the Timer and Stopwatch, with interval chimes to support your practice.
+- Watch sessions now keep their names and recording details in Health exports.
+- Always free. No ads. No subscriptions.
 
 2611.11.0
 - A refreshed donation page

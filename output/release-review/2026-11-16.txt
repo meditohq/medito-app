@@ -1,0 +1,40 @@
+Medito pre-release review — 16 November 2026
+
+Scope: 2611.11.0 through 1da3cc05 (develop), including the Watch and analytics reconsent merges. Focused inspection covered Watch completion/account syncing, offline transfers, automatic downloads, Health export, consent handling, native packaging and release configuration.
+
+Findings
+
+1. Missing Apple Watch store screenshots. App Store Connect Asset Library was filtered across every available Watch size (Ultra 3, Series 11, Series 9, Series 6, Series 3), all statuses and asset types. Result: Assets (0). The four prepared iOS assets are three iPad images and an iPhone widget graphic; none supplies Watch screenshots. Apple requires screenshots for Apple Watch apps. Prepare and attach these before submission.
+   Source: https://developer.apple.com/help/app-store-connect/reference/app-information/screenshot-specifications/
+   Evidence: ../store-promotion/ios/watch-assets-review.png
+
+2. Watch Health exports drop content metadata. lib/services/watch_sync_service.dart:390 persists only account, timestamp and duration before invoking the Health writer. trackId and fileId received from the Watch are discarded; neither native Watch completion sender includes title. Health records therefore fall back to generic Medito without their content IDs. Session time and Medito progress are preserved. A focused test supplied trackId=watch-track, fileId=watch-file and title=Body Scan; the actual Health writer payload had a null trackId. Temporary reproduction test was removed after validation.
+   Also inspect ios/MeditoWatch/WatchStore.swift:100 and android/wear/src/main/kotlin/meditofoundation/medito/wear/WatchRepository.kt:132.
+
+Validation
+- Flutter suite: 1,165 passed, one skipped.
+- Static analysis: zero errors, zero warnings; 285 informational notices, mainly Flutter Material deprecations. CI already uses --no-fatal-infos.
+- Swift Watch progress fixtures: 12 passed.
+- Kotlin Watch progress fixtures: 12 passed.
+- Android phone unit tests: 27 passed, no skips/failures/errors.
+- Wear OS debug and release builds passed, including release shrinking.
+- iOS simulator build passed; its bundle contains the Apple Watch app and widget extension with matching app version/build and companion bundle ID.
+- Android production APK build passed (112.7 MB), using the normal release workflow dependency refresh. An initial --no-pub attempt inherited a test-only plugin registrant from test execution; the normal release build regenerated it correctly. No application source change was needed.
+- Promo text release-lane check passed: all six locales mention Apple Watch, omit Coming soon, and fit 170 characters. edit_live=false stages the new text on the upcoming version rather than editing the live version.
+
+Release preparation
+- Current version/build remains 2611.11.0+302489. Bump before uploading another build.
+- Enable wear_os in the release workflow to ship the matching Wear OS update; it defaults to false.
+- Release notes, launch promo text, screenshot attachment and the verified-Watch-build guard are included in this release-preparation change. Push the commit before cutting the release.
+- Real paired-watch playback/offline transfer, device Health permissions, and store distribution signing/validation have not been exercised by this local review.
+- No release or store review submission was triggered.
+
+Resolution — 16 November 2026
+
+Both review findings are resolved in this change.
+- Watch completion senders now include session title on Apple Watch and Wear OS. The durable Health retry queue preserves title, trackId and fileId. A regression test verifies the metadata survives native acknowledgement and sync-service reconstruction; legacy records without optional fields remain supported.
+- Both Watch screenshots have been captured and uploaded to Apple Asset Library. Asset IDs: 84400005-9741-87e6-8008-d70d854b76bf and 99800005-9741-87e6-801b-b75f4ed86bcc. The release lane automatically attaches the committed Watch screenshots to the next version.
+- Watch-specific promo text/screenshots cannot be submitted from an unverified build: new IPAs are inspected for the embedded Watch app; existing builds must be processed and report the exact Watch bundle ID. The guard runs before upload_to_app_store.
+- Final focused Flutter validation: 19 tests passed. Static analysis: zero errors or warnings (285 informational notices). Native Watch Swift build and Wear OS production build passed. Ruby guard tests: 5 tests, 14 assertions passed. Release-lane integration check blocks a phone-only build before metadata upload and allows a verified Watch build with six-language promo copy and both screenshots.
+- App Store and Play release announcements, including the Watch Health improvement, remain within the workflow limit (483 and 438 characters respectively).
+- The app version/build is unchanged. No release tag, binary upload, publishing action or review submission was triggered.
