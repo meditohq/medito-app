@@ -16,19 +16,15 @@ The app is free, forever: no ads, no spam, no need to sign up or pay. Medito App
 
 ### Contributions (Running in Mock Mode (no keys required))
 
-Use **Flutter 3.47.2 / Dart 3.13.2**, matching CI and the checked-in `.fvmrc`. With FVM,
+Use **Flutter 3.50.0 / Dart 3.14.0**, matching CI and the checked-in `.fvmrc`. With FVM,
 run `fvm install` and prefix the commands below with `fvm` (for example,
 `fvm flutter pub get` and `fvm dart run build_runner build --delete-conflicting-outputs`).
-Alternatively, put a Flutter 3.47.2 installation on your `PATH`.
+Alternatively, put a Flutter 3.50.0 installation on your `PATH`.
 
-The Dart SDK lower bound stays at 3.8 because it also selects the app's language
-version. Freezed 3.x generates constructor parameters that Dart 3.13 language
-rules reject. The Flutter constraint and `.fvmrc` select the supported toolchain;
-raising the Dart language version requires a coordinated generator upgrade.
-
-Flutter 3.50 changes the test packages pinned by the SDK and cannot resolve
-the current Riverpod/code-generator dependencies. Upgrade the SDK and those
-dependencies together; `flutter pub upgrade` alone does not fix that mismatch.
+The SDK, Freezed 4, Riverpod 3.5 and Pigeon 30 were upgraded together; the Dart
+SDK lower bound (3.14) also selects the app's language version. Upgrade Flutter
+and these generators together, and re-run build_runner and Pigeon afterwards;
+`flutter pub upgrade` alone does not keep them in step.
 
 Contributors can run the app without any API keys or Firebase setup using mock mode. All network calls are intercepted and return hardcoded sample data — no real credentials are needed.
 

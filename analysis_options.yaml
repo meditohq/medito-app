@@ -10,6 +10,7 @@ analyzer:
     - lib/**/*.g.dart
     - lib/**/*.freezed.dart
     - widgetbook/**
+    - third_party/**
     - build/**
     - android/**
     - ios/**

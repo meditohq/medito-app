@@ -18,7 +18,7 @@ class AudioStateProvider implements MeditoAudioServiceCallbackApi {
   AudioStateProvider(this.notifier, {this.ref});
 
   @override
-  void updatePlaybackState(PlaybackState state) {
+  Future<void> updatePlaybackState(PlaybackState state) async {
     notifier.updatePlaybackState(state);
     // Android position feed for session analytics (the poll runs ~1/s).
     AudioSessionTracker.instance.onPositionUpdate(
@@ -30,12 +30,12 @@ class AudioStateProvider implements MeditoAudioServiceCallbackApi {
   }
 
   @override
-  void reportPlayerError(
+  Future<void> reportPlayerError(
     String errorCode,
     String message,
     int positionMs,
     int durationMs,
-  ) {
+  ) async {
     CrashlyticsService().recordError(
       Exception('ExoPlayer $errorCode: $message'),
       StackTrace.current,

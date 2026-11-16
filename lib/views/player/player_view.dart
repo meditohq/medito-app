@@ -1,8 +1,10 @@
 // ignore_for_file: use_build_context_synchronously
 
 import 'dart:async';
+
 import 'package:medito/widgets/adaptive/adaptive_player_layout.dart';
 import 'package:medito/models/player/playback_request.dart';
+
 import 'dart:ui';
 import 'dart:io';
 
@@ -145,13 +147,7 @@ class _PlayerViewState extends ConsumerState<PlayerView> {
     _completionGate.reset();
     // So the end screen can be rebuilt if the app is killed before this
     // session's completion gets to open it.
-    unawaited(
-      PendingEndScreen.start(
-        _prefs,
-        request,
-        _statsAtSessionStart,
-      ),
-    );
+    unawaited(PendingEndScreen.start(_prefs, request, _statsAtSessionStart));
     try {
       await ref.read(playerProvider.notifier).play(request);
       if (!mounted) return;
@@ -401,6 +397,7 @@ class _PlayerViewState extends ConsumerState<PlayerView> {
     unawaited(
       handleStats({
         TypeConstants.trackIdKey: timerSessionId(elapsed),
+        TypeConstants.titleKey: request.title,
         TypeConstants.durationIdKey: elapsed.inMilliseconds,
         TypeConstants.fileIdKey: request.fileId,
         TypeConstants.guideIdKey: '',

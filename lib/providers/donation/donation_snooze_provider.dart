@@ -1,6 +1,8 @@
 import 'dart:async';
+
 import 'package:medito/services/notifications/supporter_campaign_api.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
+
 import '../../services/notifications/local_notifications.dart';
 import 'supporter_appeal_experiment.dart';
 
@@ -74,7 +76,9 @@ class DonationSnooze extends _$DonationSnooze {
       snoozedUntil.millisecondsSinceEpoch,
     );
 
-    ref.invalidateSelf();
+    // Auto-disposed with no listeners during the awaits above? The next read
+    // rebuilds from prefs anyway, and riverpod >=3.5 throws on a dead ref.
+    if (ref.mounted) ref.invalidateSelf();
     unawaited(SupporterCampaignApi.updatePreferences(prefs));
   }
 
@@ -102,7 +106,9 @@ class DonationSnooze extends _$DonationSnooze {
       snoozedUntil.millisecondsSinceEpoch,
     );
 
-    ref.invalidateSelf();
+    // Auto-disposed with no listeners during the awaits above? The next read
+    // rebuilds from prefs anyway, and riverpod >=3.5 throws on a dead ref.
+    if (ref.mounted) ref.invalidateSelf();
     unawaited(SupporterCampaignApi.updatePreferences(prefs));
     await LocalNotifications.cancelSafely(
       SupporterAppealExperiment.notificationId,

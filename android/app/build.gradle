@@ -65,12 +65,6 @@ if (envJsonFile.exists()) {
     }
 }
 
-def isDebugBuild = project.gradle.startParameter.taskNames.any { it.toLowerCase().contains('debug') }
-if (isDebugBuild) {
-    println "Facebook App ID: ${facebookAppId ?: 'NOT SET'}"
-    println "Facebook Client Token: ${facebookClientToken ?: 'NOT SET'}"
-}
-
 android {
     namespace "meditofoundation.medito"
     compileSdkVersion 36
@@ -80,10 +74,6 @@ android {
         coreLibraryDesugaringEnabled true
         sourceCompatibility JavaVersion.VERSION_17
         targetCompatibility JavaVersion.VERSION_17
-    }
-
-    kotlinOptions {
-        jvmTarget = '17'
     }
 
 
@@ -129,6 +119,8 @@ android {
 
     buildFeatures {
         compose true
+        // Off by default since AGP 9; defaultConfig uses resValue.
+        resValues true
     }
 
     packagingOptions {
@@ -163,7 +155,7 @@ android {
             debuggable false
             minifyEnabled true
             shrinkResources false
-            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+            proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
         }
     }
 
@@ -177,6 +169,15 @@ android {
         prod {
             dimension "default"
         }
+    }
+}
+
+kotlin {
+    compilerOptions {
+        jvmTarget = org.jetbrains.kotlin.gradle.dsl.JvmTarget.JVM_17
+        // MindfulnessSessionRecord (HealthConnectBridge) is opt-in in
+        // connect-client 1.1.0; Kotlin 2.4 enforces it as an error.
+        optIn.add("androidx.health.connect.client.feature.ExperimentalMindfulnessSessionApi")
     }
 }
 
@@ -227,10 +228,5 @@ dependencies {
         resolutionStrategy {
             force "androidx.work:work-runtime:2.8.1"
             force "androidx.work:work-runtime-ktx:2.8.1"
-            // Pin Glance to 1.2.0-beta01. Without this, transitive resolution
-            // can pull 1.3.0-alpha01 which requires compileSdk 37 + AGP 9.1.
-            force "androidx.glance:glance:1.2.0-beta01"
-            force "androidx.glance:glance-appwidget:1.2.0-beta01"
-            force "androidx.glance:glance-material:1.2.0-beta01"
         }
     }

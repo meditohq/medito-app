@@ -1,0 +1,9 @@
+<resources>
+    <string name="requesting_permissions">Requesting permissions</string>
+    <string name="app_name">App Killer Manager</string>
+    <string name="dialog_huawei_notification">%s need to be set as \'Protected App\' in settings in order to received correctly all notifications and let background tasks work properly (Musics, Services, etc)</string>
+    <string name="remind_me_again">Remind me again</string>
+    <string name="dialog_do_not_show_again">Don\'t show again</string>
+    <string name="dialog_title_notification">%s alert notification</string>
+    <string name="dialog_button">Open settings</string>
+</resources>

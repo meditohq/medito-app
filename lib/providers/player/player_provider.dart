@@ -1,5 +1,7 @@
 import '../background_sounds/background_sounds_notifier.dart';
+
 import 'package:medito/constants/strings/analytics_event_constants.dart';
+
 import 'dart:async';
 import 'dart:io';
 

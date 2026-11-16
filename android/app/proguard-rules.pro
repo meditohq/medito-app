@@ -1,3 +1,8 @@
+# AGP 9 dropped proguard-android.txt (which carried -dontoptimize) in favour of
+# proguard-android-optimize.txt. Keep R8 optimization off, as it always has
+# been for this app; turning it on needs a full release-build regression pass.
+-dontoptimize
+
 ## Gson rules
 # Gson uses generic type information stored in a class file when working with fields. Proguard
 # removes such information by default, so configure it to keep all of it.

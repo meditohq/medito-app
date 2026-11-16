@@ -41,11 +41,6 @@ class DownloadOptionsSheet extends ConsumerWidget {
           mainAxisSize: MainAxisSize.min,
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Semantics(
-              header: true,
-              child: Text(l10n.downloadOptions, style: context.text.title),
-            ),
-            const SizedBox(height: 12),
             SwitchListTile.adaptive(
               contentPadding: EdgeInsets.zero,
               title: Text(

@@ -157,3 +157,6 @@ docs/experiments/*
 
 # Local release adoption snapshot
 /docs/RELEASE_ADOPTION.md
+
+# Prebuilt DevTools assets from the vendored preview package.
+/third_party/device_preview/extension/devtools/build/

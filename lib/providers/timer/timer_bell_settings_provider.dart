@@ -21,11 +21,13 @@ class TimerBellSettings {
   bool get hasAnyBell =>
       pattern != SessionBellPattern.none || intervalSeconds > 0;
 
-  TimerBellSettings copyWith({SessionBellPattern? pattern, int? intervalSeconds}) =>
-      TimerBellSettings(
-        pattern: pattern ?? this.pattern,
-        intervalSeconds: intervalSeconds ?? this.intervalSeconds,
-      );
+  TimerBellSettings copyWith({
+    SessionBellPattern? pattern,
+    int? intervalSeconds,
+  }) => TimerBellSettings(
+    pattern: pattern ?? this.pattern,
+    intervalSeconds: intervalSeconds ?? this.intervalSeconds,
+  );
 }
 
 /// The timer's saved bell choices, shared by setup and its player sound sheet.

@@ -7,8 +7,7 @@ import 'package:pigeon/pigeon.dart';
   PigeonOptions(
     dartOut: 'lib/src/audio_pigeon.g.dart',
     dartOptions: DartOptions(),
-    kotlinOut:
-        'android/app/src/main/kotlin/meditofoundation/medito/pigeon/AudioPigeon.g.kt',
+    kotlinOut: 'android/app/src/main/kotlin/meditofoundation/medito/pigeon/AudioPigeon.g.kt',
     kotlinOptions: KotlinOptions(package: 'meditofoundation.medito.pigeon'),
   ),
 )
@@ -28,22 +27,22 @@ enum RepeatMode { none, once, infinite }
 abstract class MeditoAndroidAudioServiceManager {
   void startService();
 
-  @async
+  @asyncCallback
   bool isServiceReady();
 }
 
 @HostApi()
 abstract class MeditoWidgetManager {
-  @async
+  @asyncCallback
   bool pinWidget(String widgetType);
 }
 
 @HostApi()
 abstract class MeditoAppIconManager {
-  @async
+  @asyncCallback
   String? getAlternateIconName();
 
-  @async
+  @asyncCallback
   void setAlternateIconName(String? iconName);
 }
 
@@ -51,16 +50,16 @@ enum HealthConnectStatus { available, notInstalled, notSupported }
 
 @HostApi()
 abstract class MeditoHealthConnectManager {
-  @async
+  @asyncCallback
   HealthConnectStatus getStatus();
 
-  @async
+  @asyncCallback
   bool hasMindfulnessPermissions();
 
-  @async
+  @asyncCallback
   bool requestMindfulnessPermissions();
 
-  @async
+  @asyncCallback
   bool writeMindfulnessSession(
     int startEpochMs,
     int endEpochMs,
@@ -188,12 +187,14 @@ class CompletionData {
 
 @FlutterApi()
 abstract class MeditoAudioServiceCallbackApi {
+  @asyncCallback
   void updatePlaybackState(PlaybackState state);
-  @async
+  @asyncCallback
   bool handleCompletedTrack(CompletionData completionData);
   // A repeated play-through (repeat once / forever): adds listening time only.
-  @async
+  @asyncCallback
   bool handleRepeatPlaythrough(CompletionData completionData);
+  @asyncCallback
   void reportPlayerError(
     String errorCode,
     String message,

@@ -59,8 +59,7 @@ final mockHome = HomeModel(
   ],
   todayQuote: const HomeQuoteModel(
     id: 'quote-1',
-    quote:
-        'The present moment is filled with joy and happiness. If you are attentive, you will see it.',
+    quote: 'The present moment is filled with joy and happiness. If you are attentive, you will see it.',
     author: 'Thich Nhat Hanh',
   ),
 );
@@ -76,8 +75,7 @@ final mockPacks = [
     subtitle: '7 sessions',
     coverUrl: 'https://picsum.photos/seed/pack1/400/400',
     path: 'packs/pack-1',
-    description:
-        'Learn the fundamentals of meditation with this guided introduction course.',
+    description: 'Learn the fundamentals of meditation with this guided introduction course.',
     isPublished: true,
     items: [
       PackItemsModel(
@@ -151,8 +149,7 @@ final mockTracks = <String, Track>{
     id: 'track-1',
     title: 'Introduction to Meditation',
     subtitle: 'A gentle start to your practice',
-    description:
-        'This session introduces the basics of meditation, including posture, breathing, and mindset.',
+    description: 'This session introduces the basics of meditation, including posture, breathing, and mindset.',
     coverUrl: 'https://picsum.photos/seed/track1/400/400',
     isPublished: true,
     hasBackgroundSound: true,
@@ -170,8 +167,7 @@ final mockTracks = <String, Track>{
     id: 'track-2',
     title: 'Breath Awareness',
     subtitle: 'Focus on your natural breath',
-    description:
-        'Learn to anchor your attention on the breath as a foundation for deeper meditation.',
+    description: 'Learn to anchor your attention on the breath as a foundation for deeper meditation.',
     coverUrl: 'https://picsum.photos/seed/track2/400/400',
     isPublished: true,
     hasBackgroundSound: true,
@@ -189,8 +185,7 @@ final mockTracks = <String, Track>{
     id: 'track-3',
     title: 'Body Scan',
     subtitle: 'Relax from head to toe',
-    description:
-        'A guided body scan meditation to release tension and cultivate body awareness.',
+    description: 'A guided body scan meditation to release tension and cultivate body awareness.',
     coverUrl: 'https://picsum.photos/seed/track3/400/400',
     isPublished: true,
     hasBackgroundSound: true,
@@ -248,10 +243,7 @@ final mockTracks = <String, Track>{
 // Me
 // ---------------------------------------------------------------------------
 
-const mockMe = MeModel(
-  id: 'mock-user-001',
-  email: 'contributor@medito.app',
-);
+const mockMe = MeModel(id: 'mock-user-001', email: 'contributor@medito.app');
 
 // ---------------------------------------------------------------------------
 // Stats

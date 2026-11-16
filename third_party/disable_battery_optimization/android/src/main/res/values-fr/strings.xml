@@ -1,0 +1,7 @@
+<resources>
+    <string name="app_name">App Killer Manager</string>
+    <string name="dialog_huawei_notification">%s nécessite d\'être activé comme \'Application protégée\' dans le gestionnaire de batterie du Huawei afin de recevoir correctement les notifications et permmetre l\'execution de tâches en arrière plan (Musique, Services, etc)</string>
+    <string name="dialog_do_not_show_again">Ne plus afficher</string>
+    <string name="dialog_title_notification">%s notification alerte</string>
+    <string name="dialog_button">Accéder aux paramètres</string>
+</resources>

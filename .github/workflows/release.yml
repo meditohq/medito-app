@@ -98,11 +98,11 @@ jobs:
         uses: actions/cache@v6.1.0
         with:
           path: ${{ runner.tool_cache }}/flutter
-          key: flutter-sdk-${{ runner.os }}-${{ runner.arch }}-3.47.2
+          key: flutter-sdk-${{ runner.os }}-${{ runner.arch }}-3.50.0
 
       - uses: subosito/flutter-action@v2.23.0
         with:
-          flutter-version: '3.47.2'
+          flutter-version: '3.50.0'
           channel: stable
           cache: false
 
@@ -645,11 +645,11 @@ jobs:
         uses: actions/cache@v6.1.0
         with:
           path: ${{ runner.tool_cache }}/flutter
-          key: flutter-sdk-${{ runner.os }}-${{ runner.arch }}-3.47.2
+          key: flutter-sdk-${{ runner.os }}-${{ runner.arch }}-3.50.0
 
       - uses: subosito/flutter-action@v2.23.0
         with:
-          flutter-version: '3.47.2'
+          flutter-version: '3.50.0'
           channel: stable
           cache: false
 
@@ -1064,11 +1064,11 @@ jobs:
         uses: actions/cache@v6.1.0
         with:
           path: ${{ runner.tool_cache }}/flutter
-          key: flutter-sdk-${{ runner.os }}-${{ runner.arch }}-3.47.2
+          key: flutter-sdk-${{ runner.os }}-${{ runner.arch }}-3.50.0
 
       - uses: subosito/flutter-action@v2.23.0
         with:
-          flutter-version: '3.47.2'
+          flutter-version: '3.50.0'
           channel: stable
           cache: false
 

@@ -1,5 +1,6 @@
 import '../../models/background_sounds/session_bell_pattern.dart';
 import '../../services/audio/session_bell_preview.dart';
+
 import 'dart:async';
 import 'dart:io';
 
@@ -361,9 +362,7 @@ class BackgroundSoundsNotifier extends Notifier<BackgroundSoundsState> {
   /// platform bell schedules understand. The bare pattern name stays the same
   /// for compatibility; an interval is appended as `"+<seconds>"`.
   String _encodePattern(SessionBellPattern pattern, int intervalSeconds) =>
-      intervalSeconds > 0
-          ? '${pattern.name}+$intervalSeconds'
-          : pattern.name;
+      intervalSeconds > 0 ? '${pattern.name}+$intervalSeconds' : pattern.name;
 
   Future<void> _applySessionBells(bool enabled, {required bool preview}) async {
     try {

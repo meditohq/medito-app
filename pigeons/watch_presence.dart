@@ -6,8 +6,7 @@ import 'package:pigeon/pigeon.dart';
   PigeonOptions(
     dartOut: 'lib/src/watch_presence_pigeon.g.dart',
     dartOptions: DartOptions(),
-    kotlinOut:
-        'android/app/src/main/kotlin/meditofoundation/medito/pigeon/WatchPresencePigeon.g.kt',
+    kotlinOut: 'android/app/src/main/kotlin/meditofoundation/medito/pigeon/WatchPresencePigeon.g.kt',
     // Own error class names so further Pigeon files don't collide (AudioPigeon.g.kt
     // already defines FlutterError in this package).
     kotlinOptions: KotlinOptions(
@@ -36,6 +35,6 @@ class WatchStatus {
 abstract class WatchPresenceApi {
   /// Fails (instead of reporting no watch) when the state can't be read, e.g.
   /// WCSession didn't activate.
-  @async
+  @asyncCallback
   WatchStatus getStatus();
 }

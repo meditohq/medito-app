@@ -58,7 +58,7 @@ jobs:
       - name: Flutter version
         uses: subosito/flutter-action@v2.23.0
         with:
-          flutter-version: '3.47.2'
+          flutter-version: '3.50.0'
 
       - name: Flutter Pub Get
         uses: nick-fields/retry@v4.0.0

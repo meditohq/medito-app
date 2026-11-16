@@ -63,9 +63,7 @@ class FakeAuthRepository implements AuthRepository {
   @override
   Future<bool> signOut() async => true;
 
-
   @override
-
   Future<void> signOutLocally() async {}
 
   @override
@@ -195,9 +193,8 @@ class PreviewShell extends StatelessWidget {
           supportedLocales: const [Locale('en'), Locale('es')],
           locale: locale,
           builder: (context, child) => MediaQuery(
-            data: MediaQuery.of(
-              context,
-            ).copyWith(alwaysUse24HourFormat: alwaysUse24HourFormat),
+            data: MediaQuery.of(context)
+                .copyWith(alwaysUse24HourFormat: alwaysUse24HourFormat),
             child: child!,
           ),
           home: padded

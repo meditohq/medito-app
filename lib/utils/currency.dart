@@ -105,8 +105,6 @@ String spokenCurrencyAmount(int amount, String currency) {
   final after = visible.substring(at + symbol.length);
   // "$5" has no gap between symbol and number; "COP5" would be read as one
   // word, so add a non-breaking space when the number follows directly.
-  final gap = after.isNotEmpty && RegExp(r'^\d').hasMatch(after)
-      ? ' '
-      : '';
+  final gap = after.isNotEmpty && RegExp(r'^\d').hasMatch(after) ? ' ' : '';
   return '$before$code$gap$after';
 }

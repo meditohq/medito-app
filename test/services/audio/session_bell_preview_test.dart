@@ -1,4 +1,5 @@
 import 'dart:async';
+
 import 'package:flutter_test/flutter_test.dart';
 import 'package:just_audio/just_audio.dart';
 import 'package:mocktail/mocktail.dart';
@@ -12,9 +13,8 @@ void main() {
   late SessionBellPreview preview;
   setUp(() {
     player = _Player();
-    when(
-      () => player.setAsset(kSessionBellAsset),
-    ).thenAnswer((_) async => const Duration(seconds: 6));
+    when(() => player.setAsset(kSessionBellAsset))
+        .thenAnswer((_) async => const Duration(seconds: 6));
     when(() => player.setVolume(any())).thenAnswer((_) async {});
     when(() => player.play()).thenAnswer((_) async {});
     when(() => player.stop()).thenAnswer((_) async {});
@@ -33,9 +33,8 @@ void main() {
 
   test('switching sounds during load cancels stale audition', () async {
     final loaded = Completer<Duration?>();
-    when(
-      () => player.setAsset(kSessionBellAsset),
-    ).thenAnswer((_) => loaded.future);
+    when(() => player.setAsset(kSessionBellAsset))
+        .thenAnswer((_) => loaded.future);
     final pending = preview.play(.4);
     await preview.stop();
     loaded.complete(const Duration(seconds: 6));
@@ -45,9 +44,8 @@ void main() {
 
   test('dispose during load prevents late playback', () async {
     final loaded = Completer<Duration?>();
-    when(
-      () => player.setAsset(kSessionBellAsset),
-    ).thenAnswer((_) => loaded.future);
+    when(() => player.setAsset(kSessionBellAsset))
+        .thenAnswer((_) => loaded.future);
     final pending = preview.play(.4);
     await preview.dispose();
     loaded.complete(const Duration(seconds: 6));

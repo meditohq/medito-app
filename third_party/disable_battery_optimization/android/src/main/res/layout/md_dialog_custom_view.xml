@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:orientation="vertical">
+
+    <ScrollView
+        android:id="@+id/md_contentScrollView"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_weight="1"
+        android:clipToPadding="false"
+        android:layout_marginBottom="8dp"
+        android:paddingBottom="@dimen/md_content_padding_bottom"
+        android:paddingTop="@dimen/md_content_padding_top">
+
+        <TextView
+            android:id="@+id/md_content"
+            tools:text="@string/dialog_huawei_notification"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="@dimen/md_content_padding_top"
+            android:paddingLeft="@dimen/md_dialog_frame_margin"
+            android:paddingRight="@dimen/md_dialog_frame_margin"
+            android:textSize="@dimen/md_content_textsize" />
+
+    </ScrollView>
+
+    <ImageView
+        android:id="@+id/md_imageView"
+        tools:src="@drawable/asus_autostart"
+        android:layout_width="match_parent"
+        android:layout_height="200dp"
+        android:layout_gravity="center_vertical|center_horizontal"
+        android:layout_weight="3"/>
+
+    <CheckBox
+        android:id="@+id/md_promptCheckbox"
+        tools:text="Don't ask again"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_gravity="start"
+        android:visibility="gone"
+        tools:visibility="visible"
+        android:textColor="@android:color/darker_gray"
+        android:layout_marginLeft="@dimen/md_notitle_vertical_padding"
+        android:layout_marginRight="@dimen/md_notitle_vertical_padding"
+        android:focusable="true"
+        android:gravity="start|center_vertical" />
+</LinearLayout>

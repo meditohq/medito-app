@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+
 import '../constants/strings/shared_preference_constants.dart';
 import '../l10n/app_localizations.dart';
 import '../services/home_widget_service.dart';
@@ -37,13 +38,11 @@ class ThemeNotifier extends Notifier<ThemeMode> {
     // Save theme preference to widget when loading. Pass the theme actually
     // in use: with nothing saved the app is dark, and the widget would
     // otherwise follow the system.
-    HomeWidgetService.saveThemePreference(
-      switch (themeMode) {
-        ThemeMode.light => 'light',
-        ThemeMode.dark => 'dark',
-        ThemeMode.system => 'system',
-      },
-    );
+    HomeWidgetService.saveThemePreference(switch (themeMode) {
+      ThemeMode.light => 'light',
+      ThemeMode.dark => 'dark',
+      ThemeMode.system => 'system',
+    });
 
     return themeMode;
   }
