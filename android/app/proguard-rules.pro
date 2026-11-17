@@ -3,6 +3,12 @@
 # been for this app; turning it on needs a full release-build regression pass.
 -dontoptimize
 
+# WorkManager 2.8 creates its generated Room database by reflection. Preserve
+# the database constructors and overrides under AGP 9 / R8; stripping these
+# crashes InitializationProvider before the Flutter activity can start.
+-keep class androidx.work.impl.WorkDatabase { *; }
+-keep class androidx.work.impl.WorkDatabase_Impl { *; }
+
 ## Gson rules
 # Gson uses generic type information stored in a class file when working with fields. Proguard
 # removes such information by default, so configure it to keep all of it.
