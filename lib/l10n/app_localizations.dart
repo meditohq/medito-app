@@ -5068,6 +5068,54 @@ abstract class AppLocalizations {
   /// **'Other amount (min {amount})'**
   String donationOtherAmountHint(String amount);
 
+  /// Pay button on the donation page for a yearly gift
+  ///
+  /// In en, this message translates to:
+  /// **'Donate {amount}/year'**
+  String donateAmountPerYear(String amount);
+
+  /// Pay button on the donation page for a one-time gift
+  ///
+  /// In en, this message translates to:
+  /// **'Donate {amount}'**
+  String donateAmountOnce(String amount);
+
+  /// Under the custom amount field on the donation page, monthly gift. perDay is the monthly amount divided by 30.
+  ///
+  /// In en, this message translates to:
+  /// **'{amount} a month — about {perDay} a day to keep Medito free for millions.'**
+  String donationCustomMonthly(String amount, String perDay);
+
+  /// Under the custom amount field on the donation page, yearly gift. perMonth is the yearly amount divided by 12.
+  ///
+  /// In en, this message translates to:
+  /// **'{amount} a year — about {perMonth} a month to keep Medito free for millions.'**
+  String donationCustomYearly(String amount, String perMonth);
+
+  /// Under the custom amount field on the donation page, one-time gift.
+  ///
+  /// In en, this message translates to:
+  /// **'Your {amount} helps keep Medito free for millions.'**
+  String donationCustomOneTime(String amount);
+
+  /// Under the custom amount field when the typed monthly amount is above the largest preset.
+  ///
+  /// In en, this message translates to:
+  /// **'{amount} a month — thank you. That keeps Medito free for many people who can’t afford to give.'**
+  String donationCustomGenerousMonthly(String amount);
+
+  /// Under the custom amount field when the typed yearly amount is above the largest preset.
+  ///
+  /// In en, this message translates to:
+  /// **'{amount} a year — thank you. That keeps Medito free for many people who can’t afford to give.'**
+  String donationCustomGenerousYearly(String amount);
+
+  /// Under the custom amount field when the typed one-time amount is above the largest preset.
+  ///
+  /// In en, this message translates to:
+  /// **'{amount} — thank you. That keeps Medito free for many people who can’t afford to give.'**
+  String donationCustomGenerousOneTime(String amount);
+
   /// Small print under the pay buttons on the donation page
   ///
   /// In en, this message translates to:

@@ -19,6 +19,7 @@ import 'package:medito/providers/donation/end_screen_donation_experiment.dart';
 import 'package:medito/providers/donation/supporter_appeal_experiment.dart';
 import 'package:medito/providers/locale_provider.dart';
 import 'package:medito/providers/onboarding/onboarding_donation_timing_experiment.dart';
+import 'package:medito/providers/onboarding/onboarding_native_pay_experiment.dart';
 import 'package:medito/providers/shared_preference/shared_preference_provider.dart';
 import 'package:medito/providers/stripe/payment_service_provider.dart';
 import 'package:medito/providers/stripe/payment_ui_controller.dart';
@@ -287,6 +288,7 @@ class _WebViewDonationScreenState extends ConsumerState<WebViewDonationScreen> {
     query
       ..addAll(EndScreenDonationExperiment.paymentMetadata(prefs))
       ..addAll(OnboardingDonationTimingExperiment.paymentMetadata(prefs))
+      ..addAll(OnboardingNativePayExperiment.paymentMetadata(prefs))
       ..addAll(SupporterAppealExperiment(prefs).paymentMetadata())
       ..addAll(widget.campaignMetadata);
     if (widget.campaignMetadata.isNotEmpty) {

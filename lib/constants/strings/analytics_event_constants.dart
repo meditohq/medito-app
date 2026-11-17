@@ -107,12 +107,19 @@ class AnalyticsEventConstants {
   ///
   /// Without it the earliest measurable event was [onboardingDonateNowTap]
   /// (webview arm) or the paywall itself, so the ask's own impression count had
-  /// to be proxied by [onboardingQuestionFlowCompleted]. Parameter
-  /// [paramWouldBeVariant] records which arm rendered ('native' / 'webview'),
-  /// since the two have different downstream funnels — the native page has no
-  /// intro-tap step at all.
+  /// to be proxied by [onboardingQuestionFlowCompleted]. Since
+  /// `onboarding_native_pay` the intro always renders and every arm has the
+  /// same intro-tap step; [paramWouldBeVariant] records which page the CTA
+  /// opens ('native' / 'webview'), and `experiment_name` / `variant_id` carry
+  /// the arm (A = webview, B = native).
   static const String onboardingDonationScreenShown =
       'onboarding_donation_screen_shown';
+
+  /// Native onboarding arm fell back to the webview (`reason`: `setup` when
+  /// config/payment methods weren't ready in time, `payment_method_unavailable`
+  /// when the sheet reported no usable method). The user stays in arm B.
+  static const String onboardingNativePayFallback =
+      'onboarding_native_pay_fallback';
 
   /// Event logged when user taps donate now during onboarding
   static const String onboardingDonateNowTap = 'onboarding_donate_now_tap';

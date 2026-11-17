@@ -46,6 +46,7 @@ void main() {
           SharedPreferences.setMockInitialValues({
             SharedPreferenceConstants.utmSource: 'google',
             SharedPreferenceConstants.userId: 'test-user',
+            SharedPreferenceConstants.onboardingNativePayVariant: 'A',
           });
           final prefs = await SharedPreferences.getInstance();
           final experiment = SupporterAppealExperiment(prefs);
@@ -162,6 +163,7 @@ void main() {
             expect(request.metadata!['user_id'], 'test-user');
             expect(request.metadata!['experiment_id'], 'existing_price_test');
             expect(request.metadata!['experiment_variant'], 'B');
+            expect(request.metadata!['onboarding_native_pay'], 'A');
             expect(
               request.metadata!['utm_source'],
               isAppealCta ? 'medito_app' : 'google',

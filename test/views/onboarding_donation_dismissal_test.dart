@@ -5,6 +5,9 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:medito/constants/http/http_constants.dart';
 import 'package:medito/l10n/app_localizations.dart';
 import 'package:medito/providers/stripe/payment_service_provider.dart';
+import 'package:medito/providers/shared_preference/shared_preference_provider.dart';
+import 'package:medito/constants/strings/shared_preference_constants.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:medito/views/onboarding/onboarding_donation_screen.dart';
 
 import '../helpers/firebase_analytics_test_helper.dart';
@@ -15,10 +18,15 @@ void main() {
   testWidgets('returning without payment advances exactly once', (
     tester,
   ) async {
+    SharedPreferences.setMockInitialValues({
+      SharedPreferenceConstants.onboardingNativePayVariant: 'A',
+    });
+    final prefs = await SharedPreferences.getInstance();
     var advances = 0;
     await tester.pumpWidget(
       ProviderScope(
         overrides: [
+          sharedPreferencesProvider.overrideWithValue(prefs),
           paywallConfigProvider.overrideWith(
             (ref) async => throw Exception('offline'),
           ),

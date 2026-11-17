@@ -1,0 +1,25 @@
+Donation and onboarding release review — 2026-11-17
+
+Reviewed the pending client-side onboarding native checkout experiment,
+payment metadata, localized donation summaries and amount/cadence buttons.
+
+Fixed:
+- Lock payment attempts before asynchronous email confirmation/storage and
+  retain the amount, currency and frequency selected when payment was tapped.
+- Stop late checkout setup work after its timeout or provider disposal.
+- Reset stale amounts/custom input when currency or offered pricing changes.
+- Preserve recurring wording when a small equivalent amount rounds to zero.
+- Let payment buttons expand at large text sizes and respect wallet availability.
+
+Regression coverage includes duplicate taps, pricing refresh, setup timeout,
+unavailable payment methods, screen-reader dismissal, navigation advancing once,
+currency precision and experiment metadata for all three payment frequencies.
+
+Validation:
+- Full Flutter suite: 1,182 passed, 1 mock-only test skipped.
+- Separate mock-checkout navigation run: 1 passed.
+- Flutter analysis: no errors or warnings; 287 informational diagnostics.
+- git diff --check: passed.
+- No live payments were made. Native/store submission was not performed here.
+
+This review does not cut a release or change its version/build number.

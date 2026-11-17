@@ -6,11 +6,12 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:medito/constants/constants.dart';
 import 'package:medito/constants/strings/analytics_event_constants.dart';
 import 'package:medito/l10n/app_localizations.dart';
-import 'package:medito/models/stripe/paywall_config_model.dart';
 import 'package:medito/providers/stripe/payment_service_provider.dart';
 import 'package:medito/services/analytics/firebase_analytics_service.dart';
 import 'package:medito/routes/routes.dart';
-import 'package:medito/views/donation/native_donation_page.dart';
+import 'package:medito/providers/onboarding/onboarding_native_pay_experiment.dart';
+import 'package:medito/providers/providers.dart';
+import 'package:medito/views/onboarding/onboarding_native_donation_screen.dart';
 import 'package:medito/widgets/onboarding/onboarding_header_image.dart';
 import 'package:medito/widgets/onboarding/onboarding_step_title.dart';
 
@@ -28,11 +29,16 @@ class OnboardingDonationScreen extends ConsumerStatefulWidget {
 }
 
 class _DonationScreenState extends ConsumerState<OnboardingDonationScreen> {
-  static const _paywallConfigTimeout = Duration(seconds: 3);
-
   bool _hasAttemptedDonation = isSmokeTestMode;
   bool _openingDonation = false;
   bool _advanced = false;
+  bool _impressionLogged = false;
+
+  /// `onboarding_native_pay` arm: which page the intro's CTA opens. Smoke tests
+  /// stay on the webview and are never enrolled.
+  late final String _variant;
+
+  bool get _isNative => _variant == OnboardingNativePayExperiment.variantNative;
 
   void _advance() {
     if (!mounted || _advanced) return;
@@ -40,40 +46,30 @@ class _DonationScreenState extends ConsumerState<OnboardingDonationScreen> {
     widget.onNext?.call();
   }
 
-  // Decided once: true = native inline paywall, false = existing intro +
-  // webview flow, null = still waiting on paywall config.
-  bool? _useNativePaywall;
-  bool _configTimedOut = false;
-  Timer? _configTimer;
-  // Instrumentation latches; each event fires at most once per screen.
-  bool _timeoutLogged = false;
-  bool _lateArrivalLogged = false;
-  bool _fellBackWithoutConfig = false;
-  bool _impressionLogged = false;
-
   @override
   void initState() {
     super.initState();
-    // Smoke tests drive the existing intro + webview flow; skip the server
-    // flag so they stay deterministic.
     if (isSmokeTestMode) {
-      _useNativePaywall = false;
+      _variant = OnboardingNativePayExperiment.variantWebview;
       return;
     }
-    _configTimer = Timer(_paywallConfigTimeout, () {
-      // Nothing to do if the arm is already latched, from a config that arrived
-      // in time or from an error; the rebuild would be wasted. The timeout is
-      // recorded where the fallback is committed, not here — see
-      // [_resolveNativeConfig].
-      if (!mounted || _useNativePaywall != null) return;
-      setState(() => _configTimedOut = true);
-    });
-  }
-
-  @override
-  void dispose() {
-    _configTimer?.cancel();
-    super.dispose();
+    // Assigned when the ask is shown, so every intro viewer is in an arm.
+    _variant = OnboardingNativePayExperiment.resolveVariant(
+      ref.read(sharedPreferencesProvider),
+    );
+    unawaited(
+      ref
+          .read(analyticsServiceProvider)
+          .setUserProperty(
+            name: OnboardingNativePayExperiment.userProperty,
+            value: _variant,
+          ),
+    );
+    // Warm the native page's config while the user reads the intro, so the
+    // CTA usually opens straight onto the amounts.
+    if (_isNative) {
+      ref.read(paywallConfigProvider);
+    }
   }
 
   Future<void> _handleDonationAction(BuildContext context) async {
@@ -84,16 +80,25 @@ class _DonationScreenState extends ConsumerState<OnboardingDonationScreen> {
         unawaited(
           FirebaseAnalyticsService().logEvent(
             name: FirebaseAnalyticsService.eventOnboardingDonateNowTap,
+            parameters: _experimentParams,
           ),
         );
       }
       if (!context.mounted) return;
-      await handleDonationNavigation(
-        context,
-        ref,
-        FirebaseAnalyticsService.paywallSourceOnboarding,
-        navigator: Navigator.of(context),
-      );
+      if (_isNative) {
+        await Navigator.of(context).push<void>(
+          MaterialPageRoute(
+            builder: (_) => const OnboardingNativeDonationScreen(),
+          ),
+        );
+      } else {
+        await handleDonationNavigation(
+          context,
+          ref,
+          FirebaseAnalyticsService.paywallSourceOnboarding,
+          navigator: Navigator.of(context),
+        );
+      }
       // A completed gift AND a dismissed ask both continue the onboarding flow.
       _advance();
     } catch (_) {
@@ -104,47 +109,18 @@ class _DonationScreenState extends ConsumerState<OnboardingDonationScreen> {
     }
   }
 
-  /// The wait elapsed with no config, so this user gets the webview arm no
-  /// matter what the server would have assigned. Records that the fallback
-  /// happened; [_logLateArrival] later records which arm was lost, if the
-  /// config turns up at all.
-  void _logConfigTimeout() {
-    if (_timeoutLogged) return;
-    _timeoutLogged = true;
-    FirebaseAnalyticsService().logEvent(
-      name: AnalyticsEventConstants.paywallConfigTimeout,
-      parameters: {
-        AnalyticsEventConstants.paramPaywallSource:
-            AnalyticsEventConstants.paywallSourceOnboarding,
-        AnalyticsEventConstants.paramDurationMs:
-            _paywallConfigTimeout.inMilliseconds,
-      },
-    );
-  }
+  Map<String, Object> get _experimentParams => isSmokeTestMode
+      ? const {}
+      : {
+          AnalyticsEventConstants.paramExperimentName:
+              OnboardingNativePayExperiment.experimentName,
+          AnalyticsEventConstants.paramVariantId: _variant,
+        };
 
-  /// The config arrived after the arm was already latched to the webview. Its
-  /// `nativePaywall` value is the assignment this user should have received, so
-  /// logging it is what lets the native arm's denominator be corrected.
-  void _logLateArrival(PaywallConfigModel config) {
-    if (_lateArrivalLogged) return;
-    _lateArrivalLogged = true;
-    FirebaseAnalyticsService().logEvent(
-      name: AnalyticsEventConstants.paywallConfigLateArrival,
-      parameters: {
-        AnalyticsEventConstants.paramPaywallSource:
-            AnalyticsEventConstants.paywallSourceOnboarding,
-        AnalyticsEventConstants.paramWouldBeVariant: config.nativePaywallEnabled
-            ? 'native'
-            : 'webview',
-      },
-    );
-  }
-
-  /// The ask's own impression, fired once the arm is settled so it can be
-  /// attributed to 'native' or 'webview'. This is the denominator for the
-  /// onboarding donation funnel; deferred to a post-frame callback because it
-  /// is triggered from build.
-  void _logImpression({required bool isNative}) {
+  /// The ask's own impression: the denominator for the onboarding donation
+  /// funnel and for `onboarding_native_pay`. Deferred to a post-frame
+  /// callback because it is triggered from build.
+  void _logImpression() {
     if (_impressionLogged) return;
     _impressionLogged = true;
     WidgetsBinding.instance.addPostFrameCallback((_) {
@@ -155,9 +131,10 @@ class _DonationScreenState extends ConsumerState<OnboardingDonationScreen> {
           parameters: {
             AnalyticsEventConstants.paramPaywallSource:
                 FirebaseAnalyticsService.paywallSourceOnboarding,
-            AnalyticsEventConstants.paramWouldBeVariant: isNative
+            AnalyticsEventConstants.paramWouldBeVariant: _isNative
                 ? 'native'
                 : 'webview',
+            ..._experimentParams,
           },
         ),
       );
@@ -174,76 +151,8 @@ class _DonationScreenState extends ConsumerState<OnboardingDonationScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final config = _resolveNativeConfig();
-
-    if (_useNativePaywall == null) {
-      // Still waiting (< timeout) on the paywall config.
-      return Scaffold(
-        backgroundColor: Theme.of(context).scaffoldBackgroundColor,
-        body: Center(
-          child: CircularProgressIndicator(
-            semanticsLabel: AppLocalizations.of(context)!.loading,
-          ),
-        ),
-      );
-    }
-
-    if (_useNativePaywall == true && config != null) {
-      _logImpression(isNative: true);
-      return Scaffold(
-        backgroundColor: Theme.of(context).scaffoldBackgroundColor,
-        // Unlike the webview intro (which bleeds a header image to the top
-        // edge), the native page leads with text, so it must respect the top
-        // inset or the eyebrow renders under the status bar / Dynamic Island.
-        body: SafeArea(
-          child: NativeDonationPage(
-            config: config,
-            source: FirebaseAnalyticsService.paywallSourceOnboarding,
-            onNext: _advance,
-          ),
-        ),
-      );
-    }
-
-    _logImpression(isNative: false);
-
+    _logImpression();
     return _buildWebviewIntro(context);
-  }
-
-  /// Decides (once) between the native page and the existing webview flow:
-  /// native only when the config resolves in time AND its effective config
-  /// carries `nativePaywall: true`; any error, timeout, or absent/false flag
-  /// keeps the current behavior.
-  PaywallConfigModel? _resolveNativeConfig() {
-    final paywallAsync = ref.watch(paywallConfigProvider);
-    final config = paywallAsync.value;
-
-    if (_useNativePaywall == null) {
-      if (config != null) {
-        _useNativePaywall = config.nativePaywallEnabled;
-        // Config beat the deadline: disarm so the pending timer cannot fire a
-        // timeout for a user who never waited one out.
-        _configTimer?.cancel();
-      } else if (paywallAsync.hasError || _configTimedOut) {
-        _useNativePaywall = false;
-        // Distinguishes "fell back because no config arrived" from "config
-        // arrived and specified the webview arm" — only the former loses an
-        // assignment, and only the former can see a late arrival.
-        _fellBackWithoutConfig = true;
-        // Logged here rather than in the timer callback so the event means
-        // exactly "a timeout caused a fallback". The arm is latched only in
-        // build, so a config landing between the timer firing and the next
-        // frame would otherwise log a timeout for a user who never fell back.
-        if (_configTimedOut) _logConfigTimeout();
-      }
-    }
-
-    // The assignment this user should have had, arriving too late to honour.
-    if (_fellBackWithoutConfig && config != null) {
-      _logLateArrival(config);
-    }
-
-    return _useNativePaywall == true ? config : null;
   }
 
   Widget _buildWebviewIntro(BuildContext context) {
@@ -279,9 +188,9 @@ class _DonationScreenState extends ConsumerState<OnboardingDonationScreen> {
                                 OnboardingStepTitle(
                                   AppLocalizations.of(context)!.donationTitle,
                                   style: context.text.headline.copyWith(
-                                    color: Theme.of(
-                                      context,
-                                    ).colorScheme.onSurface,
+                                    color: Theme.of(context)
+                                        .colorScheme
+                                        .onSurface,
                                   ),
                                   textAlign: TextAlign.center,
                                 ),
@@ -302,9 +211,8 @@ class _DonationScreenState extends ConsumerState<OnboardingDonationScreen> {
                             Column(
                               children: [
                                 _buildActionButton(
-                                  text: AppLocalizations.of(
-                                    context,
-                                  )!.donationPrimerCta,
+                                  text: AppLocalizations.of(context)!
+                                      .donationPrimerCta,
                                   onPressed: _openingDonation
                                       ? null
                                       : () => _handleDonationAction(context),
@@ -316,9 +224,8 @@ class _DonationScreenState extends ConsumerState<OnboardingDonationScreen> {
                                     child: TextButton(
                                       onPressed: _handleSkip,
                                       child: Text(
-                                        AppLocalizations.of(
-                                          context,
-                                        )!.skipForNow,
+                                        AppLocalizations.of(context)!
+                                            .skipForNow,
                                       ),
                                     ),
                                   ),

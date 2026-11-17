@@ -473,7 +473,7 @@ void main() {
       expect(find.text('Monthly'), findsOneWidget);
       expect(find.text('Yearly'), findsOneWidget);
       Future<void> pay() async {
-        final button = find.widgetWithText(ElevatedButton, 'Donate');
+        final button = find.byKey(donationPayButtonKey);
         await tester.ensureVisible(button);
         await tester.tap(button);
         await tester.pumpAndSettle();
@@ -607,7 +607,7 @@ void main() {
           );
         }
         await pump(tester, value: config(), payments: payments);
-        final button = find.widgetWithText(ElevatedButton, 'Donate');
+        final button = find.byKey(donationPayButtonKey);
         await tester.ensureVisible(button);
         await tester.tap(button);
         await tester.pumpAndSettle();
