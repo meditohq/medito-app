@@ -253,7 +253,9 @@ jobs:
   android-smoke-test:
     name: Android – Smoke Test
     needs: [android-build]
-    runs-on: ubuntu-latest
+    # Linux QEMU exits during the signed-in onboarding transition, including
+    # on a fresh boot and pinned emulator. Keep the full check on macOS/HVF.
+    runs-on: macos-15-intel
     if: ${{ github.event_name != 'workflow_dispatch' || inputs.wear_only != true }}
 
     steps:
@@ -268,6 +270,7 @@ jobs:
           path: build/app/outputs/apk/prod/release/
 
       - name: Enable KVM
+        if: runner.os == 'Linux'
         run: |
           echo 'KERNEL=="kvm", GROUP="kvm", MODE="0666", OPTIONS+="static_node=kvm"' | sudo tee /etc/udev/rules.d/99-kvm4all.rules
           sudo udevadm control --reload-rules
