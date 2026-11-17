@@ -227,4 +227,3 @@ dependencies {
     // Facebook SDK; declared because we call it directly.
     implementation "com.android.installreferrer:installreferrer:2.2"
 }
-

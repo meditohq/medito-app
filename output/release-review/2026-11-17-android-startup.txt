@@ -1,0 +1,28 @@
+Android internal release startup repair — 2026-11-17
+
+Release 2611.17.0 (302490), original workflow 44084161460:
+- Android release compiled, but smoke testing failed before the welcome screen.
+- Downloaded the exact CI APK and reproduced its InitializationProvider /
+  WorkDatabase startup crash on a disposable API 36 ARM64 emulator.
+- A targeted database keep rule fixed that exception but exposed a second
+  startup crash: background_downloader expected WorkManager.Companion, which
+  the app's forced WorkManager 2.8.1 runtime does not provide.
+- Cancelled Android-only retry 44089409472 before any deployment.
+
+Final repair:
+- Removed the obsolete app-level WorkManager 2.8.1 downgrade.
+- Removed the temporary database keep rules; current library consumer rules
+  provide the required database preservation.
+- Dependency inspection resolves work-runtime and work-runtime-ktx to 2.11.2,
+  satisfying background_downloader 9.6.6 and home_widget 0.9.4.
+
+Verification:
+- Built an isolated checkout with production configuration, shrinking and
+  Dart obfuscation; signed release APK build passed (106.5 MB).
+- Installed on the same emulator that reproduced the failed CI APK.
+- App stays running and shows Meditation Made Simple / Get started.
+- Native crash log is empty after launch.
+- Concurrent streak-icon UI edits were excluded from this release repair.
+
+The iOS run is independent and uses the original release commit; this repair
+changes Android dependency packaging only. Production publishing remains off.
