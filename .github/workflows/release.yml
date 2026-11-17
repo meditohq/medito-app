@@ -443,9 +443,10 @@ jobs:
       - name: Resolve previous release tag
         id: prev
         run: |
+          CURRENT_VERSION=$(awk '/^version:/ { split($2, v, "+"); print v[1]; exit }' pubspec.yaml)
           PREV=$(git tag --list '[0-9]*.[0-9]*.[0-9]*' --sort=-v:refname \
-                 | grep -v "^${GITHUB_REF_NAME}$" \
-                 | head -1)
+                 | awk -v ref="$GITHUB_REF_NAME" -v current="$CURRENT_VERSION" \
+                   '$0 != ref && $0 != current && !found { print; found = 1 }')
           if [ -z "$PREV" ]; then
             echo "No previous release tag found." >> "$GITHUB_STEP_SUMMARY"
             echo "tag=" >> "$GITHUB_OUTPUT"
@@ -1018,9 +1019,10 @@ jobs:
       - name: Resolve previous release tag
         id: prev
         run: |
+          CURRENT_VERSION=$(awk '/^version:/ { split($2, v, "+"); print v[1]; exit }' pubspec.yaml)
           PREV=$(git tag --list '[0-9]*.[0-9]*.[0-9]*' --sort=-v:refname \
-                 | grep -v "^${GITHUB_REF_NAME}$" \
-                 | head -1)
+                 | awk -v ref="$GITHUB_REF_NAME" -v current="$CURRENT_VERSION" \
+                   '$0 != ref && $0 != current && !found { print; found = 1 }')
           if [ -z "$PREV" ]; then
             echo "No previous release tag found." >> "$GITHUB_STEP_SUMMARY"
             echo "tag=" >> "$GITHUB_OUTPUT"
