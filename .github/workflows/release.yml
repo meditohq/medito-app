@@ -253,9 +253,7 @@ jobs:
   android-smoke-test:
     name: Android – Smoke Test
     needs: [android-build]
-    # Linux QEMU exits during the signed-in onboarding transition, including
-    # on a fresh boot and pinned emulator. Keep the full check on macOS/HVF.
-    runs-on: macos-15-intel
+    runs-on: ubuntu-latest
     if: ${{ github.event_name != 'workflow_dispatch' || inputs.wear_only != true }}
 
     steps:
@@ -280,7 +278,6 @@ jobs:
         timeout-minutes: 25
         uses: reactivecircus/android-emulator-runner@v2.38.0
         with:
-          emulator-build: 14214601 # 36.2.12; matches the passing local release check
           api-level: 34
           arch: x86_64
           # No Google Play services: on google_apis, Android restarted GMS mid-run
@@ -319,7 +316,6 @@ jobs:
           TEST_ACCOUNT_EMAIL: ${{ secrets.TEST_ACCOUNT_EMAIL }}
           TEST_ACCOUNT_OTP: ${{ secrets.TEST_ACCOUNT_OTP }}
         with:
-          emulator-build: 14214601 # 36.2.12; matches the passing local release check
           api-level: 34
           arch: x86_64
           # No Google Play services: on google_apis, Android restarted GMS mid-run
@@ -349,7 +345,6 @@ jobs:
           TEST_ACCOUNT_EMAIL: ${{ secrets.TEST_ACCOUNT_EMAIL }}
           TEST_ACCOUNT_OTP: ${{ secrets.TEST_ACCOUNT_OTP }}
         with:
-          emulator-build: 14214601 # 36.2.12; matches the passing local release check
           api-level: 34
           arch: x86_64
           # No Google Play services: on google_apis, Android restarted GMS mid-run
@@ -522,7 +517,6 @@ jobs:
         timeout-minutes: 15
         uses: reactivecircus/android-emulator-runner@v2.38.0
         with:
-          emulator-build: 14214601 # 36.2.12; matches the passing local release check
           api-level: 34
           arch: x86_64
           # No Google Play services: on google_apis, Android restarted GMS mid-run
@@ -550,7 +544,6 @@ jobs:
         timeout-minutes: 12
         uses: reactivecircus/android-emulator-runner@v2.38.0
         with:
-          emulator-build: 14214601 # 36.2.12; matches the passing local release check
           api-level: 34
           arch: x86_64
           # No Google Play services: on google_apis, Android restarted GMS mid-run
