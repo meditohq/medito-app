@@ -1,0 +1,35 @@
+App branch/worktree audit and download integration — 2026-11-17
+
+Audit:
+- Refreshed origin and checked all six app worktrees, 13 local branches,
+  and remote branch histories against develop.
+- Watch, analytics reconsent, older-Watch playback and supporter work is merged.
+- Push-token source matches develop; remaining branch toolchain settings were
+  superseded by the Flutter 3.50 / generator upgrade.
+- The batch-download review worktree contains three uncommitted files. Its
+  unfinished fixes were inspected and integrated into current develop while
+  preserving the shared DownloadLibrary queue and current pack eligibility/UI.
+- The original worktree and all branches were retained without alteration.
+
+Reproduced on the pre-fix develop code with isolated regression checks:
+- A metadata fetch failure could report a pack fully downloaded.
+- A new audio variant could be written to disk but omitted from the library.
+- Cancelling and then deleting could resurrect in-flight downloads.
+
+Integrated fixes:
+- Incomplete packs report an error, retaining completed files for retry.
+- Downloaded audio variants merge into existing voices and files.
+- Cancellation drains active workers; deletion waits for workers and prevents
+  new batches starting until it completes.
+- Shared library updates continue to serialize with manual/automatic downloads.
+- Failed deletion returns failure and displays an error instead of success.
+- Empty audio variants are skipped safely and count as incomplete sessions.
+
+Validation:
+- Focused integration tests: 32 passed before additional failure/retry coverage.
+- Final full Flutter suite: 1,190 passed; 1 mock-only test skipped.
+- Separate mock-checkout onboarding test: 1 passed.
+- Analysis: no errors or warnings; 287 informational diagnostics.
+- git diff --check passed.
+
+No branches/worktrees were deleted, no commits pushed, no release submitted.

@@ -19,6 +19,7 @@ import 'package:share_plus/share_plus.dart';
 
 import 'animated_favourite_icon.dart';
 import 'bottom_action_bar.dart';
+
 import 'package:medito/constants/theme/medito_text.dart';
 
 class PackViewBottomBar extends ConsumerStatefulWidget {
@@ -48,9 +49,8 @@ class _PackViewBottomBarState extends ConsumerState<PackViewBottomBar> {
 
   void _sharePack(BuildContext context) {
     final deepLink = 'https://medito.app/packs/${widget.packId}';
-    final shareText = AppLocalizations.of(
-      context,
-    )!.sharePackText(widget.packName, deepLink);
+    final shareText = AppLocalizations.of(context)!
+        .sharePackText(widget.packName, deepLink);
     SharePlus.instance.share(ShareParams(text: shareText));
   }
 
@@ -94,9 +94,9 @@ class _PackViewBottomBarState extends ConsumerState<PackViewBottomBar> {
                             batchState.total,
                           ),
                           style: consumerContext.text.subtitle.copyWith(
-                            color: Theme.of(
-                              consumerContext,
-                            ).colorScheme.onSurface,
+                            color: Theme.of(consumerContext)
+                                .colorScheme
+                                .onSurface,
                           ),
                         ),
                       ),
@@ -126,9 +126,9 @@ class _PackViewBottomBarState extends ConsumerState<PackViewBottomBar> {
                         title: Text(
                           l10n.allDownloaded,
                           style: consumerContext.text.subtitle.copyWith(
-                            color: Theme.of(
-                              consumerContext,
-                            ).colorScheme.onSurface,
+                            color: Theme.of(consumerContext)
+                                .colorScheme
+                                .onSurface,
                           ),
                         ),
                       ),
@@ -143,13 +143,18 @@ class _PackViewBottomBarState extends ConsumerState<PackViewBottomBar> {
                         textColor: Theme.of(consumerContext).colorScheme.error,
                         onTap: () async {
                           Navigator.pop(bottomSheetContext);
-                          await ref
+                          final deleted = await ref
                               .read(batchDownloadProvider.notifier)
                               .deletePackDownloads(pack);
                           if (context.mounted) {
                             scaffoldMessengerKey.currentState
                                 ?.hideCurrentSnackBar();
-                            showSnackBar(context, l10n.packDownloadsDeleted);
+                            showSnackBar(
+                              context,
+                              deleted
+                                  ? l10n.packDownloadsDeleted
+                                  : l10n.anErrorOccurred,
+                            );
                           }
                         },
                       ),
