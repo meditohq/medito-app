@@ -289,7 +289,9 @@ jobs:
           ram-size: 4096M
           cores: 4
           force-avd-creation: false
-          emulator-options: -no-snapshot-save -no-window -gpu swiftshader_indirect -noaudio -no-boot-anim
+          # Use the supported software renderer without Vulkan: the Linux
+          # emulator vanished mid-flow with swiftshader_indirect on both boots.
+          emulator-options: -no-snapshot-save -no-window -gpu swiftshader -feature -Vulkan -noaudio -no-boot-anim
           disable-animations: true
           script: |
             curl -Ls "https://get.maestro.mobile.dev" | bash
@@ -325,7 +327,7 @@ jobs:
           ram-size: 4096M
           cores: 4
           force-avd-creation: false
-          emulator-options: -no-snapshot-save -no-window -gpu swiftshader_indirect -noaudio -no-boot-anim
+          emulator-options: -no-snapshot-save -no-window -gpu swiftshader -feature -Vulkan -noaudio -no-boot-anim
           disable-animations: true
           script: |
             curl -Ls "https://get.maestro.mobile.dev" | bash
@@ -354,7 +356,7 @@ jobs:
           ram-size: 4096M
           cores: 4
           force-avd-creation: false
-          emulator-options: -no-snapshot-save -no-window -gpu swiftshader_indirect -noaudio -no-boot-anim
+          emulator-options: -no-snapshot-save -no-window -gpu swiftshader -feature -Vulkan -noaudio -no-boot-anim
           disable-animations: true
           script: |
             curl -Ls "https://get.maestro.mobile.dev" | bash
@@ -526,7 +528,7 @@ jobs:
           ram-size: 4096M
           cores: 4
           force-avd-creation: false
-          emulator-options: -no-snapshot-save -no-window -gpu swiftshader_indirect -noaudio -no-boot-anim
+          emulator-options: -no-snapshot-save -no-window -gpu swiftshader -feature -Vulkan -noaudio -no-boot-anim
           disable-animations: true
           script: |
             curl -Ls "https://get.maestro.mobile.dev" | bash
@@ -553,7 +555,7 @@ jobs:
           ram-size: 4096M
           cores: 4
           force-avd-creation: false
-          emulator-options: -no-snapshot-save -no-window -gpu swiftshader_indirect -noaudio -no-boot-anim
+          emulator-options: -no-snapshot-save -no-window -gpu swiftshader -feature -Vulkan -noaudio -no-boot-anim
           disable-animations: true
           script: |
             adb shell pm list packages | grep -q meditofoundation.medito || (echo "Seeded install did not survive the emulator restart" && exit 1)
