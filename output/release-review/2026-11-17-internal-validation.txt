@@ -31,3 +31,12 @@ iOS validation and retry:
 
 These are test releases only. Production publishing and store review remain off.
 The newer streak-icon feature is excluded from these pinned release branches.
+
+Additional upgrade validation:
+- Downloaded the exact previous shipped APK from release run 43036413056.
+- Seeded it using the Maestro flow from tag 2611.11.0 on the disposable ARM64
+  emulator, then installed the corrected APK in place without clearing data.
+- upgrade.yaml passed (exit 0): Home/state persisted and audio playback worked.
+- The hosted upgrade job 134140951806 timed out installing its Android system
+  image before it launched the old app. Raised the future seed-step allowance
+  from 15 to 25 minutes to include that setup plus the actual UI flow.

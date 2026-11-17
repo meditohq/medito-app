@@ -515,7 +515,9 @@ jobs:
       # each command on a single line and inline the app id.
       - name: Seed old version on emulator
         if: steps.gate.outputs.run == 'true'
-        timeout-minutes: 15
+        # Includes SDK/system-image installation on a fresh runner as well as
+        # the seed flow; a slow image download previously consumed all 15 min.
+        timeout-minutes: 25
         uses: reactivecircus/android-emulator-runner@v2.38.0
         with:
           api-level: 34
