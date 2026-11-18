@@ -80,8 +80,10 @@ reminderReschedulerOverride;
 
 /// Reschedules the Daily reminder series so its anchor and the streak /
 /// consistency values baked into each day's copy reflect the latest session
-/// state. Safe to call from any stats-mutating path (real completions, manual
-/// adds, deletes); no-ops when Daily reminders are disabled.
+/// state. For a session that just happened (a real completion, or one from
+/// the watch); manual adds, edits and deletes go through
+/// [_rescheduleRemindersAfterHistoryChange]. No-ops when Daily reminders are
+/// disabled.
 Future<void> _rescheduleReminders({
   required int endMs,
   required int durationMs,
@@ -131,6 +133,69 @@ Future<void> _rescheduleReminders({
     }
   } catch (reminderError) {
     AppLogger.e('STATS', 'Failed to schedule Daily reminder', reminderError);
+  }
+}
+
+/// Test seam for [_rescheduleRemindersAfterHistoryChange], as
+/// [reminderReschedulerOverride] is for [_rescheduleReminders].
+@visibleForTesting
+Future<void> Function({required bool meditatedToday, required DateTime now})?
+reminderHistoryReschedulerOverride;
+
+/// Rebuilds the Daily reminder series after the history was changed by hand
+/// (a manual add, an edit or a delete), so the streak / consistency values in
+/// each day's copy are current.
+///
+/// Unlike [_rescheduleReminders] this does not anchor on a session: the entry
+/// that changed can be on any past day and says nothing about when the next
+/// reminder is due. The anchor comes from whether there is a session today —
+/// see [anchorAfterHistoryChange].
+Future<void> _rescheduleRemindersAfterHistoryChange(
+  StatsManager statsManager,
+) async {
+  try {
+    final prefs = await SharedPreferences.getInstance();
+    final hasSaved =
+        prefs.getInt(SharedPreferenceConstants.savedHours) != null &&
+        prefs.getInt(SharedPreferenceConstants.savedMinutes) != null;
+    final enabled =
+        prefs.getBool(SharedPreferenceConstants.dailyReminderEnabled) ??
+        hasSaved;
+
+    if (!enabled) {
+      AppLogger.d('STATS', 'Daily reminders disabled; skipping scheduling');
+      return;
+    }
+
+    final now = statsManager.currentDate;
+    final stats = await statsManager.localAllStats;
+    // A streak freeze covers a missed day; it is not a session.
+    final meditatedToday = (stats.audioCompleted ?? []).any((session) {
+      if (isFreezeSession(session)) return false;
+      final at = DateTime.fromMillisecondsSinceEpoch(session.timestamp);
+      return at.year == now.year && at.month == now.month && at.day == now.day;
+    });
+
+    final override = reminderHistoryReschedulerOverride;
+    if (override != null) {
+      await override(meditatedToday: meditatedToday, now: now);
+      return;
+    }
+
+    final context = navigatorKey.currentContext;
+    await DailyRemindersScheduler(
+      prefs: prefs,
+      reminders: ReminderProvider(),
+    ).rescheduleAfterHistoryChange(
+      meditatedToday: meditatedToday,
+      now: now,
+      l10n: context != null && context.mounted
+          ? AppLocalizations.of(context)
+          : null,
+    );
+    AppLogger.d('STATS', 'Daily reminder series rebuilt after history change');
+  } catch (e) {
+    AppLogger.e('STATS', 'Failed to rebuild daily reminders', e);
   }
 }
 
@@ -476,10 +541,7 @@ Future<bool> editSessionDateTime({
     );
     if (!success) return false;
     await _refreshStatsAndUpNext();
-    await _rescheduleReminders(
-      endMs: DateTime.now().millisecondsSinceEpoch,
-      durationMs: 0,
-    );
+    await _rescheduleRemindersAfterHistoryChange(statsManager);
     return true;
   } catch (e) {
     AppLogger.e('STATS', 'Failed to edit session', e);
@@ -502,8 +564,7 @@ Future<bool> deleteSession({
 
     await _refreshStatsAndUpNext();
 
-    final nowMs = DateTime.now().millisecondsSinceEpoch;
-    await _rescheduleReminders(endMs: nowMs, durationMs: 0);
+    await _rescheduleRemindersAfterHistoryChange(statsManager);
 
     try {
       final updatedStats = await statsManager.localAllStats;
@@ -565,7 +626,7 @@ Future<bool> addManualSession({
     // Refresh stats from local; upNextProvider rebuilds reactively.
     await _refreshStatsAndUpNext();
 
-    await _rescheduleReminders(endMs: timestamp, durationMs: durationMs);
+    await _rescheduleRemindersAfterHistoryChange(statsManager);
 
     // Update home widget with latest stats (fire-and-forget to avoid blocking)
     try {
@@ -608,7 +669,6 @@ Future<int> addManualSessions({
   // (setCurrentDateForTesting) flows through here too.
   final now = statsManager.currentDate;
   var added = 0;
-  int latestTimestamp = 0;
 
   for (final date in dates) {
     // Anchor at the shared manual-session hour so the calendar's streak
@@ -629,9 +689,6 @@ Future<int> addManualSessions({
       );
       await statsManager.addAudioCompleted(entry, durationMs, skipPost: true);
       added++;
-      if (entry.timestamp > latestTimestamp) {
-        latestTimestamp = entry.timestamp;
-      }
     } catch (e) {
       AppLogger.e('STATS', 'Failed to add manual session in bulk for $date', e);
     }
@@ -658,7 +715,7 @@ Future<int> addManualSessions({
       );
     }
 
-    await _rescheduleReminders(endMs: latestTimestamp, durationMs: durationMs);
+    await _rescheduleRemindersAfterHistoryChange(statsManager);
   }
 
   return added;

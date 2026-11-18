@@ -450,6 +450,52 @@ void main() {
     );
   });
 
+  group('anchorAfterHistoryChange', () {
+    const time = TimeOfDay(hour: 10, minute: 0);
+
+    test('no session today, time still ahead: today', () {
+      expect(
+        anchorAfterHistoryChange(
+          DateTime(2026, 9, 3, 8),
+          time,
+          meditatedToday: false,
+        ),
+        DateTime(2026, 9, 3, 10),
+      );
+    });
+
+    test('no session today, time already passed: tomorrow', () {
+      expect(
+        anchorAfterHistoryChange(
+          DateTime(2026, 9, 3, 14),
+          time,
+          meditatedToday: false,
+        ),
+        DateTime(2026, 9, 4, 10),
+      );
+    });
+
+    test('session today: tomorrow, even with the time still ahead', () {
+      expect(
+        anchorAfterHistoryChange(
+          DateTime(2026, 9, 3, 8),
+          time,
+          meditatedToday: true,
+        ),
+        DateTime(2026, 9, 4, 10),
+      );
+      // Just after midnight must not fall back onto today.
+      expect(
+        anchorAfterHistoryChange(
+          DateTime(2026, 9, 3, 0, 5),
+          time,
+          meditatedToday: true,
+        ),
+        DateTime(2026, 9, 4, 10),
+      );
+    });
+  });
+
   group('anchorPreferringSavedTime', () {
     final sessionAnchor = DateTime(2026, 9, 2, 20, 50); // meditated at 21:00
 
