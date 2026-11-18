@@ -467,7 +467,12 @@ class _NativeDonationPageState extends ConsumerState<NativeDonationPage> {
         AppLogger.w(_logTag, 'Donor skipped the receipt email prompt');
         return;
       }
-      await customerHasEmail(email);
+      // A 200 can still say no (payment without a customer or charge, or a
+      // deleted customer). Only remember the address once Stripe has it.
+      if (!await customerHasEmail(email)) {
+        AppLogger.w(_logTag, 'Receipt email was not saved to the customer');
+        return;
+      }
       await ReceiptEmail.save(ref.read(sharedPreferencesProvider), email);
     } catch (e) {
       AppLogger.w(_logTag, 'Could not confirm the receipt email: $e');

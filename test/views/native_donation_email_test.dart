@@ -27,6 +27,7 @@ import 'package:medito/models/stripe/paywall_config_model.dart';
 import 'package:medito/models/stripe/payment_config_model.dart';
 import 'package:medito/models/stripe/payment_method_model.dart';
 import 'package:medito/providers/stripe/payment_providers.dart';
+import 'package:medito/utils/receipt_email.dart';
 import 'package:medito/providers/stripe/payment_ui_controller.dart';
 import 'package:medito/services/network/donation_api_service.dart';
 import 'package:medito/views/donation/receipt_email_prompt.dart'
@@ -144,8 +145,11 @@ class _PaidState extends PaymentState {
 /// Donate API stand-in: answers the receipt-email check from [customerHasEmail]
 /// until an address is posted.
 class _ReceiptEmailApi implements IDonationApiService {
-  _ReceiptEmailApi({required this.customerHasEmail});
+  _ReceiptEmailApi({required this.customerHasEmail, this.acceptsEmail = true});
   final bool customerHasEmail;
+
+  /// False models a 200 that still reports no address after one is posted.
+  final bool acceptsEmail;
   final bodies = <Map<String, dynamic>>[];
 
   @override
@@ -155,7 +159,10 @@ class _ReceiptEmailApi implements IDonationApiService {
     bodies.add(sent);
     return {
       'success': true,
-      'data': {'hasEmail': customerHasEmail || sent.containsKey('email')},
+      'data': {
+        'hasEmail':
+            customerHasEmail || (acceptsEmail && sent.containsKey('email')),
+      },
     };
   }
 
@@ -499,6 +506,41 @@ void main() {
           'clientSecret': 'pi_1_secret',
           'email': 'late@example.invalid',
         });
+        expect(ReceiptEmail.read(prefs), 'late@example.invalid');
+        expect(advanced, 1);
+      });
+    });
+
+    testWidgets('does not remember an address Stripe did not take', (
+      tester,
+    ) async {
+      await onIOS(() async {
+        SharedPreferences.setMockInitialValues({});
+        final prefs = await SharedPreferences.getInstance();
+        final api = _ReceiptEmailApi(
+          customerHasEmail: false,
+          acceptsEmail: false,
+        );
+        var advanced = 0;
+        await pump(
+          tester,
+          prefs: prefs,
+          payments: _SucceedingPayment(),
+          applePay: true,
+          donateApi: api,
+          onNext: () => advanced++,
+        );
+
+        await payWithApplePay(tester);
+        await tester.enterText(
+          find.byKey(receiptEmailPromptFieldKey),
+          'late@example.invalid',
+        );
+        await tester.tap(find.text('Save'));
+        await tester.pumpAndSettle();
+
+        expect(api.bodies, hasLength(2));
+        expect(ReceiptEmail.read(prefs), isNull);
         expect(advanced, 1);
       });
     });
