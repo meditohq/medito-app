@@ -1,5 +1,6 @@
 import 'dart:convert';
 import 'dart:async';
+
 import '../notifications/supporter_campaign_api.dart';
 import '../../providers/donation/supporter_appeal_experiment.dart';
 import '../notifications/local_notifications.dart';
@@ -131,6 +132,28 @@ DateTime firstFutureOccurrence(DateTime anchor, DateTime now) {
   }
 
   return candidate;
+}
+
+/// The anchor after the history was changed by hand: a manual add, an edit or
+/// a delete.
+///
+/// None of those is a session that just happened, so the changed entry's own
+/// date must not decide when reminders fire. Anchoring on it scheduled the
+/// series from a past day when someone backfilled an old date, and reminded
+/// people at their usual time on a day they had already meditated. The series
+/// is still rebuilt, because the streak and consistency numbers are baked into
+/// each day's copy.
+///
+/// What decides the anchor is today: with a session today the next reminder is
+/// tomorrow at [time], otherwise it is the next occurrence of [time].
+DateTime anchorAfterHistoryChange(
+  DateTime now,
+  TimeOfDay time, {
+  required bool meditatedToday,
+}) {
+  if (!meditatedToday) return firstReminderAnchor(now, time);
+
+  return DateTime(now.year, now.month, now.day + 1, time.hour, time.minute);
 }
 
 class DailyRemindersService {
@@ -353,6 +376,27 @@ class DailyRemindersScheduler {
       prefs.getInt(SharedPreferenceConstants.savedMinutes),
     );
     await scheduleSeriesFromAnchor(anchor, l10n: l10n);
+  }
+
+  /// Rebuilds the series after a manual add, edit or delete. See
+  /// [anchorAfterHistoryChange] for why the changed entry is not the anchor.
+  Future<void> rescheduleAfterHistoryChange({
+    required bool meditatedToday,
+    DateTime? now,
+    AppLocalizations? l10n,
+  }) async {
+    final current = now ?? _now();
+    final savedHour = prefs.getInt(SharedPreferenceConstants.savedHours);
+    final savedMinute = prefs.getInt(SharedPreferenceConstants.savedMinutes);
+    // Without a chosen time there is nothing to keep, so use the current time
+    // of day, as a session-derived anchor would.
+    final time = savedHour == null || savedMinute == null
+        ? TimeOfDay.fromDateTime(current)
+        : TimeOfDay(hour: savedHour, minute: savedMinute);
+    await scheduleSeriesFromAnchor(
+      anchorAfterHistoryChange(current, time, meditatedToday: meditatedToday),
+      l10n: l10n,
+    );
   }
 
   (String, String) _copyForDay(
