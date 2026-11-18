@@ -169,11 +169,14 @@ class MockStatsBackupService extends _i1.Mock
   }
 
   @override
-  _i3.Future<bool> backupStats(_i5.LocalAllStats? stats, String? userId) =>
-      (super.noSuchMethod(
-        Invocation.method(#backupStats, [stats, userId]),
-        returnValue: _i3.Future<bool>.value(false),
-      ) as _i3.Future<bool>);
+  _i3.Future<bool> backupStats(
+    _i5.LocalAllStats? stats,
+    String? userId, {
+    bool? force = false,
+  }) => (super.noSuchMethod(
+    Invocation.method(#backupStats, [stats, userId], {#force: force}),
+    returnValue: _i3.Future<bool>.value(false),
+  ) as _i3.Future<bool>);
 
   @override
   _i3.Future<_i5.LocalAllStats?> getLatestBackup(String? userId) =>

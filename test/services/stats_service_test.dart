@@ -246,11 +246,44 @@ void main() {
       final emptyStats = LocalAllStats.empty();
 
       // Act
-      await statsService.postStats(emptyStats);
+      await statsService.postStats(emptyStats, force: false);
 
       // Assert
       verifyNever(mockBackupService.backupStats(any, any));
       verifyNever(mockHttpApiService.postRequest(any, body: anyNamed('body')));
+    });
+
+    test('should post an empty history when force is true', () async {
+      // Arrange
+      final emptyStats = LocalAllStats.empty();
+
+      when(
+        mockBackupService.backupStats(any, any, force: anyNamed('force')),
+      ).thenAnswer((_) async => true);
+
+      when(
+        mockHttpApiService.postRequest(any, body: anyNamed('body')),
+      ).thenAnswer((_) async => {});
+
+      // Act
+      await statsService.postStats(emptyStats, force: true);
+
+      // Assert - the empty history is backed up and sent, so a later restore
+      // or a fresh launch cannot bring the deleted session back.
+      verify(
+        mockBackupService.backupStats(emptyStats, userId, force: true),
+      ).called(1);
+
+      final body =
+          verify(
+                mockHttpApiService.postRequest(
+                  HTTPConstants.allStats,
+                  body: captureAnyNamed('body'),
+                ),
+              ).captured.single
+              as Map<String, dynamic>;
+      expect(body['audio_completed'], isEmpty);
+      expect(body['total_tracks_completed'], 0);
     });
 
     test('should still backup if server post fails', () async {

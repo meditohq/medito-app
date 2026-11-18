@@ -32,9 +32,19 @@ class StatsBackupService {
 
   /// Backs up the stats with timestamp and userId
   /// Returns true if backup was successful
-  Future<bool> backupStats(LocalAllStats stats, String userId) async {
-    // Don't backup empty stats
-    if (stats.totalTracksCompleted == 0 &&
+  ///
+  /// An empty snapshot is normally refused, because a blank in-memory copy
+  /// means nothing has loaded yet. Deleting the last session passes [force]
+  /// so the empty history is stored as the newest snapshot. Without it, the
+  /// restore path would hand the deleted session back.
+  Future<bool> backupStats(
+    LocalAllStats stats,
+    String userId, {
+    bool force = false,
+  }) async {
+    // Don't backup empty stats, unless the caller asked for it
+    if (!force &&
+        stats.totalTracksCompleted == 0 &&
         (stats.audioCompleted?.isEmpty ?? true)) {
       return false;
     }

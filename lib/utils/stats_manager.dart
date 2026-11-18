@@ -504,19 +504,26 @@ class StatsManager {
     );
   }
 
-  Future<void> _saveLocalAllStatsToSharedPrefs() async {
-    if (_allStats != null && _allStats?.totalTracksCompleted == 0) return;
+  /// Writes [_allStats] to disk.
+  ///
+  /// Without [force], an all-zero object is not written: an empty in-memory
+  /// copy usually means nothing has loaded yet, and persisting it would wipe
+  /// the saved history. Deleting a session is the exception — there the empty
+  /// history is what the user asked for, and skipping the write left the old
+  /// copy on disk, so the deleted session came back on the next launch.
+  Future<void> _saveLocalAllStatsToSharedPrefs({bool force = false}) async {
+    final stats = _allStats;
+    if (stats == null) return;
+    if (!force && stats.totalTracksCompleted == 0) return;
 
     //dev.log'StatsManager: Saving local stats');
 
     var prefs = _prefs;
-    if (_allStats != null) {
-      final saved = await prefs.setString(
-        SharedPreferenceConstants.localAllStatsKey,
-        jsonEncode(_allStats!.toJson()),
-      );
-      if (!saved) throw StateError('Could not persist local stats');
-    }
+    final saved = await prefs.setString(
+      SharedPreferenceConstants.localAllStatsKey,
+      jsonEncode(stats.toJson()),
+    );
+    if (!saved) throw StateError('Could not persist local stats');
   }
 
   Future<LocalAllStats> _loadLocalAllStats() async {
@@ -836,8 +843,12 @@ class StatsManager {
     final newConsistencyScore = calculateConsistencyScore(_allStats!);
     _allStats = _allStats!.copyWith(consistencyScore: newConsistencyScore);
     await saveConsistencyScoreHistory(newConsistencyScore);
-    await _saveLocalAllStatsToSharedPrefs();
-    await _statsService.postStats(_allStats!);
+    // force: removing the last session leaves a legitimately empty history,
+    // and it must still be written or the session returns on the next launch.
+    await _saveLocalAllStatsToSharedPrefs(force: true);
+    // force: the empty history is the user's intent here. Without it the
+    // service skips the POST and the server keeps the deleted session.
+    await _statsService.postStats(_allStats!, force: true);
     _lastSyncedAt = _getCurrentDate();
     await _saveLastSyncedAt();
     _dirty = false;

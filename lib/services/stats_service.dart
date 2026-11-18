@@ -159,15 +159,22 @@ class StatsService {
     }
   }
 
-  Future<void> postStats(LocalAllStats stats) async {
+  /// Pushes [stats] to the server.
+  ///
+  /// An empty history is normally skipped: it usually means nothing loaded
+  /// yet, and posting it would wipe the account. Deleting the last session is
+  /// the exception, so that path passes [force] and the empty history becomes
+  /// the server copy. The local backup is written with the same intent, or a
+  /// restore would bring the deleted session back.
+  Future<void> postStats(LocalAllStats stats, {bool force = false}) async {
     if (useMockBackend) {
       await MockStatsBackend.saveStats(stats);
       dev.log('MockStatsService: Saved stats locally');
       return;
     }
 
-    // Don't push if stats are empty
-    if (stats.audioCompleted?.isEmpty == true) {
+    // Don't push if stats are empty, unless the caller asked for it
+    if (!force && stats.audioCompleted?.isEmpty == true) {
       dev.log('StatsService: No stats to post, skipping');
       return;
     }
@@ -182,7 +189,11 @@ class StatsService {
 
     // Backup the stats before posting to server
     var userId = _prefs.getString(SharedPreferenceConstants.userId) ?? '';
-    var backupSuccess = await _backupService.backupStats(stats, userId);
+    var backupSuccess = await _backupService.backupStats(
+      stats,
+      userId,
+      force: force,
+    );
 
     if (backupSuccess) {
       dev.log('StatsService: Successfully backed up stats locally');
@@ -204,7 +215,7 @@ class StatsService {
       // If backup failed and posting failed, try backup again
       if (!backupSuccess) {
         dev.log('StatsService: Attempting backup again after post failure');
-        await _backupService.backupStats(stats, userId);
+        await _backupService.backupStats(stats, userId, force: force);
       }
     }
   }
