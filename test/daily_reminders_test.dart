@@ -275,8 +275,9 @@ void main() {
       registerFallbackValue(<ScheduledReminder>[]);
       when(() => reminders.cancelReminderSeries()).thenAnswer((_) async {});
       when(() => reminders.cancelDailyNotification()).thenAnswer((_) async {});
-      when(() => reminders.scheduleReminderSeries(any()))
-          .thenAnswer((_) async {});
+      when(
+        () => reminders.scheduleReminderSeries(any()),
+      ).thenAnswer((_) async {});
       // The scheduler converts each anchor to tz.local, so pin it: the
       // assertions must not depend on the machine's zone data being loaded.
       tzdata.initializeTimeZones();
@@ -289,10 +290,12 @@ void main() {
     Future<List<ScheduledReminder>> reschedule({
       required DateTime sessionEnd,
       Duration duration = const Duration(minutes: 5),
+      DateTime? now,
     }) async {
       final scheduler = DailyRemindersScheduler(
         prefs: prefs,
         reminders: reminders,
+        now: now == null ? null : () => now,
       );
       await scheduler.rescheduleAfterSession(
         endMs: sessionEnd.millisecondsSinceEpoch,
@@ -309,24 +312,67 @@ void main() {
     test(
       'anchors the series one calendar day on, at the session time',
       () async {
+        // A session that just ended anchors tomorrow, so the guard against a
+        // past series leaves it exactly where the arithmetic put it.
+        final tomorrow = sameLocalTimeAfterDays(DateTime.now(), 1);
         final items = await reschedule(
-          sessionEnd: DateTime(2026, 10, 24, 10, 15),
+          sessionEnd: DateTime(
+            tomorrow.year,
+            tomorrow.month,
+            tomorrow.day,
+            10,
+            15,
+          ),
         );
 
-        expect(items, hasLength(16));
-        expect(
-          items.first.scheduledDate.toLocal(),
-          DateTime(2026, 10, 25, 10, 0),
+        final first = DateTime(
+          tomorrow.year,
+          tomorrow.month,
+          tomorrow.day + 1,
+          10,
+          0,
         );
-        expect(items[14].scheduledDate.toLocal(), DateTime(2026, 11, 8, 10, 0));
+        expect(items, hasLength(16));
+        expect(items.first.scheduledDate.toLocal(), first);
+        expect(
+          items[14].scheduledDate.toLocal(),
+          sameLocalTimeAfterDays(first, 14),
+        );
         expect(
           items.last.scheduledDate.toLocal(),
-          DateTime(2026, 11, 23, 10, 0),
+          sameLocalTimeAfterDays(first, 29),
         );
         expect(prefs.getInt(SharedPreferenceConstants.savedHours), 10);
         expect(prefs.getInt(SharedPreferenceConstants.savedMinutes), 0);
       },
     );
+
+    test('a backdated session never schedules reminders in the past', () async {
+      // A pinned clock keeps the expectation away from the 10:00 boundary: a
+      // real clock captured here can move past 10:00 before the scheduler
+      // reads its own "now", which made this test flaky.
+      final now = DateTime(2026, 5, 20, 14, 30);
+      // Manual entry for three days ago, or a completion replayed days late.
+      final sessionEnd = DateTime(now.year, now.month, now.day - 3, 10, 15);
+
+      final items = await reschedule(sessionEnd: sessionEnd, now: now);
+
+      final todayAt10 = DateTime(now.year, now.month, now.day, 10, 0);
+      final expectedFirst = todayAt10.isBefore(now)
+          ? sameLocalTimeAfterDays(todayAt10, 1)
+          : todayAt10;
+
+      expect(items, hasLength(16));
+      expect(items.first.scheduledDate.toLocal(), expectedFirst);
+      expect(
+        items.every((item) => !item.scheduledDate.toLocal().isBefore(now)),
+        isTrue,
+        reason: 'the platform drops a reminder whose time has passed',
+      );
+      // The wall clock survives the move, so Settings keeps showing it.
+      expect(prefs.getInt(SharedPreferenceConstants.savedHours), 10);
+      expect(prefs.getInt(SharedPreferenceConstants.savedMinutes), 0);
+    });
 
     // A DST regression only shows up on an hour-changing day, so these two are
     // skipped on a host timezone without DST.
@@ -347,6 +393,9 @@ void main() {
             9,
             15,
           ),
+          // Pinned after the anchor and before the DST day, so the series is
+          // moved by the guard exactly as this test expects.
+          now: DateTime(dayBefore.year, dayBefore.month, dayBefore.day, 20),
         );
 
         // The session started 09:10; a 24h step would anchor at 10:00.
@@ -379,6 +428,9 @@ void main() {
             9,
             15,
           ),
+          // Pinned after the anchor and before the DST day, so the series is
+          // moved by the guard exactly as this test expects.
+          now: DateTime(dayBefore.year, dayBefore.month, dayBefore.day, 20),
         );
 
         // The session started 09:10; a 24h step would anchor at 08:00.
@@ -425,6 +477,78 @@ void main() {
       expect(anchorPreferringSavedTime(sessionAnchor, 7, null), sessionAnchor);
       expect(anchorPreferringSavedTime(sessionAnchor, null, 0), sessionAnchor);
     });
+  });
+
+  group('firstFutureOccurrence', () {
+    final springForward = _firstDayOfLength(2026, const Duration(hours: 23));
+
+    test('leaves an anchor that is still ahead alone', () {
+      final anchor = DateTime(2026, 9, 3, 7, 0);
+      expect(
+        firstFutureOccurrence(anchor, DateTime(2026, 9, 2, 12, 0)),
+        anchor,
+      );
+      expect(firstFutureOccurrence(anchor, anchor), anchor);
+    });
+
+    test('moves a backdated anchor to its next occurrence', () {
+      // A session from 1 September hands the series 2 September 07:00. On
+      // 3 September at noon that is in the past, so every reminder of the
+      // series was scheduled before "now" and none of them ever fired.
+      expect(
+        firstFutureOccurrence(
+          DateTime(2026, 9, 1, 7, 0),
+          DateTime(2026, 9, 3, 12),
+        ),
+        DateTime(2026, 9, 4, 7, 0),
+      );
+    });
+
+    test('a time that already passed today moves to tomorrow', () {
+      expect(
+        firstFutureOccurrence(
+          DateTime(2026, 9, 2, 7, 0),
+          DateTime(2026, 9, 3, 8),
+        ),
+        DateTime(2026, 9, 4, 7, 0),
+      );
+    });
+
+    test(
+      'keeps the hour when the step crosses a DST change',
+      () {
+        // A 24h step from 09:00 lands on 10:00 after spring-forward and would
+        // then carry the wrong hour for the rest of the series.
+        final anchor = DateTime(
+          springForward!.year,
+          springForward.month,
+          springForward.day - 3,
+          9,
+        );
+        final now = DateTime(
+          springForward.year,
+          springForward.month,
+          springForward.day + 1,
+          8,
+        );
+        final next = firstFutureOccurrence(anchor, now);
+
+        expect(next.hour, 9);
+        expect(
+          next,
+          DateTime(
+            springForward.year,
+            springForward.month,
+            springForward.day + 1,
+            9,
+          ),
+        );
+      },
+      skip: springForward == null
+          ? 'host timezone (${DateTime(2026, 1, 1).timeZoneName}) has no '
+                'spring-forward in 2026'
+          : false,
+    );
   });
 
   group('reminderPayload', () {
