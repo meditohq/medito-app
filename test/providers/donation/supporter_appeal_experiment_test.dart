@@ -214,19 +214,22 @@ void main() {
     },
   );
 
-  test('CTA UTMs do not overwrite acquisition UTMs or retain stale click snapshots', () async {
-    await enroll('B');
-    await prefs.setString('utm_source', 'google');
-    final tags = experiment.ctaMetadata(now: now);
-    expect(tags['utm_campaign'], SupporterAppealExperiment.campaign);
-    expect(tags['utm_content'], 'B');
-    expect(tags.containsKey('appeal_notification_click_id'), isFalse);
-    expect(
-      experiment.paymentMetadata(now: now).containsKey('utm_source'),
-      isFalse,
-    );
-    expect(prefs.getString('utm_source'), 'google');
-  });
+  test(
+    'CTA UTMs do not overwrite acquisition UTMs or retain stale click snapshots',
+    () async {
+      await enroll('B');
+      await prefs.setString('utm_source', 'google');
+      final tags = experiment.ctaMetadata(now: now);
+      expect(tags['utm_campaign'], SupporterAppealExperiment.campaign);
+      expect(tags['utm_content'], 'B');
+      expect(tags.containsKey('appeal_notification_click_id'), isFalse);
+      expect(
+        experiment.paymentMetadata(now: now).containsKey('utm_source'),
+        isFalse,
+      );
+      expect(prefs.getString('utm_source'), 'google');
+    },
+  );
 
   test(
     'tap entry point requests Home once, before payment attribution is read',
@@ -249,52 +252,55 @@ void main() {
     },
   );
 
-  test('server assignments use persistent IDs, dynamic copy and B/C tap attribution', () async {
-    final data = {
-      'id': '11111111-2222-4333-8444-555555555555',
-      'campaign_id': 'remote-campaign',
-      'arm': 'B',
-      'assigned_at': now.millisecondsSinceEpoch,
-      'expires_at': now.add(const Duration(days: 2)).millisecondsSinceEpoch,
-      'notification_eligible': true,
-      'consistency_band': 'under_25',
-      'announcement': 'Server announcement',
-      'cta_title': 'Support Medito',
-    };
-    expect(
-      await experiment.applyServerAssignment(data, userId: 'test-user'),
-      isTrue,
-    );
-    final a = experiment.assignment!;
-    expect(a.isServer, isTrue);
-    expect(a.id, data['id']);
-    expect(a.announcement, 'Server announcement');
-    expect(experiment.showCard(now.add(const Duration(days: 3))), isFalse);
-    expect(experiment.ctaMetadata()['utm_campaign'], 'remote-campaign');
-    expect(
-      experiment.paymentMetadata(now: now)['appeal_campaign_id'],
-      'remote-campaign',
-    );
-    final payload =
-        jsonDecode(experiment.notificationPayload(a)) as Map<String, dynamic>;
-    expect(
-      await experiment.recordNotificationTap(
-        payload,
-        now.add(const Duration(minutes: 1)),
-      ),
-      isNotNull,
-    );
-    await prefs.setBool(SupporterAppealExperiment.dismissedKey, true);
-    await experiment.applyServerAssignment(data, userId: 'test-user');
-    expect(prefs.getBool(SupporterAppealExperiment.dismissedKey), isTrue);
-    expect(prefs.containsKey(SupporterAppealExperiment.tapKey), isTrue);
-    expect(
-      await experiment.applyServerAssignment({
-        ...data,
-        'id': 'bad-id',
-      }, userId: 'test-user'),
-      isFalse,
-    );
-    expect(experiment.assignment!.id, a.id);
-  });
+  test(
+    'server assignments use persistent IDs, dynamic copy and B/C tap attribution',
+    () async {
+      final data = {
+        'id': '11111111-2222-4333-8444-555555555555',
+        'campaign_id': 'remote-campaign',
+        'arm': 'B',
+        'assigned_at': now.millisecondsSinceEpoch,
+        'expires_at': now.add(const Duration(days: 2)).millisecondsSinceEpoch,
+        'notification_eligible': true,
+        'consistency_band': 'under_25',
+        'announcement': 'Server announcement',
+        'cta_title': 'Support Medito',
+      };
+      expect(
+        await experiment.applyServerAssignment(data, userId: 'test-user'),
+        isTrue,
+      );
+      final a = experiment.assignment!;
+      expect(a.isServer, isTrue);
+      expect(a.id, data['id']);
+      expect(a.announcement, 'Server announcement');
+      expect(experiment.showCard(now.add(const Duration(days: 3))), isFalse);
+      expect(experiment.ctaMetadata()['utm_campaign'], 'remote-campaign');
+      expect(
+        experiment.paymentMetadata(now: now)['appeal_campaign_id'],
+        'remote-campaign',
+      );
+      final payload =
+          jsonDecode(experiment.notificationPayload(a)) as Map<String, dynamic>;
+      expect(
+        await experiment.recordNotificationTap(
+          payload,
+          now.add(const Duration(minutes: 1)),
+        ),
+        isNotNull,
+      );
+      await prefs.setBool(SupporterAppealExperiment.dismissedKey, true);
+      await experiment.applyServerAssignment(data, userId: 'test-user');
+      expect(prefs.getBool(SupporterAppealExperiment.dismissedKey), isTrue);
+      expect(prefs.containsKey(SupporterAppealExperiment.tapKey), isTrue);
+      expect(
+        await experiment.applyServerAssignment({
+          ...data,
+          'id': 'bad-id',
+        }, userId: 'test-user'),
+        isFalse,
+      );
+      expect(experiment.assignment!.id, a.id);
+    },
+  );
 }
