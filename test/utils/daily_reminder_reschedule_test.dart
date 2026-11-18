@@ -9,23 +9,25 @@ import 'package:shared_preferences/shared_preferences.dart';
 
 import '../stats_manager_test.mocks.dart';
 
-/// Pins down the bug fix: when stats change via manual add / delete (or the
-/// real audio-completion path), the Daily reminder series must be
-/// re-anchored. Otherwise the already-scheduled notifications keep referring
-/// to the *previous* most-recent session and the streak/consistency baked
-/// into the copy goes stale.
+/// Pins down two things about the Daily reminder series when stats change by
+/// hand (manual add, edit, delete):
+///
+/// - it is rebuilt, or the streak/consistency baked into the copy goes stale;
+/// - the changed entry is NOT the anchor. A backfilled past day says nothing
+///   about when the next reminder is due; only "is there a session today?"
+///   does.
 ///
 /// We don't exercise the real [DailyRemindersScheduler] here (that would
 /// require platform notification channels). Instead we install a test
-/// override on [reminderReschedulerOverride] and assert that the
-/// stats-updater hits it with the expected anchor.
+/// override on [reminderHistoryReschedulerOverride] and assert what the
+/// stats-updater hands it.
 void main() {
   TestWidgetsFlutterBinding.ensureInitialized();
 
   late StatsManager statsManager;
   late MockStatsService mockStatsService;
   late DateTime today;
-  late List<({int endMs, int durationMs})> calls;
+  late List<({bool meditatedToday, DateTime now})> calls;
 
   setUp(() async {
     SharedPreferences.setMockInitialValues({
@@ -40,71 +42,84 @@ void main() {
     statsManager.setStatsServiceForTesting(mockStatsService);
     await statsManager.initializeForTesting(statsService: mockStatsService);
 
-    today = DateTime(2026, 4, 28);
+    today = DateTime(2026, 4, 28, 8);
     statsManager.setCurrentDateForTesting(today);
 
-    when(
-      mockStatsService.postStats(any),
-    ).thenAnswer((_) async => Future.value());
+    when(mockStatsService.postStats(any))
+        .thenAnswer((_) async => Future.value());
 
     statsManager.setStatsForTesting(
       LocalAllStats.empty().copyWith(streakCurrent: 0, streakLongest: 0),
     );
 
     calls = [];
-    reminderReschedulerOverride =
-        ({required int endMs, required int durationMs}) async {
-          calls.add((endMs: endMs, durationMs: durationMs));
+    reminderHistoryReschedulerOverride =
+        ({required bool meditatedToday, required DateTime now}) async {
+          calls.add((meditatedToday: meditatedToday, now: now));
         };
   });
 
   tearDown(() {
-    reminderReschedulerOverride = null;
+    reminderHistoryReschedulerOverride = null;
     statsManager.resetForTesting();
   });
 
   group('Daily reminder rescheduling on manual stats changes', () {
-    test(
-      'addManualSession reschedules with that session as the anchor',
-      () async {
-        final when = DateTime(2026, 4, 27, 14, 30);
-        final ok = await addManualSession(
-          dateTime: when,
-          durationMinutes: 10,
-          statsManager: statsManager,
-        );
-        expect(ok, isTrue);
-        expect(calls, hasLength(1));
-        expect(calls.single.endMs, when.millisecondsSinceEpoch);
-        expect(calls.single.durationMs, 10 * 60 * 1000);
-      },
-    );
+    test('a backfilled past day rebuilds without counting as today', () async {
+      final ok = await addManualSession(
+        dateTime: DateTime(2026, 4, 25, 14, 30),
+        durationMinutes: 10,
+        statsManager: statsManager,
+      );
+      expect(ok, isTrue);
+      expect(calls, hasLength(1));
+      expect(calls.single.meditatedToday, isFalse);
+      expect(calls.single.now, today);
+    });
 
-    test(
-      'addManualSessions reschedules once with the latest day as anchor',
-      () async {
-        final dates = [
+    test('a manual session for today counts as today', () async {
+      final ok = await addManualSession(
+        dateTime: DateTime(2026, 4, 28, 7),
+        durationMinutes: 10,
+        statsManager: statsManager,
+      );
+      expect(ok, isTrue);
+      expect(calls.single.meditatedToday, isTrue);
+    });
+
+    test('backfilling after a session today still counts as today', () async {
+      // The case the old anchor got wrong: the backfilled day became the
+      // anchor and today's reminder fired although today was already done.
+      await addManualSession(
+        dateTime: DateTime(2026, 4, 28, 7),
+        durationMinutes: 10,
+        statsManager: statsManager,
+      );
+      calls.clear();
+
+      await addManualSession(
+        dateTime: DateTime(2026, 4, 25, 14, 30),
+        durationMinutes: 10,
+        statsManager: statsManager,
+      );
+      expect(calls.single.meditatedToday, isTrue);
+    });
+
+    test('addManualSessions rebuilds once for the whole batch', () async {
+      final added = await addManualSessions(
+        dates: [
           DateTime(2026, 4, 24),
           DateTime(2026, 4, 26),
           DateTime(2026, 4, 25),
-        ];
-        final added = await addManualSessions(
-          dates: dates,
-          durationMinutes: 10,
-          statsManager: statsManager,
-        );
-        expect(added, 3);
-        // Exactly one reschedule for the whole batch — same batching rule as
-        // postStats.
-        expect(calls, hasLength(1));
-        // Anchored at noon on the latest day in the batch (Apr 26).
-        expect(
-          calls.single.endMs,
-          DateTime(2026, 4, 26, manualSessionAnchorHour).millisecondsSinceEpoch,
-        );
-        expect(calls.single.durationMs, 10 * 60 * 1000);
-      },
-    );
+        ],
+        durationMinutes: 10,
+        statsManager: statsManager,
+      );
+      expect(added, 3);
+      // Same batching rule as postStats.
+      expect(calls, hasLength(1));
+      expect(calls.single.meditatedToday, isFalse);
+    });
 
     test('addManualSessions with no past dates does not reschedule', () async {
       final added = await addManualSessions(
@@ -116,36 +131,28 @@ void main() {
       expect(calls, isEmpty);
     });
 
-    test('deleteSession reschedules using "now" as the anchor', () async {
-      // Seed a session first so there's something to delete. We do this
-      // through the same helper so we don't have to know StatsManager's
-      // internals, then clear the override-call log before the delete.
-      final seed = DateTime(2026, 4, 26, 12);
+    test('deleting today\'s only session stops counting today', () async {
+      final seed = DateTime(2026, 4, 28, 7);
       await addManualSession(
         dateTime: seed,
         durationMinutes: 10,
         statsManager: statsManager,
       );
+      expect(calls.single.meditatedToday, isTrue);
       calls.clear();
 
-      final session = LocalAudioCompleted(
-        id: 'manual2',
-        timestamp: seed.millisecondsSinceEpoch,
-      );
-      final before = DateTime.now().millisecondsSinceEpoch;
       final ok = await deleteSession(
-        session: session,
+        session: LocalAudioCompleted(
+          id: 'manual1',
+          timestamp: seed.millisecondsSinceEpoch,
+        ),
         statsManager: statsManager,
       );
-      final after = DateTime.now().millisecondsSinceEpoch;
 
       expect(ok, isTrue);
       expect(calls, hasLength(1));
-      // Delete anchors at "now" with zero duration — verify the timestamp
-      // sits inside the call window rather than asserting an exact value.
-      expect(calls.single.endMs, greaterThanOrEqualTo(before));
-      expect(calls.single.endMs, lessThanOrEqualTo(after));
-      expect(calls.single.durationMs, 0);
+      // Today's reminder is due again.
+      expect(calls.single.meditatedToday, isFalse);
     });
 
     test('reschedule is skipped when reminders are disabled', () async {
