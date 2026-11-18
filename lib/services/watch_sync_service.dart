@@ -489,7 +489,6 @@ class WatchCompletionSync {
           ),
           duration,
           skipPost: true,
-          deduplicate: true,
           timestampIsNormalized: session['statsTimestamp'] is int,
         );
         savedAny = true;

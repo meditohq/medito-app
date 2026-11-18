@@ -28,7 +28,6 @@ void main() {
       LocalAudioCompleted(id: 'watch-track', timestamp: timestamp),
       600000,
       skipPost: true,
-      deduplicate: true,
       timestampIsNormalized: true,
     );
     expect(manager.currentStats!.audioCompleted!.single.timestamp, timestamp);
@@ -50,7 +49,6 @@ void main() {
           entry,
           duration,
           skipPost: true,
-          deduplicate: true,
         );
 
         // Simulate process death after local save but before native acknowledgement.
@@ -60,7 +58,6 @@ void main() {
           entry,
           duration,
           skipPost: true,
-          deduplicate: true,
         );
 
         final prefs = await SharedPreferences.getInstance();
