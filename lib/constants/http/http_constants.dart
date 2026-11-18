@@ -177,6 +177,7 @@ class HTTPConstants {
   static const String paywall = 'paywall';
   static const String createPaymentIntent = 'payment-intents';
   static const String confirmPaymentIntent = 'payment-intents/confirm';
+  static const String receiptEmail = 'payment-intents/receipt-email';
 
   // DEAD DOMAINS - domains that no longer exist and should be avoided
   static const List<String> _deadDomains = ['images.medito.space'];

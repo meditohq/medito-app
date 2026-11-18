@@ -5080,41 +5080,41 @@ abstract class AppLocalizations {
   /// **'Donate {amount}'**
   String donateAmountOnce(String amount);
 
-  /// Under the custom amount field on the donation page, monthly gift. perDay is the monthly amount divided by 30.
+  /// Title of the dialog shown after a successful Apple Pay donation when no email address reached us
   ///
   /// In en, this message translates to:
-  /// **'{amount} a month — about {perDay} a day to keep Medito free for millions.'**
-  String donationCustomMonthly(String amount, String perDay);
+  /// **'Where should we send your receipt?'**
+  String get donationReceiptEmailTitle;
 
-  /// Under the custom amount field on the donation page, yearly gift. perMonth is the yearly amount divided by 12.
+  /// Body of the receipt email dialog shown after a successful donation
   ///
   /// In en, this message translates to:
-  /// **'{amount} a year — about {perMonth} a month to keep Medito free for millions.'**
-  String donationCustomYearly(String amount, String perMonth);
+  /// **'Thank you — your donation went through. Add your email to get your receipt and manage your donation.'**
+  String get donationReceiptEmailBody;
 
-  /// Under the custom amount field on the donation page, one-time gift.
+  /// Under the amounts on the donation page, monthly gift. perDay is the monthly amount divided by 30.
   ///
   /// In en, this message translates to:
-  /// **'Your {amount} helps keep Medito free for millions.'**
-  String donationCustomOneTime(String amount);
+  /// **'About {perDay} a day to keep Medito free for millions.'**
+  String donationCustomMonthly(String perDay);
 
-  /// Under the custom amount field when the typed monthly amount is above the largest preset.
+  /// Under the amounts on the donation page, yearly gift. perMonth is the yearly amount divided by 12.
   ///
   /// In en, this message translates to:
-  /// **'{amount} a month — thank you. That keeps Medito free for many people who can’t afford to give.'**
-  String donationCustomGenerousMonthly(String amount);
+  /// **'About {perMonth} a month to keep Medito free for millions.'**
+  String donationCustomYearly(String perMonth);
 
-  /// Under the custom amount field when the typed yearly amount is above the largest preset.
+  /// Under the amounts on the donation page, one-time gift.
   ///
   /// In en, this message translates to:
-  /// **'{amount} a year — thank you. That keeps Medito free for many people who can’t afford to give.'**
-  String donationCustomGenerousYearly(String amount);
+  /// **'Helps keep Medito free for millions.'**
+  String get donationCustomOneTime;
 
-  /// Under the custom amount field when the typed one-time amount is above the largest preset.
+  /// Under the amounts on the donation page when the typed amount is above the largest preset.
   ///
   /// In en, this message translates to:
-  /// **'{amount} — thank you. That keeps Medito free for many people who can’t afford to give.'**
-  String donationCustomGenerousOneTime(String amount);
+  /// **'Thank you. That keeps Medito free for many people who can’t afford to give.'**
+  String get donationCustomGenerous;
 
   /// Small print under the pay buttons on the donation page
   ///

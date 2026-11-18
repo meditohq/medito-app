@@ -11,6 +11,7 @@
 // post-payment prompt.
 import 'dart:async';
 
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
@@ -25,7 +26,11 @@ import 'package:medito/l10n/app_localizations.dart';
 import 'package:medito/models/stripe/paywall_config_model.dart';
 import 'package:medito/models/stripe/payment_config_model.dart';
 import 'package:medito/models/stripe/payment_method_model.dart';
+import 'package:medito/providers/stripe/payment_providers.dart';
 import 'package:medito/providers/stripe/payment_ui_controller.dart';
+import 'package:medito/services/network/donation_api_service.dart';
+import 'package:medito/views/donation/receipt_email_prompt.dart'
+    show receiptEmailPromptFieldKey;
 import 'package:medito/repositories/auth/auth_repository.dart';
 import 'package:medito/views/donation/native_donation_page.dart'
     show NativeDonationPage, donationEmailFieldKey, donationPayButtonKey;
@@ -65,6 +70,8 @@ class _SlowReceiptStore extends InMemorySharedPreferencesStore {
 
 class _CapturePayment extends PaymentUIController {
   final amounts = <int>[];
+  final emails = <String?>[];
+  final methods = <PaymentMethodType>[];
   @override
   void build() {}
 
@@ -85,8 +92,75 @@ class _CapturePayment extends PaymentUIController {
     Map<String, String> campaignMetadata = const {},
   }) async {
     amounts.add(amount);
+    emails.add(userEmail);
+    methods.add(paymentMethod);
     return const PaymentResult.cancelled();
   }
+}
+
+/// A payment that goes through, as the real controller reports it.
+class _SucceedingPayment extends PaymentUIController {
+  @override
+  void build() {}
+
+  @override
+  Future<PaymentResult> initiateMonthlySubscription({
+    required BuildContext context,
+    required int amount,
+    required String currency,
+    required PaymentMethodType paymentMethod,
+    String? paywallId,
+    String? userId,
+    String? userEmail,
+    String? paywallSource,
+    String? variantId,
+    String? experimentId,
+    VoidCallback? onSuccess,
+    bool showSuccessFeedback = true,
+    Map<String, String> campaignMetadata = const {},
+  }) async {
+    onSuccess?.call();
+    return PaymentResult.success(
+      paymentIntentId: 'pi_1',
+      amount: amount,
+      currency: currency,
+    );
+  }
+}
+
+class _PaidState extends PaymentState {
+  @override
+  PaymentStateData build() => const PaymentStateData(
+    paymentIntent: PaymentIntentModel(
+      id: 'pi_1',
+      clientSecret: 'pi_1_secret',
+      status: 'succeeded',
+      amount: 500,
+      currency: 'usd',
+    ),
+  );
+}
+
+/// Donate API stand-in: answers the receipt-email check from [customerHasEmail]
+/// until an address is posted.
+class _ReceiptEmailApi implements IDonationApiService {
+  _ReceiptEmailApi({required this.customerHasEmail});
+  final bool customerHasEmail;
+  final bodies = <Map<String, dynamic>>[];
+
+  @override
+  Future<Map<String, dynamic>> postRequest(String path, {dynamic body}) async {
+    expect(path, 'payment-intents/receipt-email');
+    final sent = Map<String, dynamic>.from(body as Map);
+    bodies.add(sent);
+    return {
+      'success': true,
+      'data': {'hasEmail': customerHasEmail || sent.containsKey('email')},
+    };
+  }
+
+  @override
+  dynamic noSuchMethod(Invocation invocation) => null;
 }
 
 PaywallConfigModel _config({String? email}) => PaywallConfigModel(
@@ -111,6 +185,9 @@ void main() {
     AuthRepository? authRepository,
     SharedPreferences? prefs,
     PaymentUIController? payments,
+    bool applePay = false,
+    IDonationApiService? donateApi,
+    VoidCallback? onNext,
   }) async {
     await tester.pumpWidget(
       ProviderScope(
@@ -118,13 +195,24 @@ void main() {
           if (prefs != null) sharedPreferencesProvider.overrideWithValue(prefs),
           if (payments != null)
             paymentUIControllerProvider.overrideWith(() => payments),
+          if (donateApi != null) ...[
+            donationServiceProvider.overrideWithValue(donateApi),
+            paymentStateProvider.overrideWith(_PaidState.new),
+          ],
           authRepositorySyncProvider.overrideWithValue(
             authRepository ?? _AnonymousAuthRepository(),
           ),
           // Card-only: keeps the Apple Pay branch out of the widget tree.
           availablePaymentMethodsProvider.overrideWith(
-            (ref) async => const <PaymentMethod>[
-              PaymentMethod(
+            (ref) async => <PaymentMethod>[
+              if (applePay)
+                const PaymentMethod(
+                  id: 'apple_pay',
+                  type: PaymentMethodType.applePay,
+                  displayName: 'Apple Pay',
+                  isAvailable: true,
+                ),
+              const PaymentMethod(
                 id: 'card',
                 type: PaymentMethodType.card,
                 displayName: 'Card',
@@ -140,7 +228,7 @@ void main() {
             body: NativeDonationPage(
               config: _config(email: knownEmail),
               source: 'onboarding',
-              onNext: () {},
+              onNext: onNext ?? () {},
             ),
           ),
         ),
@@ -272,5 +360,190 @@ void main() {
     expect(find.text('Email address'), findsOneWidget);
     final field = tester.widget<TextField>(find.byKey(donationEmailFieldKey));
     expect(field.controller!.text, 'returning@example.com');
+  });
+
+  group('where Apple Pay is offered', () {
+    // Reset inside each test body: the binding checks the override is cleared
+    // before tearDown callbacks run.
+    Future<void> onIOS(Future<void> Function() body) async {
+      debugDefaultTargetPlatformOverride = TargetPlatform.iOS;
+      try {
+        await body();
+      } finally {
+        debugDefaultTargetPlatformOverride = null;
+      }
+    }
+
+    final applePayButton = find.widgetWithText(ElevatedButton, 'Pay');
+
+    testWidgets('Apple Pay needs no email on the page', (tester) async {
+      await onIOS(() async {
+        final payments = _CapturePayment();
+        await pump(tester, payments: payments, applePay: true);
+        expect(find.byKey(donationEmailFieldKey), findsNothing);
+
+        await tester.ensureVisible(applePayButton);
+        await tester.tap(applePayButton);
+        await tester.pumpAndSettle();
+
+        // No address is sent: the Apple Pay sheet collects it instead.
+        expect(payments.methods, [PaymentMethodType.applePay]);
+        expect(payments.emails, [null]);
+        expect(find.byKey(donationEmailFieldKey), findsNothing);
+      });
+    });
+
+    testWidgets('card asks for the email before paying', (tester) async {
+      await onIOS(() async {
+        final payments = _CapturePayment();
+        await pump(tester, payments: payments, applePay: true);
+
+        await tester.ensureVisible(find.byKey(donationPayButtonKey));
+        await tester.tap(find.byKey(donationPayButtonKey));
+        await tester.pumpAndSettle();
+
+        expect(payments.amounts, isEmpty);
+        expect(find.byKey(donationEmailFieldKey), findsOneWidget);
+        // Asked, not scolded: the helper line shows, not a "required" error.
+        expect(
+          find.text('For your receipt and to manage your donation.'),
+          findsOneWidget,
+        );
+        expect(
+          find.text('Enter your email so we can send a receipt.'),
+          findsNothing,
+        );
+
+        // A second tap with it still empty is the donor's omission.
+        await tester.ensureVisible(find.byKey(donationPayButtonKey));
+        await tester.tap(find.byKey(donationPayButtonKey));
+        await tester.pumpAndSettle();
+        expect(payments.amounts, isEmpty);
+        expect(
+          find.text('Enter your email so we can send a receipt.'),
+          findsOneWidget,
+        );
+      });
+    });
+
+    Future<void> payWithApplePay(WidgetTester tester) async {
+      await tester.ensureVisible(applePayButton);
+      await tester.tap(applePayButton);
+      await tester.pumpAndSettle();
+    }
+
+    testWidgets('moves on without asking when the sheet supplied the email', (
+      tester,
+    ) async {
+      await onIOS(() async {
+        final api = _ReceiptEmailApi(customerHasEmail: true);
+        var advanced = 0;
+        await pump(
+          tester,
+          payments: _SucceedingPayment(),
+          applePay: true,
+          donateApi: api,
+          onNext: () => advanced++,
+        );
+
+        await payWithApplePay(tester);
+
+        expect(api.bodies, [
+          {'paymentIntentId': 'pi_1', 'clientSecret': 'pi_1_secret'},
+        ]);
+        expect(find.byKey(receiptEmailPromptFieldKey), findsNothing);
+        expect(advanced, 1);
+      });
+    });
+
+    testWidgets('asks afterwards when no email reached Stripe', (tester) async {
+      await onIOS(() async {
+        SharedPreferences.setMockInitialValues({});
+        final prefs = await SharedPreferences.getInstance();
+        final api = _ReceiptEmailApi(customerHasEmail: false);
+        var advanced = 0;
+        await pump(
+          tester,
+          prefs: prefs,
+          payments: _SucceedingPayment(),
+          applePay: true,
+          donateApi: api,
+          onNext: () => advanced++,
+        );
+
+        await payWithApplePay(tester);
+
+        expect(find.text('Where should we send your receipt?'), findsOneWidget);
+        // Held on the page until the donor answers.
+        expect(advanced, 0);
+
+        // A bad address is caught before it is sent.
+        await tester.enterText(find.byKey(receiptEmailPromptFieldKey), 'nope');
+        await tester.tap(find.text('Save'));
+        await tester.pumpAndSettle();
+        expect(api.bodies, hasLength(1));
+        expect(
+          find.text('That email address does not look right.'),
+          findsOneWidget,
+        );
+
+        await tester.enterText(
+          find.byKey(receiptEmailPromptFieldKey),
+          'late@example.invalid',
+        );
+        await tester.tap(find.text('Save'));
+        await tester.pumpAndSettle();
+
+        expect(api.bodies.last, {
+          'paymentIntentId': 'pi_1',
+          'clientSecret': 'pi_1_secret',
+          'email': 'late@example.invalid',
+        });
+        expect(advanced, 1);
+      });
+    });
+
+    testWidgets('skipping the prompt still moves on', (tester) async {
+      await onIOS(() async {
+        final api = _ReceiptEmailApi(customerHasEmail: false);
+        var advanced = 0;
+        await pump(
+          tester,
+          payments: _SucceedingPayment(),
+          applePay: true,
+          donateApi: api,
+          onNext: () => advanced++,
+        );
+
+        await payWithApplePay(tester);
+        await tester.tap(find.text('Skip'));
+        await tester.pumpAndSettle();
+
+        expect(api.bodies, hasLength(1));
+        expect(advanced, 1);
+      });
+    });
+
+    testWidgets('a known email is still sent with Apple Pay', (tester) async {
+      await onIOS(() async {
+        SharedPreferences.setMockInitialValues({});
+        final prefs = await SharedPreferences.getInstance();
+        final payments = _CapturePayment();
+        await pump(
+          tester,
+          knownEmail: 'donor@example.invalid',
+          prefs: prefs,
+          payments: payments,
+          applePay: true,
+        );
+        expect(find.byKey(donationEmailFieldKey), findsNothing);
+
+        await tester.ensureVisible(applePayButton);
+        await tester.tap(applePayButton);
+        await tester.pumpAndSettle();
+
+        expect(payments.emails, ['donor@example.invalid']);
+      });
+    });
   });
 }

@@ -44,6 +44,7 @@ class MeditoTextField extends StatefulWidget {
     this.maxLength,
     this.maxLines = 1,
     this.textAlign = TextAlign.start,
+    this.scrollPadding = const EdgeInsets.all(20),
   });
 
   /// Applied to the inner [TextField] so `find.byKey` in widget tests keeps
@@ -78,6 +79,10 @@ class MeditoTextField extends StatefulWidget {
   final ValueChanged<String>? onChanged;
   final ValueChanged<String>? onSubmitted;
   final bool autofocus;
+
+  /// Space kept clear around the field when it scrolls into view above the
+  /// keyboard. Raise the bottom to keep content just below the field visible.
+  final EdgeInsets scrollPadding;
   final bool enabled;
   final bool obscureText;
   final bool autocorrect;
@@ -169,6 +174,7 @@ class _MeditoTextFieldState extends State<MeditoTextField> {
       controller: _controller,
       focusNode: _node,
       autofocus: widget.autofocus,
+      scrollPadding: widget.scrollPadding,
       enabled: widget.enabled,
       obscureText: widget.obscureText,
       autocorrect: widget.autocorrect,

@@ -1,7 +1,7 @@
 import 'dart:async';
-import 'dart:io';
 
-import 'package:flutter/foundation.dart' show listEquals;
+import 'package:flutter/foundation.dart'
+    show TargetPlatform, defaultTargetPlatform, listEquals;
 import 'package:flutter/material.dart';
 import 'package:flutter/semantics.dart';
 import 'package:flutter/services.dart';
@@ -16,7 +16,10 @@ import 'package:medito/models/stripe/payment_method_model.dart'
 import 'package:medito/models/stripe/paywall_config_model.dart';
 import 'package:medito/models/stripe/payment_error_model.dart';
 import 'package:medito/models/stripe/payment_intent_model.dart';
+import 'package:medito/constants/http/http_constants.dart';
+import 'package:medito/providers/stripe/payment_providers.dart';
 import 'package:medito/providers/stripe/payment_ui_controller.dart';
+import 'package:medito/views/donation/receipt_email_prompt.dart';
 import 'package:medito/repositories/auth/auth_repository.dart';
 import 'package:medito/services/analytics/firebase_analytics_service.dart';
 import 'package:medito/services/secure_storage_service.dart';
@@ -121,12 +124,19 @@ class _NativeDonationPageState extends ConsumerState<NativeDonationPage> {
   late bool _closeRevealed = widget.closeButtonDelay == Duration.zero;
   Timer? _closeRevealTimer;
 
-  // Anonymous donors have no account email, so without asking here the Stripe
+  // Anonymous donors have no account email, so without one the Stripe
   // Customer is created with none: no receipt, and no way into the hosted
   // billing portal (it authenticates by emailing a magic link) — i.e. a
-  // recurring charge the donor cannot cancel themselves. Always shown (even
-  // when known) to match the webview arm, which always collects one.
+  // recurring charge the donor cannot cancel themselves. Card donors are
+  // therefore asked here; Apple Pay donors are asked on the Apple Pay sheet
+  // (see _emailRevealed).
   final _emailController = TextEditingController();
+  final _emailFocusNode = FocusNode();
+  // Where Apple Pay is offered the field starts hidden: the Apple Pay sheet
+  // asks for the address itself (see ApplePayService) and Stripe stores it on
+  // the charge, from which the donate API fills in the Customer. It is shown
+  // only once the donor picks the card button without a known address.
+  bool _emailRevealed = false;
   final _emailTypoConfirmation = EmailTypoConfirmation();
   String? _emailError;
 
@@ -134,6 +144,10 @@ class _NativeDonationPageState extends ConsumerState<NativeDonationPage> {
   // native page lacked. Mutually exclusive with the preset ladder: picking a
   // preset clears this, typing a valid custom value deselects the presets.
   final _customAmountController = TextEditingController();
+  final _customAmountFocusNode = FocusNode();
+  // Collapsed behind an "Other amount" link until asked for: one fewer input
+  // on the page and the pay button sits higher.
+  bool _showCustomAmount = false;
   String? _customAmountError;
 
   /// Resolved in [initState]: paywall config → auth user (incl. tokens) →
@@ -252,7 +266,9 @@ class _NativeDonationPageState extends ConsumerState<NativeDonationPage> {
   void dispose() {
     _closeRevealTimer?.cancel();
     _emailController.dispose();
+    _emailFocusNode.dispose();
     _customAmountController.dispose();
+    _customAmountFocusNode.dispose();
     // Parent pager may advance past this tab without an explicit skip tap.
     if (!_didDonate) _logPaywallDismissedNoPayment();
     super.dispose();
@@ -398,8 +414,68 @@ class _NativeDonationPageState extends ConsumerState<NativeDonationPage> {
     widget.onNext();
   }
 
+  // defaultTargetPlatform, not Platform.isIOS, so widget tests can exercise
+  // the Apple Pay layout.
+  bool get _isIOS => defaultTargetPlatform == TargetPlatform.iOS;
+
+  /// Apple Pay is on offer, or may be: on iOS the field also stays hidden while
+  /// the payment methods load, so it does not flash in and out.
+  bool get _applePayOfferedOrPending {
+    if (!_isIOS) return false;
+    // read, not watch: also called from the pay handler. build() already
+    // watches this provider in _buildPaymentButtons.
+    final methods = ref.read(availablePaymentMethodsProvider);
+    if (methods.isLoading) return true;
+    return (methods.value ?? const []).any(
+      (m) => m.type == payment_models.PaymentMethodType.applePay,
+    );
+  }
+
+  bool get _emailFieldHidden => !_emailRevealed && _applePayOfferedOrPending;
+
+  /// After an Apple Pay donation made without an address on the page: confirm
+  /// the Stripe Customer got one from the sheet, and ask the donor if not.
+  ///
+  /// The API fills the Customer from the charge as part of this call, so it
+  /// does not depend on the webhook having run yet. Every failure is swallowed
+  /// — the gift has already succeeded, and an API without this endpoint yet
+  /// must not hold the donor on the page.
+  Future<void> _ensureReceiptEmail() async {
+    try {
+      final intent = ref.read(paymentStateProvider).paymentIntent;
+      if (intent == null) return;
+      final client = ref.read(donationServiceProvider);
+      Future<bool> customerHasEmail([String? email]) async {
+        final response = await client
+            .postRequest(
+              HTTPConstants.receiptEmail,
+              body: {
+                'paymentIntentId': intent.id,
+                'clientSecret': intent.clientSecret,
+                'email': ?email,
+              },
+            )
+            .timeout(const Duration(seconds: 8));
+        final data = response['data'];
+        return data is Map && data['hasEmail'] == true;
+      }
+
+      if (await customerHasEmail()) return;
+      if (!mounted) return;
+      final email = await showReceiptEmailPrompt(context);
+      if (email == null) {
+        AppLogger.w(_logTag, 'Donor skipped the receipt email prompt');
+        return;
+      }
+      await customerHasEmail(email);
+      await ReceiptEmail.save(ref.read(sharedPreferencesProvider), email);
+    } catch (e) {
+      AppLogger.w(_logTag, 'Could not confirm the receipt email: $e');
+    }
+  }
+
   Future<void> _handlePay(payment_models.PaymentMethodType method) async {
-    if (_isProcessingPayment || _selectedAmount <= 0) return;
+    if (_isProcessingPayment || _didDonate || _selectedAmount <= 0) return;
     // Lock before email confirmation/storage can yield, so two taps cannot
     // create separate payment attempts. Freeze the amount and cadence tapped.
     setState(() => _isProcessingPayment = true);
@@ -407,30 +483,51 @@ class _NativeDonationPageState extends ConsumerState<NativeDonationPage> {
     final frequency = _selectedFrequency;
     final currency = widget.config.currencyCode;
     try {
-      // Block before the sheet opens: the Customer is created upstream of it, so
-      // an email captured later would never reach the Customer record.
-      if (!await _emailTypoConfirmation.confirm(context, _emailController)) {
-        return;
-      }
-      if (!mounted) return;
-      final typedEmail = _emailController.text.trim();
-      if (!_emailPattern.hasMatch(typedEmail)) {
-        final l10n = AppLocalizations.of(context)!;
-        setState(
-          () => _emailError = typedEmail.isEmpty
-              ? l10n.donationEmailRequired
-              : l10n.donationEmailInvalid,
-        );
-        return;
-      }
-      if (_emailError != null) setState(() => _emailError = null);
-      try {
-        await ReceiptEmail.save(
-          ref.read(sharedPreferencesProvider),
-          typedEmail,
-        );
-      } catch (e) {
-        AppLogger.w(_logTag, 'Could not store receipt email: $e');
+      // Apple Pay with no address on the page: the sheet collects it, so there
+      // is nothing to validate or store here. An address that is present
+      // (known donor, or typed after revealing the field) is still used.
+      final emailFromSheet =
+          method == payment_models.PaymentMethodType.applePay &&
+          _emailController.text.trim().isEmpty;
+      String? userEmail;
+      if (!emailFromSheet) {
+        // Card needs it up front: the Customer is created before the card
+        // sheet opens, and that sheet does not ask for one.
+        if (_emailFieldHidden && _emailController.text.trim().isEmpty) {
+          // Not an error: the donor was never asked. The field's helper line
+          // says what the address is for.
+          setState(() => _emailRevealed = true);
+          WidgetsBinding.instance.addPostFrameCallback((_) {
+            if (mounted) _emailFocusNode.requestFocus();
+          });
+          return;
+        }
+        if (!await _emailTypoConfirmation.confirm(context, _emailController)) {
+          return;
+        }
+        if (!mounted) return;
+        final typedEmail = _emailController.text.trim();
+        if (!_emailPattern.hasMatch(typedEmail)) {
+          final l10n = AppLocalizations.of(context)!;
+          setState(() {
+            // A bad stored address must be visible to be corrected.
+            _emailRevealed = true;
+            _emailError = typedEmail.isEmpty
+                ? l10n.donationEmailRequired
+                : l10n.donationEmailInvalid;
+          });
+          return;
+        }
+        if (_emailError != null) setState(() => _emailError = null);
+        try {
+          await ReceiptEmail.save(
+            ref.read(sharedPreferencesProvider),
+            typedEmail,
+          );
+        } catch (e) {
+          AppLogger.w(_logTag, 'Could not store receipt email: $e');
+        }
+        userEmail = typedEmail;
       }
       if (!mounted) return;
 
@@ -458,11 +555,19 @@ class _NativeDonationPageState extends ConsumerState<NativeDonationPage> {
       final authRepository = ref.read(authRepositorySyncProvider);
       final userId = authRepository.currentUser?.id ?? 'unknown';
       _capturedUserId ??= authRepository.currentUser?.id;
-      final userEmail = typedEmail;
 
       void onSuccess() {
-        _didDonate = true;
-        widget.onNext();
+        // Also keeps the pay buttons off while the receipt check below runs.
+        setState(() => _didDonate = true);
+        if (!emailFromSheet) {
+          widget.onNext();
+          return;
+        }
+        unawaited(
+          _ensureReceiptEmail().whenComplete(() {
+            if (mounted) widget.onNext();
+          }),
+        );
       }
 
       late final PaymentResult result;
@@ -578,12 +683,17 @@ class _NativeDonationPageState extends ConsumerState<NativeDonationPage> {
                             const SizedBox(height: 20),
                           ],
                           _buildAmountGrid(context, onSurface),
-                          const SizedBox(height: 12),
-                          _buildCustomAmountField(context, onSurface),
+                          if (_showCustomAmount) ...[
+                            const SizedBox(height: 12),
+                            _buildCustomAmountField(context, onSurface),
+                          ] else
+                            _buildOtherAmountLink(context, onSurface),
                           _buildAmountSummary(context, onSurface),
                           const SizedBox(height: 24),
-                          _buildEmailField(context, onSurface),
-                          const SizedBox(height: 24),
+                          if (!_emailFieldHidden) ...[
+                            _buildEmailField(context, onSurface),
+                            const SizedBox(height: 24),
+                          ],
                           _buildPaymentButtons(context),
                           const SizedBox(height: 24),
                           _buildDisclosure(context, onSurface),
@@ -857,6 +967,44 @@ class _NativeDonationPageState extends ConsumerState<NativeDonationPage> {
     );
   }
 
+  // Same quiet small-print link as "Not now", with a 48pt touch target.
+  Widget _buildOtherAmountLink(BuildContext context, Color onSurface) {
+    final faint = onSurface.withValues(alpha: 0.7);
+    void reveal() {
+      setState(() => _showCustomAmount = true);
+      // The field only exists after this frame.
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        if (mounted) _customAmountFocusNode.requestFocus();
+      });
+    }
+
+    return Semantics(
+      button: true,
+      child: GestureDetector(
+        onTap: _isProcessingPayment ? null : reveal,
+        behavior: HitTestBehavior.opaque,
+        child: ConstrainedBox(
+          constraints: const BoxConstraints(minHeight: 48, minWidth: 48),
+          child: Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
+            child: Align(
+              widthFactor: 1,
+              heightFactor: 1,
+              child: Text(
+                AppLocalizations.of(context)!.donateOtherAmount,
+                style: context.text.caption.copyWith(
+                  color: faint,
+                  decoration: TextDecoration.underline,
+                  decorationColor: faint,
+                ),
+              ),
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+
   // Mirrors the webview's "other amount" input: whole major units, digit-only,
   // with the same "Minimum amount is X" validation copy.
   Widget _buildCustomAmountField(BuildContext context, Color onSurface) {
@@ -866,6 +1014,10 @@ class _NativeDonationPageState extends ConsumerState<NativeDonationPage> {
     return MeditoTextField(
       fieldKey: customAmountFieldKey,
       controller: _customAmountController,
+      focusNode: _customAmountFocusNode,
+      // Keeps the summary line under the field clear of the keyboard, so the
+      // typed amount is echoed back where it can be seen.
+      scrollPadding: const EdgeInsets.fromLTRB(20, 20, 20, 96),
       keyboardType: TextInputType.number,
       textInputAction: TextInputAction.done,
       inputFormatters: [FilteringTextInputFormatter.digitsOnly],
@@ -918,28 +1070,23 @@ class _NativeDonationPageState extends ConsumerState<NativeDonationPage> {
         ladder.isNotEmpty &&
         _selectedAmount > ladder.reduce((a, b) => a > b ? a : b);
 
+    if (isGenerous) return l10n.donationCustomGenerous;
     switch (_selectedFrequency) {
       case _Frequency.monthly:
-        if (isGenerous) return l10n.donationCustomGenerousMonthly(amount);
         final perDay = (_selectedAmount / 30).round();
         // Rounds to nothing only for amounts far below any real ladder.
         if (perDay <= 0) return l10n.donateAmountPerMonth(amount);
         return l10n.donationCustomMonthly(
-          amount,
           formatCurrencyAmount(perDay, currency),
         );
       case _Frequency.yearly:
-        if (isGenerous) return l10n.donationCustomGenerousYearly(amount);
         final perMonth = (_selectedAmount / 12).round();
         if (perMonth <= 0) return l10n.donateAmountPerYear(amount);
         return l10n.donationCustomYearly(
-          amount,
           formatCurrencyAmount(perMonth, currency),
         );
       case _Frequency.oneTime:
-        return isGenerous
-            ? l10n.donationCustomGenerousOneTime(amount)
-            : l10n.donationCustomOneTime(amount);
+        return l10n.donationCustomOneTime;
     }
   }
 
@@ -948,6 +1095,9 @@ class _NativeDonationPageState extends ConsumerState<NativeDonationPage> {
     final field = MeditoTextField(
       fieldKey: donationEmailFieldKey,
       controller: _emailController,
+      focusNode: _emailFocusNode,
+      // Keeps the helper/error line under the field clear of the keyboard.
+      scrollPadding: const EdgeInsets.fromLTRB(20, 20, 20, 72),
       keyboardType: TextInputType.emailAddress,
       autofillHints: const [AutofillHints.email],
       textInputAction: TextInputAction.done,
@@ -984,11 +1134,11 @@ class _NativeDonationPageState extends ConsumerState<NativeDonationPage> {
     final l10n = AppLocalizations.of(context)!;
     // Disabled while no valid amount is chosen (a cleared or below-minimum
     // custom amount), rather than a tap that silently does nothing.
-    final canPay = !_isProcessingPayment && _selectedAmount > 0;
+    final canPay = !_isProcessingPayment && !_didDonate && _selectedAmount > 0;
     final methodsAsync = ref.watch(availablePaymentMethodsProvider);
     final methods = methodsAsync.value ?? const [];
     final hasApplePay =
-        Platform.isIOS &&
+        _isIOS &&
         methods.any(
           (m) =>
               m.type == payment_models.PaymentMethodType.applePay &&
@@ -1102,20 +1252,14 @@ class _NativeDonationPageState extends ConsumerState<NativeDonationPage> {
     );
   }
 
-  // The sole pay button names the amount and cadence ("Donate $5/month"), so
-  // the commitment is on the thing being tapped. With no valid amount it is
-  // disabled and falls back to plain "Donate".
+  // The sole pay button names the amount ("Donate $5") so the figure is on
+  // the thing being tapped; the cadence is left to the summary line above.
+  // With no valid amount it is disabled and falls back to plain "Donate".
   String _payLabel(AppLocalizations l10n) {
     if (_selectedAmount <= 0) return l10n.donateTitle;
-    final amount = formatCurrencyAmount(
-      _selectedAmount,
-      widget.config.currencyCode,
+    return l10n.donateAmountOnce(
+      formatCurrencyAmount(_selectedAmount, widget.config.currencyCode),
     );
-    return switch (_selectedFrequency) {
-      _Frequency.monthly => l10n.donateAmountPerMonth(amount),
-      _Frequency.yearly => l10n.donateAmountPerYear(amount),
-      _Frequency.oneTime => l10n.donateAmountOnce(amount),
-    };
   }
 
   Widget _buildDisclosure(BuildContext context, Color onSurface) {
