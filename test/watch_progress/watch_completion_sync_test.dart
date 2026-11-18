@@ -115,6 +115,25 @@ void main() {
     expect(manager.currentStats!.totalTracksCompleted, 1);
   });
 
+  test('Health export retains Watch session details across retries', () async {
+    pending.single.addAll({'title': 'Body Scan', 'fileId': 'watch-file'});
+    healthAvailable = false;
+    await container.read(watchCompletionSyncProvider).drainPendingSessions();
+    expect(pending, isEmpty);
+    final saved = prefs.getStringList(WatchCompletionSync.healthPendingKey)!;
+    expect(saved, hasLength(1));
+
+    // Retry after reconstructing the sync service from the durable queue.
+    healthWrites.clear();
+    healthAvailable = true;
+    container.invalidate(watchCompletionSyncProvider);
+    await container.read(watchCompletionSyncProvider).drainPendingSessions();
+    expect(healthWrites.single, containsPair('trackId', 'watch-track'));
+    expect(healthWrites.single, containsPair('fileId', 'watch-file'));
+    expect(healthWrites.single, containsPair('title', 'Body Scan'));
+    expect(prefs.getStringList(WatchCompletionSync.healthPendingKey), isEmpty);
+  });
+
   test(
     'failed acknowledgement retains queue; retry does not double count',
     () async {

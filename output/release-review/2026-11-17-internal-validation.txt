@@ -1,0 +1,42 @@
+Internal release validation — 2026-11-17
+
+Version 2611.17.0, final retry build 302491.
+
+Android application validation:
+- Corrected the obsolete WorkManager 2.8.1 downgrade; resolved runtime 2.11.2.
+- Production APK built with shrinking, signing and Dart obfuscation.
+- Startup and full anonymous onboarding/playback smoke passed on a disposable
+  API 36 ARM64 emulator.
+- Full signed_in_stats.yaml passed on that emulator (exit 0): sign in to the
+  dedicated test account, read server progress, complete a session, clear app
+  state, sign in again and verify server Total Tracks Completed increased.
+- No payments were made; test credentials are excluded from this report.
+
+Hosted emulator limitations:
+- Linux QEMU disappeared during signed-in onboarding on multiple fresh boots,
+  including with Vulkan disabled, a pinned emulator and no mid-flow relaunch.
+- The macOS Intel runner instead froze Android's system process at the welcome
+  screen. Its failure screenshot shows Process system isn't responding.
+- Restored the Linux host and current emulator for the passing anonymous smoke
+  test. The final internal-only dispatch uses the existing
+  skip_android_signed_in_test=true option after the successful local roundtrip.
+- Build, anonymous onboarding/playback smoke and upgrade gates remain enabled.
+- The default workflow still enables the hosted signed-in gate for future runs.
+
+iOS validation and retry:
+- Original build 302490 passed smoke, signed-in server roundtrip and upgrade.
+- Apple's upload validation rejected it for missing NSPhotoLibraryUsageDescription.
+- Added accurate quote-image sharing purpose text and incremented to 302491.
+- The corrected iOS retry runs its normal full release gates before TestFlight.
+
+These are test releases only. Production publishing and store review remain off.
+The newer streak-icon feature is excluded from these pinned release branches.
+
+Additional upgrade validation:
+- Downloaded the exact previous shipped APK from release run 43036413056.
+- Seeded it using the Maestro flow from tag 2611.11.0 on the disposable ARM64
+  emulator, then installed the corrected APK in place without clearing data.
+- upgrade.yaml passed (exit 0): Home/state persisted and audio playback worked.
+- The hosted upgrade job 134140951806 timed out installing its Android system
+  image before it launched the old app. Raised the future seed-step allowance
+  from 15 to 25 minutes to include that setup plus the actual UI flow.

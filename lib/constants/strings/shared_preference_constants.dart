@@ -150,6 +150,11 @@ class SharedPreferenceConstants {
   static const String endScreenDonationAskVariant =
       'end_screen_donation_ask_variant';
 
+  // Onboarding donation A/B test (intro CTA opens the webview vs a native
+  // amount page) — sticky per-install variant.
+  static const String onboardingNativePayVariant =
+      'onboarding_native_pay_variant';
+
   // First-meditation-for-experienced-users A/B test — sticky per-install
   // variant. Only assigned for users who answer `regular_practice`.
   static const String onboardingExperiencedMeditationVariant =

@@ -19,12 +19,16 @@ void main() {
     int last = 1,
     double score = .1,
     int count = 3,
+    // History is dated relative to the moment of enrolment. A fixed date here
+    // made any test that enrols at the real clock stop being eligible once
+    // the last session was more than 30 days old (2026-11-18).
+    DateTime? at,
   }) => LocalAllStats.empty().copyWith(
     consistencyScore: score,
     audioCompleted: List.generate(
       count,
       (i) => LocalAudioCompleted(
-        timestamp: now
+        timestamp: (at ?? now)
             .subtract(Duration(days: i == 0 ? age : last))
             .millisecondsSinceEpoch,
         id: 'track_$i',
@@ -41,7 +45,7 @@ void main() {
       (i) => i,
     ).firstWhere((i) => ['A', 'B', 'C'][Random(i).nextInt(3)] == arm);
     return (await experiment.enroll(
-      stats: stats(),
+      stats: stats(at: at),
       now: at ?? now,
       notificationsAllowed: notifications,
       random: Random(seed),

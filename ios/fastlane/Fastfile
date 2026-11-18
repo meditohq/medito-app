@@ -1,4 +1,5 @@
 default_platform(:ios)
+require_relative "watch_release_guard"
 
 def match_readonly?
   value = ENV["MATCH_READONLY"] || "true"
@@ -85,6 +86,7 @@ platform :ios do
     )
 
     build_release unless use_existing_build
+    verify_watch_release!(options, use_existing_build: use_existing_build)
 
     # submit_for_review:true sends the uploaded version straight to App Store
     # review; the default keeps today's behaviour (draft version, submitted by
@@ -100,6 +102,21 @@ platform :ios do
       automatic_release: true,
       force: true,
       run_precheck_before_submit: false,
+      # Set launch copy on the new version, leaving the live "Coming soon"
+      # text in place until this version ships with the embedded Watch app.
+      edit_live: false,
+      # Attach the Watch screenshots to the release version without removing
+      # the existing iPhone and iPad galleries.
+      screenshots_path: File.expand_path("screenshots", __dir__),
+      overwrite_screenshots: false,
+      promotional_text: {
+        "en-US" => "Medito on Apple Watch, iPhone and iPad. Add widgets for your streak, consistency and next meditation. Your practice, close at hand. Always free.",
+        "en-GB" => "Medito on Apple Watch, iPhone and iPad. Add widgets for your streak, consistency and next meditation. Your practice, close at hand. Always free.",
+        "en-CA" => "Medito on Apple Watch, iPhone and iPad. Add widgets for your streak, consistency and next meditation. Your practice, close at hand. Always free.",
+        "fr-FR" => "Medito sur Apple Watch, iPhone et iPad. Des widgets pour votre série, votre régularité et votre prochaine méditation. Toujours gratuit.",
+        "de-DE" => "Medito auf Apple Watch, iPhone und iPad. Widgets zeigen deine Serie, Regelmäßigkeit und nächste Meditation. Deine Praxis, immer dabei. Immer kostenlos.",
+        "es-MX" => "Medito en Apple Watch, iPhone y iPad. Añade widgets para tu racha, constancia y próxima meditación. Tu práctica, siempre a mano. Siempre gratis."
+      },
       # Every locale enabled on the App Store listing needs a What's New value,
       # or ASC rejects the review submission ("appStoreVersions ... is not in
       # valid state") — bit the 2607.24.0 release via empty en-CA/fr-FR/de-DE.
@@ -202,6 +219,31 @@ platform :ios do
     upload_dsyms_to_crashlytics
   end
 
+end
+
+# Verify the selected binary before sending Watch-specific store metadata.
+def verify_watch_release!(options, use_existing_build:)
+  if use_existing_build
+    app = Spaceship::ConnectAPI::App.find(ENV.fetch("DEVELOPER_APP_IDENTIFIER"))
+    UI.user_error!("App not found on App Store Connect") unless app
+    build = FastlaneCore::BuildWatcher.wait_for_build_processing_to_be_complete(
+      app_id: app.id,
+      platform: "IOS",
+      app_version: options[:app_version],
+      build_version: options[:build_number],
+      poll_interval: 30,
+      timeout_duration: 1800,
+      return_spaceship_testflight_build: false
+    )
+    watch_bundle_id = "#{ENV.fetch('DEVELOPER_APP_IDENTIFIER')}.watchkitapp"
+    verified = WatchReleaseGuard.build_contains_watch_app?(build, watch_bundle_id)
+  else
+    verified = WatchReleaseGuard.ipa_contains_watch_app?(lane_context[SharedValues::IPA_OUTPUT_PATH])
+  end
+  unless verified
+    UI.user_error!("Watch release blocked: this build has no verified embedded Watch app. " \
+                   "Select or build an iOS app containing MeditoWatch before uploading Watch promo text or screenshots.")
+  end
 end
 
 # App Store Connect now reports appVersionState; appStoreState is deprecated

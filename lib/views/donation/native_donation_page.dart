@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'dart:io';
 
+import 'package:flutter/foundation.dart' show listEquals;
 import 'package:flutter/material.dart';
 import 'package:flutter/semantics.dart';
 import 'package:flutter/services.dart';
@@ -52,6 +53,7 @@ enum _Frequency {
 const donationEmailFieldKey = Key('donation_email_field');
 @visibleForTesting
 const customAmountFieldKey = Key('donation_custom_amount_field');
+const donationPayButtonKey = Key('donation_pay_button');
 
 // Native fallback copy mirrors the paywall webview page (which is
 // English-only; localized copy arrives via the experiment config).
@@ -74,6 +76,9 @@ class NativeDonationPage extends ConsumerStatefulWidget {
     required this.source,
     this.campaignMetadata = const {},
     this.showCloseButton = true,
+    this.closeButtonDelay = Duration.zero,
+    this.showNotNow = true,
+    this.closeButtonOnRight = false,
     this.onNativeUnavailable,
   });
 
@@ -84,6 +89,18 @@ class NativeDonationPage extends ConsumerStatefulWidget {
 
   /// Disable when the enclosing screen supplies its own header close button.
   final bool showCloseButton;
+
+  /// Fades the close button in after this delay, matching the paywall
+  /// webview (which reveals its × after 5s). Skipped for screen-reader users,
+  /// who get the button straight away. Back navigation is never delayed.
+  final Duration closeButtonDelay;
+
+  /// The footnote "Not now" link. The webview page has no equivalent, so
+  /// surfaces comparing against it can turn it off.
+  final bool showNotNow;
+
+  /// Puts the close button top-right, where the paywall webview has its ×.
+  final bool closeButtonOnRight;
   final VoidCallback? onNativeUnavailable;
 
   @override
@@ -93,7 +110,7 @@ class NativeDonationPage extends ConsumerStatefulWidget {
 class _NativeDonationPageState extends ConsumerState<NativeDonationPage> {
   static const _logTag = 'NATIVE_DONATION';
   static const _paywallId = 'paywall_native';
-  late final List<_Frequency> _offeredFrequencies;
+  late List<_Frequency> _offeredFrequencies;
   late _Frequency _selectedFrequency;
   int _selectedAmount = 0;
   bool _isProcessingPayment = false;
@@ -101,6 +118,8 @@ class _NativeDonationPageState extends ConsumerState<NativeDonationPage> {
   bool _dismissLogged = false;
   bool _donateTapLogged = false;
   String? _capturedUserId;
+  late bool _closeRevealed = widget.closeButtonDelay == Duration.zero;
+  Timer? _closeRevealTimer;
 
   // Anonymous donors have no account email, so without asking here the Stripe
   // Customer is created with none: no receipt, and no way into the hosted
@@ -166,6 +185,47 @@ class _NativeDonationPageState extends ConsumerState<NativeDonationPage> {
     _capturedUserId = ref.read(authRepositorySyncProvider).currentUser?.id;
     _resolveKnownEmail();
 
+    _resolvePricing();
+
+    if (!_closeRevealed) {
+      _closeRevealTimer = Timer(widget.closeButtonDelay, () {
+        if (mounted) setState(() => _closeRevealed = true);
+      });
+    }
+
+    _logPageShown();
+  }
+
+  @override
+  void didUpdateWidget(covariant NativeDonationPage oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    final pricingChanged =
+        oldWidget.config.currencyCode != widget.config.currencyCode ||
+        oldWidget.source != widget.source ||
+        _Frequency.values.any((frequency) {
+          final key = frequency.configKey;
+          return oldWidget.config.isFrequencyOffered(
+                    key,
+                    source: oldWidget.source,
+                  ) !=
+                  widget.config.isFrequencyOffered(
+                    key,
+                    source: widget.source,
+                  ) ||
+              !listEquals(
+                oldWidget.config.effectiveLadder(key, source: oldWidget.source),
+                widget.config.effectiveLadder(key, source: widget.source),
+              ) ||
+              oldWidget.config.effectiveSuggested(
+                    key,
+                    source: oldWidget.source,
+                  ) !=
+                  widget.config.effectiveSuggested(key, source: widget.source);
+        });
+    if (pricingChanged) _resolvePricing(preserveFrequency: true);
+  }
+
+  void _resolvePricing({bool preserveFrequency = false}) {
     _offeredFrequencies = _Frequency.values
         .where(
           (f) => widget.config.isFrequencyOffered(
@@ -175,18 +235,22 @@ class _NativeDonationPageState extends ConsumerState<NativeDonationPage> {
         )
         .toList();
     // The webview page defaults to monthly; fall back to the first offered.
-    _selectedFrequency = _offeredFrequencies.contains(_Frequency.monthly)
-        ? _Frequency.monthly
-        : (_offeredFrequencies.isNotEmpty
-              ? _offeredFrequencies.first
-              : _Frequency.monthly);
+    if (!preserveFrequency ||
+        !_offeredFrequencies.contains(_selectedFrequency)) {
+      _selectedFrequency = _offeredFrequencies.contains(_Frequency.monthly)
+          ? _Frequency.monthly
+          : (_offeredFrequencies.isNotEmpty
+                ? _offeredFrequencies.first
+                : _Frequency.monthly);
+    }
     _selectedAmount = _suggestedAmountFor(_selectedFrequency);
-
-    _logPageShown();
+    _customAmountController.clear();
+    _customAmountError = null;
   }
 
   @override
   void dispose() {
+    _closeRevealTimer?.cancel();
     _emailController.dispose();
     _customAmountController.dispose();
     // Parent pager may advance past this tab without an explicit skip tap.
@@ -325,9 +389,9 @@ class _NativeDonationPageState extends ConsumerState<NativeDonationPage> {
 
   void _handleSkip(String method) {
     FirebaseAnalyticsService().logEvent(
-      name: widget.source == 'onboarding'
-          ? FirebaseAnalyticsService.eventOnboardingDonationSkipTap
-          : 'donation_close_tapped',
+      // Not onboarding_donation_skip_tap even for onboarding: this page is
+      // pushed from the intro, and that event belongs to the intro's own skip.
+      name: 'donation_close_tapped',
       parameters: {'method': method, 'paywall_source': widget.source},
     );
     if (!_didDonate) _logPaywallDismissedNoPayment();
@@ -336,60 +400,65 @@ class _NativeDonationPageState extends ConsumerState<NativeDonationPage> {
 
   Future<void> _handlePay(payment_models.PaymentMethodType method) async {
     if (_isProcessingPayment || _selectedAmount <= 0) return;
-
-    // Block before the sheet opens: the Customer is created upstream of it, so
-    // an email captured later would never reach the Customer record.
-    if (!await _emailTypoConfirmation.confirm(context, _emailController)) {
-      return;
-    }
-    if (!mounted) return;
-    final typedEmail = _emailController.text.trim();
-    if (!_emailPattern.hasMatch(typedEmail)) {
-      final l10n = AppLocalizations.of(context)!;
-      setState(
-        () => _emailError = typedEmail.isEmpty
-            ? l10n.donationEmailRequired
-            : l10n.donationEmailInvalid,
-      );
-      return;
-    }
-    if (_emailError != null) setState(() => _emailError = null);
+    // Lock before email confirmation/storage can yield, so two taps cannot
+    // create separate payment attempts. Freeze the amount and cadence tapped.
+    setState(() => _isProcessingPayment = true);
+    final amount = _selectedAmount;
+    final frequency = _selectedFrequency;
+    final currency = widget.config.currencyCode;
     try {
-      await ReceiptEmail.save(ref.read(sharedPreferencesProvider), typedEmail);
-    } catch (e) {
-      AppLogger.w(_logTag, 'Could not store receipt email: $e');
-    }
-    if (!mounted) return;
+      // Block before the sheet opens: the Customer is created upstream of it, so
+      // an email captured later would never reach the Customer record.
+      if (!await _emailTypoConfirmation.confirm(context, _emailController)) {
+        return;
+      }
+      if (!mounted) return;
+      final typedEmail = _emailController.text.trim();
+      if (!_emailPattern.hasMatch(typedEmail)) {
+        final l10n = AppLocalizations.of(context)!;
+        setState(
+          () => _emailError = typedEmail.isEmpty
+              ? l10n.donationEmailRequired
+              : l10n.donationEmailInvalid,
+        );
+        return;
+      }
+      if (_emailError != null) setState(() => _emailError = null);
+      try {
+        await ReceiptEmail.save(
+          ref.read(sharedPreferencesProvider),
+          typedEmail,
+        );
+      } catch (e) {
+        AppLogger.w(_logTag, 'Could not store receipt email: $e');
+      }
+      if (!mounted) return;
 
-    if (!_donateTapLogged) {
-      _donateTapLogged = true;
+      if (!_donateTapLogged) {
+        _donateTapLogged = true;
+        unawaited(
+          FirebaseAnalyticsService().logEvent(
+            // Not onboarding_donate_now_tap: the intro CTA that opened this
+            // page already logged it, as it does for the webview arm.
+            name: 'donation_pay_tapped',
+            parameters: {'paywall_source': widget.source},
+          ),
+        );
+      }
+
+      // The pay button swaps its label for a spinner; say why, once.
       unawaited(
-        FirebaseAnalyticsService().logEvent(
-          name: widget.source == 'onboarding'
-              ? FirebaseAnalyticsService.eventOnboardingDonateNowTap
-              : 'donation_pay_tapped',
-          parameters: {'paywall_source': widget.source},
+        SemanticsService.sendAnnouncement(
+          View.of(context),
+          AppLocalizations.of(context)!.processingDonation,
+          Directionality.of(context),
         ),
       );
-    }
-
-    setState(() => _isProcessingPayment = true);
-    // The pay button swaps its label for a spinner; say why, once.
-    unawaited(
-      SemanticsService.sendAnnouncement(
-        View.of(context),
-        AppLocalizations.of(context)!.processingDonation,
-        Directionality.of(context),
-      ),
-    );
-    try {
       final uiController = ref.read(paymentUIControllerProvider.notifier);
       final authRepository = ref.read(authRepositorySyncProvider);
       final userId = authRepository.currentUser?.id ?? 'unknown';
       _capturedUserId ??= authRepository.currentUser?.id;
       final userEmail = typedEmail;
-      final currency = widget.config.currencyCode;
-      final amount = _selectedAmount;
 
       void onSuccess() {
         _didDonate = true;
@@ -397,7 +466,7 @@ class _NativeDonationPageState extends ConsumerState<NativeDonationPage> {
       }
 
       late final PaymentResult result;
-      switch (_selectedFrequency) {
+      switch (frequency) {
         case _Frequency.monthly:
           result = await uiController.initiateMonthlySubscription(
             context: context,
@@ -511,14 +580,17 @@ class _NativeDonationPageState extends ConsumerState<NativeDonationPage> {
                           _buildAmountGrid(context, onSurface),
                           const SizedBox(height: 12),
                           _buildCustomAmountField(context, onSurface),
+                          _buildAmountSummary(context, onSurface),
                           const SizedBox(height: 24),
                           _buildEmailField(context, onSurface),
                           const SizedBox(height: 24),
                           _buildPaymentButtons(context),
                           const SizedBox(height: 24),
                           _buildDisclosure(context, onSurface),
-                          const SizedBox(height: 12),
-                          _buildNotNow(context, onSurface),
+                          if (widget.showNotNow) ...[
+                            const SizedBox(height: 12),
+                            _buildNotNow(context, onSurface),
+                          ],
                         ],
                       ),
                     ),
@@ -530,15 +602,34 @@ class _NativeDonationPageState extends ConsumerState<NativeDonationPage> {
           if (widget.showCloseButton)
             Positioned(
               top: 4,
-              left: 4,
-              child: IconButton(
-                onPressed: () => _handleSkip('close'),
-                icon: Icon(
-                  Icons.close,
-                  size: 22,
-                  color: onSurface.withValues(alpha: 0.6),
-                ),
-                tooltip: AppLocalizations.of(context)!.skipForNow,
+              left: widget.closeButtonOnRight ? null : 4,
+              right: widget.closeButtonOnRight ? 4 : null,
+              child: Builder(
+                builder: (context) {
+                  final visible =
+                      _closeRevealed ||
+                      MediaQuery.accessibleNavigationOf(context);
+                  return IgnorePointer(
+                    ignoring: !visible,
+                    child: ExcludeSemantics(
+                      excluding: !visible,
+                      child: AnimatedOpacity(
+                        opacity: visible ? 1 : 0,
+                        duration: const Duration(milliseconds: 400),
+                        curve: Curves.easeIn,
+                        child: IconButton(
+                          onPressed: () => _handleSkip('close'),
+                          icon: Icon(
+                            Icons.close,
+                            size: 22,
+                            color: onSurface.withValues(alpha: 0.6),
+                          ),
+                          tooltip: AppLocalizations.of(context)!.skipForNow,
+                        ),
+                      ),
+                    ),
+                  );
+                },
               ),
             ),
         ],
@@ -770,16 +861,6 @@ class _NativeDonationPageState extends ConsumerState<NativeDonationPage> {
   // with the same "Minimum amount is X" validation copy.
   Widget _buildCustomAmountField(BuildContext context, Color onSurface) {
     final minimum = _minimumAmountFor(_selectedFrequency);
-    // Live "= €50,000.00" echo of what the typed major-units digits resolve
-    // to, so a stray extra zero is obvious before Apple/Google Pay's own
-    // confirmation sheet is the first place the real amount shows up.
-    // formatCurrencyAmount/_selectedAmount are already currency-aware (zero-
-    // decimal JPY/KRW, 3-decimal KWD/BHD, etc.), so this needs no currency
-    // handling of its own — it only reuses that resolved amount.
-    final showPreview =
-        _customAmountError == null &&
-        _customAmountController.text.isNotEmpty &&
-        _selectedAmount > 0;
     final l10n = AppLocalizations.of(context)!;
     final currency = widget.config.currencyCode;
     return MeditoTextField(
@@ -796,11 +877,70 @@ class _NativeDonationPageState extends ConsumerState<NativeDonationPage> {
         spokenCurrencyAmount(minimum, currency),
       ),
       errorText: _customAmountError,
-      helperText: showPreview
-          ? '= ${formatCurrencyAmount(_selectedAmount, widget.config.currencyCode)}'
-          : null,
       onChanged: _onCustomAmountChanged,
     );
+  }
+
+  // One line under the amounts, for a preset or a typed amount alike, saying
+  // exactly what is about to be given and how often. Two jobs: the cadence is
+  // spelled out before the pay sheet (donors cancelling a "monthly" they took
+  // for one-time was the top cancellation reason), and a typed amount is
+  // echoed back so a stray extra zero is obvious. formatCurrencyAmount and
+  // _selectedAmount are already currency-aware (zero-decimal JPY/KRW,
+  // 3-decimal KWD/BHD, etc.), so no currency handling is needed here.
+  Widget _buildAmountSummary(BuildContext context, Color onSurface) {
+    if (_selectedAmount <= 0 || _customAmountError != null) {
+      return const SizedBox.shrink();
+    }
+    return Padding(
+      padding: const EdgeInsets.only(top: 12),
+      child: Text(
+        _amountSummary(AppLocalizations.of(context)!),
+        style: context.text.caption.copyWith(
+          color: onSurface.withValues(alpha: 0.7),
+        ),
+        textAlign: TextAlign.center,
+      ),
+    );
+  }
+
+  // A recurring amount is shown as its small daily/monthly equivalent, which
+  // makes it easier to say yes to — but only while that equivalent is small.
+  // Above the largest preset the per-day figure stops looking trivial (and no
+  // "less than a coffee" line holds across amounts and currencies), so those
+  // gifts get thanks and what they do for others instead. The ladder is
+  // already localized per currency, so it is the yardstick for "large".
+  String _amountSummary(AppLocalizations l10n) {
+    final currency = widget.config.currencyCode;
+    final amount = formatCurrencyAmount(_selectedAmount, currency);
+    final ladder = _ladderFor(_selectedFrequency);
+    final isGenerous =
+        ladder.isNotEmpty &&
+        _selectedAmount > ladder.reduce((a, b) => a > b ? a : b);
+
+    switch (_selectedFrequency) {
+      case _Frequency.monthly:
+        if (isGenerous) return l10n.donationCustomGenerousMonthly(amount);
+        final perDay = (_selectedAmount / 30).round();
+        // Rounds to nothing only for amounts far below any real ladder.
+        if (perDay <= 0) return l10n.donateAmountPerMonth(amount);
+        return l10n.donationCustomMonthly(
+          amount,
+          formatCurrencyAmount(perDay, currency),
+        );
+      case _Frequency.yearly:
+        if (isGenerous) return l10n.donationCustomGenerousYearly(amount);
+        final perMonth = (_selectedAmount / 12).round();
+        if (perMonth <= 0) return l10n.donateAmountPerYear(amount);
+        return l10n.donationCustomYearly(
+          amount,
+          formatCurrencyAmount(perMonth, currency),
+        );
+      case _Frequency.oneTime:
+        return isGenerous
+            ? l10n.donationCustomGenerousOneTime(amount)
+            : l10n.donationCustomOneTime(amount);
+    }
   }
 
   Widget _buildEmailField(BuildContext context, Color onSurface) {
@@ -849,7 +989,11 @@ class _NativeDonationPageState extends ConsumerState<NativeDonationPage> {
     final methods = methodsAsync.value ?? const [];
     final hasApplePay =
         Platform.isIOS &&
-        methods.any((m) => m.type == payment_models.PaymentMethodType.applePay);
+        methods.any(
+          (m) =>
+              m.type == payment_models.PaymentMethodType.applePay &&
+              m.isAvailable,
+        );
 
     return Column(
       children: [
@@ -857,7 +1001,6 @@ class _NativeDonationPageState extends ConsumerState<NativeDonationPage> {
           // Apple Pay offered first on iOS (App Review Guideline 3.2.1(vi)).
           SizedBox(
             width: double.infinity,
-            height: 48,
             child: ElevatedButton(
               onPressed: canPay
                   ? () => _handlePay(payment_models.PaymentMethodType.applePay)
@@ -866,6 +1009,7 @@ class _NativeDonationPageState extends ConsumerState<NativeDonationPage> {
               // "Donate with (apple) Pay" label is Apple's official variant
               // for nonprofits.
               style: ElevatedButton.styleFrom(
+                minimumSize: const Size(0, 48),
                 backgroundColor: Colors.white,
                 foregroundColor: Colors.black,
                 shape: RoundedRectangleBorder(
@@ -877,19 +1021,25 @@ class _NativeDonationPageState extends ConsumerState<NativeDonationPage> {
               child: Semantics(
                 label: l10n.donateWithApplePay,
                 excludeSemantics: true,
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
+                child: Wrap(
+                  alignment: WrapAlignment.center,
+                  crossAxisAlignment: WrapCrossAlignment.center,
+                  spacing: 6,
                   children: [
                     Text(
                       l10n.donateWithApplePayPrefix,
                       style: context.text.inherited.subtitle,
                     ),
-                    const SizedBox(width: 6),
                     // U+F8FF (Apple logo), drawn by the iOS system font — this
                     // button is iOS-only.
-                    const Text('', style: TextStyle(fontSize: 20)),
-                    const SizedBox(width: 3),
-                    Text('Pay', style: context.text.inherited.subtitle),
+                    Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        const Text('', style: TextStyle(fontSize: 20)),
+                        const SizedBox(width: 3),
+                        Text('Pay', style: context.text.inherited.subtitle),
+                      ],
+                    ),
                   ],
                 ),
               ),
@@ -899,15 +1049,16 @@ class _NativeDonationPageState extends ConsumerState<NativeDonationPage> {
         ],
         SizedBox(
           width: double.infinity,
-          height: 48,
           // With a wallet button present it is the primary action — card drops
           // to an outlined secondary. Without one, card stays the filled CTA.
           child: ElevatedButton(
+            key: donationPayButtonKey,
             onPressed: canPay
                 ? () => _handlePay(payment_models.PaymentMethodType.card)
                 : null,
             style: hasApplePay
                 ? ElevatedButton.styleFrom(
+                    minimumSize: const Size(0, 48),
                     backgroundColor: Colors.transparent,
                     foregroundColor: context.brandAccent,
                     elevation: 0,
@@ -919,6 +1070,7 @@ class _NativeDonationPageState extends ConsumerState<NativeDonationPage> {
                     ),
                   )
                 : ElevatedButton.styleFrom(
+                    minimumSize: const Size(0, 48),
                     backgroundColor: context.brandAccent,
                     foregroundColor: context.onBrandAccent,
                     shape: RoundedRectangleBorder(
@@ -940,13 +1092,30 @@ class _NativeDonationPageState extends ConsumerState<NativeDonationPage> {
                     ),
                   )
                 : Text(
-                    hasApplePay ? l10n.donateWithCard : l10n.donateTitle,
+                    hasApplePay ? l10n.donateWithCard : _payLabel(l10n),
                     style: context.text.inherited.subtitle,
+                    textAlign: TextAlign.center,
                   ),
           ),
         ),
       ],
     );
+  }
+
+  // The sole pay button names the amount and cadence ("Donate $5/month"), so
+  // the commitment is on the thing being tapped. With no valid amount it is
+  // disabled and falls back to plain "Donate".
+  String _payLabel(AppLocalizations l10n) {
+    if (_selectedAmount <= 0) return l10n.donateTitle;
+    final amount = formatCurrencyAmount(
+      _selectedAmount,
+      widget.config.currencyCode,
+    );
+    return switch (_selectedFrequency) {
+      _Frequency.monthly => l10n.donateAmountPerMonth(amount),
+      _Frequency.yearly => l10n.donateAmountPerYear(amount),
+      _Frequency.oneTime => l10n.donateAmountOnce(amount),
+    };
   }
 
   Widget _buildDisclosure(BuildContext context, Color onSurface) {

@@ -135,6 +135,7 @@ object WatchRepository {
         fileId: String,
         guide: String,
         durationMs: Long,
+        title: String,
         endedAt: Long = System.currentTimeMillis(),
     ) {
         // No account to credit (never synced, or signed out on the phone).
@@ -144,6 +145,7 @@ object WatchRepository {
             .put("accountId", snapshot.optString("accountId"))
             .put("trackId", trackId)
             .put("fileId", fileId)
+            .put("title", title)
             .put("guide", guide)
             .put("duration", durationMs)
             .put("timestamp", endedAt)

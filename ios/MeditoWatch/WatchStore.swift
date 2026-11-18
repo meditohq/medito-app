@@ -103,6 +103,7 @@ final class WatchStore: NSObject, ObservableObject, WCSessionDelegate {
             "accountId": context["accountId"] as? String ?? "",
             "trackId": track.id,
             "fileId": track.fileId,
+            "title": track.title,
             "guide": track.guide,
             "duration": track.durationMs,
             "timestamp": Int(endedAt.timeIntervalSince1970 * 1000),

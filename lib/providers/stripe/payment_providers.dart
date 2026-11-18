@@ -11,6 +11,7 @@ import 'package:medito/services/analytics/firebase_analytics_service.dart';
 import 'package:medito/providers/donation/end_screen_donation_experiment.dart';
 import 'package:medito/providers/donation/supporter_appeal_experiment.dart';
 import 'package:medito/providers/onboarding/onboarding_donation_timing_experiment.dart';
+import 'package:medito/providers/onboarding/onboarding_native_pay_experiment.dart';
 import 'package:medito/utils/currency.dart';
 import 'package:medito/utils/logger.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
@@ -528,6 +529,9 @@ class OneTimePaymentController extends _$OneTimePaymentController {
         ...OnboardingDonationTimingExperiment.paymentMetadata(
           ref.read(sharedPreferencesProvider),
         ),
+        ...OnboardingNativePayExperiment.paymentMetadata(
+          ref.read(sharedPreferencesProvider),
+        ),
         ...EndScreenDonationExperiment.paymentMetadata(
           ref.read(sharedPreferencesProvider),
         ),
@@ -633,6 +637,9 @@ class MonthlySubscriptionController extends _$MonthlySubscriptionController {
         'paywall_source': ?paywallSource,
         ...utmParams,
         ...OnboardingDonationTimingExperiment.paymentMetadata(
+          ref.read(sharedPreferencesProvider),
+        ),
+        ...OnboardingNativePayExperiment.paymentMetadata(
           ref.read(sharedPreferencesProvider),
         ),
         ...EndScreenDonationExperiment.paymentMetadata(
@@ -742,6 +749,9 @@ class YearlySubscriptionController extends _$YearlySubscriptionController {
         'paywall_source': ?paywallSource,
         ...utmParams,
         ...OnboardingDonationTimingExperiment.paymentMetadata(
+          ref.read(sharedPreferencesProvider),
+        ),
+        ...OnboardingNativePayExperiment.paymentMetadata(
           ref.read(sharedPreferencesProvider),
         ),
         ...EndScreenDonationExperiment.paymentMetadata(

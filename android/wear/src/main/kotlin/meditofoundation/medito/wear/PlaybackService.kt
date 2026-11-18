@@ -88,6 +88,7 @@ class PlaybackService : MediaSessionService() {
             fileId = extras.getString(EXTRA_FILE_ID).orEmpty(),
             guide = extras.getString(EXTRA_GUIDE).orEmpty(),
             durationMs = extras.getLong(EXTRA_DURATION_MS),
+            title = item.mediaMetadata.title?.toString().orEmpty(),
         )
     }
 

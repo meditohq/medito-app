@@ -9,9 +9,16 @@
 // The Customer is created upstream of the Stripe payment sheet, so the email
 // has to be captured *before* pay is dispatched — hence a gate, not a
 // post-payment prompt.
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+import 'package:shared_preferences_platform_interface/shared_preferences_platform_interface.dart';
+import 'package:medito/constants/strings/shared_preference_constants.dart';
+import 'package:medito/providers/shared_preference/shared_preference_provider.dart';
+import 'package:medito/models/stripe/payment_intent_model.dart';
 
 import 'package:medito/l10n/app_localizations.dart';
 
@@ -21,7 +28,7 @@ import 'package:medito/models/stripe/payment_method_model.dart';
 import 'package:medito/providers/stripe/payment_ui_controller.dart';
 import 'package:medito/repositories/auth/auth_repository.dart';
 import 'package:medito/views/donation/native_donation_page.dart'
-    show NativeDonationPage, donationEmailFieldKey;
+    show NativeDonationPage, donationEmailFieldKey, donationPayButtonKey;
 
 import '../helpers/firebase_analytics_test_helper.dart';
 
@@ -39,6 +46,47 @@ class _KnownEmailAuthRepository implements AuthRepository {
 
   @override
   dynamic noSuchMethod(Invocation invocation) => null;
+}
+
+class _SlowReceiptStore extends InMemorySharedPreferencesStore {
+  _SlowReceiptStore() : super.empty();
+  final release = Completer<void>();
+  int writes = 0;
+
+  @override
+  Future<bool> setValue(String type, String key, Object value) async {
+    if (key.endsWith(SharedPreferenceConstants.emailAddressForReceipt)) {
+      writes++;
+      await release.future;
+    }
+    return super.setValue(type, key, value);
+  }
+}
+
+class _CapturePayment extends PaymentUIController {
+  final amounts = <int>[];
+  @override
+  void build() {}
+
+  @override
+  Future<PaymentResult> initiateMonthlySubscription({
+    required BuildContext context,
+    required int amount,
+    required String currency,
+    required PaymentMethodType paymentMethod,
+    String? paywallId,
+    String? userId,
+    String? userEmail,
+    String? paywallSource,
+    String? variantId,
+    String? experimentId,
+    VoidCallback? onSuccess,
+    bool showSuccessFeedback = true,
+    Map<String, String> campaignMetadata = const {},
+  }) async {
+    amounts.add(amount);
+    return const PaymentResult.cancelled();
+  }
 }
 
 PaywallConfigModel _config({String? email}) => PaywallConfigModel(
@@ -61,10 +109,15 @@ void main() {
     WidgetTester tester, {
     String? knownEmail,
     AuthRepository? authRepository,
+    SharedPreferences? prefs,
+    PaymentUIController? payments,
   }) async {
     await tester.pumpWidget(
       ProviderScope(
         overrides: [
+          if (prefs != null) sharedPreferencesProvider.overrideWithValue(prefs),
+          if (payments != null)
+            paymentUIControllerProvider.overrideWith(() => payments),
           authRepositorySyncProvider.overrideWithValue(
             authRepository ?? _AnonymousAuthRepository(),
           ),
@@ -105,6 +158,40 @@ void main() {
     );
   });
 
+  testWidgets(
+    'repeated taps during receipt storage create one payment with the tapped amount',
+    (tester) async {
+      SharedPreferences.setMockInitialValues({});
+      final store = _SlowReceiptStore();
+      SharedPreferencesStorePlatform.instance = store;
+      final prefs = await SharedPreferences.getInstance();
+      final payments = _CapturePayment();
+      addTearDown(() => SharedPreferences.setMockInitialValues({}));
+      await pump(
+        tester,
+        knownEmail: 'donor@example.invalid',
+        prefs: prefs,
+        payments: payments,
+      );
+      final pay = tester
+          .widget<ElevatedButton>(find.byKey(donationPayButtonKey))
+          .onPressed!;
+      // Both callbacks arrive before the disabled button is rebuilt.
+      pay();
+      pay();
+      await tester.pump();
+      expect(store.writes, 1);
+      expect(payments.amounts, isEmpty);
+      // Even if a preset changes while preparation is pending, the request must
+      // retain the amount that was displayed when Pay was pressed.
+      await tester.tap(find.text('\$10'));
+      await tester.pump();
+      store.release.complete();
+      await tester.pumpAndSettle();
+      expect(payments.amounts, [500]);
+    },
+  );
+
   // The field is deliberately always visible (see _resolveKnownEmail): a known
   // donor gets it prefilled rather than hidden, so they can correct a stale
   // address instead of being silently billed against it.
@@ -121,7 +208,7 @@ void main() {
   testWidgets('blocks pay when the email is empty', (tester) async {
     await pump(tester);
 
-    final payButton = find.widgetWithText(ElevatedButton, 'Donate');
+    final payButton = find.byKey(donationPayButtonKey);
     await tester.ensureVisible(payButton);
     await tester.pumpAndSettle();
     await tester.tap(payButton);
@@ -137,7 +224,7 @@ void main() {
     await pump(tester);
 
     await tester.enterText(find.byKey(donationEmailFieldKey), 'donor@example');
-    final payButton = find.widgetWithText(ElevatedButton, 'Donate');
+    final payButton = find.byKey(donationPayButtonKey);
     await tester.ensureVisible(payButton);
     await tester.pumpAndSettle();
     await tester.tap(payButton);
@@ -154,7 +241,7 @@ void main() {
   ) async {
     await pump(tester);
 
-    final payButton = find.widgetWithText(ElevatedButton, 'Donate');
+    final payButton = find.byKey(donationPayButtonKey);
     await tester.ensureVisible(payButton);
     await tester.pumpAndSettle();
     await tester.tap(payButton);

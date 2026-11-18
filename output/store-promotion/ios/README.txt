@@ -7,3 +7,5 @@ For the next release: attach the three iPad images to the iPad 13-inch screensho
 The iPad captures show release 2611.11.0 (302489). The widget image shows native SwiftUI views from the current repository with example progress data, rendered in an isolated preview host; it is not a Home Screen capture. Source details are in manifest.json.
 
 upload/ contains the four final RGB PNGs. raw/ contains the four underlying simulator captures. all-images.jpg previews every final image. app-store-staged.png confirms the uploaded files.
+
+Apple Watch follow-up: two Watch screenshots have also been uploaded to Asset Library. See watch/ for captures, manifest and upload proof. The production release lane now attaches the committed Watch screenshots automatically and updates launch promotional text only after verifying the binary contains the Watch app.

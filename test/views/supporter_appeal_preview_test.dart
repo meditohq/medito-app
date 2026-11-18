@@ -4,6 +4,8 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:medito/main_supporter_appeal_preview.dart';
 import 'package:medito/providers/stripe/payment_service_provider.dart';
 import 'package:medito/views/donation/supporter_donation_screen.dart';
+import 'package:medito/views/donation/native_donation_page.dart'
+    show donationPayButtonKey;
 import 'package:medito/views/home/widgets/announcement/supporter_appeal_card.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -29,7 +31,7 @@ void main() {
       expect(find.byType(SupporterDonationScreen), findsOneWidget);
       await tester.tap(find.text('Yearly'));
       await tester.pumpAndSettle();
-      final donate = find.widgetWithText(ElevatedButton, 'Donate');
+      final donate = find.byKey(donationPayButtonKey);
       await tester.ensureVisible(donate);
       await tester.tap(donate);
       await tester.pumpAndSettle();

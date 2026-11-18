@@ -2883,6 +2883,46 @@ class AppLocalizationsDe extends AppLocalizations {
   }
 
   @override
+  String donateAmountPerYear(String amount) {
+    return '$amount/Jahr spenden';
+  }
+
+  @override
+  String donateAmountOnce(String amount) {
+    return '$amount spenden';
+  }
+
+  @override
+  String donationCustomMonthly(String amount, String perDay) {
+    return '$amount im Monat – das sind etwa $perDay am Tag, damit Medito für Millionen kostenlos bleibt.';
+  }
+
+  @override
+  String donationCustomYearly(String amount, String perMonth) {
+    return '$amount im Jahr – das sind etwa $perMonth im Monat, damit Medito für Millionen kostenlos bleibt.';
+  }
+
+  @override
+  String donationCustomOneTime(String amount) {
+    return 'Deine $amount helfen, Medito für Millionen kostenlos zu halten.';
+  }
+
+  @override
+  String donationCustomGenerousMonthly(String amount) {
+    return '$amount im Monat – danke. Damit bleibt Medito für viele Menschen kostenlos, die selbst nichts geben können.';
+  }
+
+  @override
+  String donationCustomGenerousYearly(String amount) {
+    return '$amount im Jahr – danke. Damit bleibt Medito für viele Menschen kostenlos, die selbst nichts geben können.';
+  }
+
+  @override
+  String donationCustomGenerousOneTime(String amount) {
+    return '$amount – danke. Damit bleibt Medito für viele Menschen kostenlos, die selbst nichts geben können.';
+  }
+
+  @override
   String get donationDisclosure =>
       'Deine Spende hilft, Medito für alle kostenlos zu halten – ohne Werbung, ohne Bezahlschranken. Du erhältst in Kürze eine Bestätigung per E-Mail.';
 

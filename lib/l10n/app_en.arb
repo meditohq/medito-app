@@ -2121,6 +2121,22 @@
       }
     }
   },
+  "donateAmountPerYear": "Donate {amount}/year",
+  "@donateAmountPerYear": {"description": "Pay button on the donation page for a yearly gift", "placeholders": {"amount": {"type": "String", "example": "$5"}}},
+  "donateAmountOnce": "Donate {amount}",
+  "@donateAmountOnce": {"description": "Pay button on the donation page for a one-time gift", "placeholders": {"amount": {"type": "String", "example": "$5"}}},
+  "donationCustomMonthly": "{amount} a month — about {perDay} a day to keep Medito free for millions.",
+  "@donationCustomMonthly": {"description": "Under the custom amount field on the donation page, monthly gift. perDay is the monthly amount divided by 30.", "placeholders": {"amount": {"type": "String", "example": "$10"}, "perDay": {"type": "String", "example": "$0.33"}}},
+  "donationCustomYearly": "{amount} a year — about {perMonth} a month to keep Medito free for millions.",
+  "@donationCustomYearly": {"description": "Under the custom amount field on the donation page, yearly gift. perMonth is the yearly amount divided by 12.", "placeholders": {"amount": {"type": "String", "example": "$10"}, "perMonth": {"type": "String", "example": "$5"}}},
+  "donationCustomOneTime": "Your {amount} helps keep Medito free for millions.",
+  "@donationCustomOneTime": {"description": "Under the custom amount field on the donation page, one-time gift.", "placeholders": {"amount": {"type": "String", "example": "$10"}}},
+  "donationCustomGenerousMonthly": "{amount} a month — thank you. That keeps Medito free for many people who can’t afford to give.",
+  "@donationCustomGenerousMonthly": {"description": "Under the custom amount field when the typed monthly amount is above the largest preset.", "placeholders": {"amount": {"type": "String", "example": "$10"}}},
+  "donationCustomGenerousYearly": "{amount} a year — thank you. That keeps Medito free for many people who can’t afford to give.",
+  "@donationCustomGenerousYearly": {"description": "Under the custom amount field when the typed yearly amount is above the largest preset.", "placeholders": {"amount": {"type": "String", "example": "$10"}}},
+  "donationCustomGenerousOneTime": "{amount} — thank you. That keeps Medito free for many people who can’t afford to give.",
+  "@donationCustomGenerousOneTime": {"description": "Under the custom amount field when the typed one-time amount is above the largest preset.", "placeholders": {"amount": {"type": "String", "example": "$10"}}},
   "donationDisclosure": "Your donation helps keep Medito free for everyone — no ads, no paywalls. You will receive an email confirmation shortly.",
   "@donationDisclosure": {
     "description": "Small print under the pay buttons on the donation page"

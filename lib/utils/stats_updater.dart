@@ -80,8 +80,10 @@ reminderReschedulerOverride;
 
 /// Reschedules the Daily reminder series so its anchor and the streak /
 /// consistency values baked into each day's copy reflect the latest session
-/// state. Safe to call from any stats-mutating path (real completions, manual
-/// adds, deletes); no-ops when Daily reminders are disabled.
+/// state. For a session that just happened (a real completion, or one from
+/// the watch); manual adds, edits and deletes go through
+/// [_rescheduleRemindersAfterHistoryChange]. No-ops when Daily reminders are
+/// disabled.
 Future<void> _rescheduleReminders({
   required int endMs,
   required int durationMs,
@@ -134,12 +136,82 @@ Future<void> _rescheduleReminders({
   }
 }
 
+/// Test seam for [_rescheduleRemindersAfterHistoryChange], as
+/// [reminderReschedulerOverride] is for [_rescheduleReminders].
+@visibleForTesting
+Future<void> Function({required bool meditatedToday, required DateTime now})?
+reminderHistoryReschedulerOverride;
+
+/// Rebuilds the Daily reminder series after the history was changed by hand
+/// (a manual add, an edit or a delete), so the streak / consistency values in
+/// each day's copy are current.
+///
+/// Unlike [_rescheduleReminders] this does not anchor on a session: the entry
+/// that changed can be on any past day and says nothing about when the next
+/// reminder is due. The anchor comes from whether there is a session today —
+/// see [anchorAfterHistoryChange].
+Future<void> _rescheduleRemindersAfterHistoryChange(
+  StatsManager statsManager,
+) async {
+  try {
+    final prefs = await SharedPreferences.getInstance();
+    final hasSaved =
+        prefs.getInt(SharedPreferenceConstants.savedHours) != null &&
+        prefs.getInt(SharedPreferenceConstants.savedMinutes) != null;
+    final enabled =
+        prefs.getBool(SharedPreferenceConstants.dailyReminderEnabled) ??
+        hasSaved;
+
+    if (!enabled) {
+      AppLogger.d('STATS', 'Daily reminders disabled; skipping scheduling');
+      return;
+    }
+
+    final now = statsManager.currentDate;
+    final stats = await statsManager.localAllStats;
+    // A streak freeze covers a missed day; it is not a session.
+    final meditatedToday = (stats.audioCompleted ?? []).any((session) {
+      if (isFreezeSession(session)) return false;
+      final at = DateTime.fromMillisecondsSinceEpoch(session.timestamp);
+      return at.year == now.year && at.month == now.month && at.day == now.day;
+    });
+
+    final override = reminderHistoryReschedulerOverride;
+    if (override != null) {
+      await override(meditatedToday: meditatedToday, now: now);
+      return;
+    }
+
+    final context = navigatorKey.currentContext;
+    await DailyRemindersScheduler(
+      prefs: prefs,
+      reminders: ReminderProvider(),
+    ).rescheduleAfterHistoryChange(
+      meditatedToday: meditatedToday,
+      now: now,
+      l10n: context != null && context.mounted
+          ? AppLocalizations.of(context)
+          : null,
+    );
+    AppLogger.d('STATS', 'Daily reminder series rebuilt after history change');
+  } catch (e) {
+    AppLogger.e('STATS', 'Failed to rebuild daily reminders', e);
+  }
+}
+
 // Completions already recorded by this engine, keyed by track + timestamp.
 // Android persists each completion natively and replays it on resume, so a
 // replay can race the live callback for the same session and record it (stats
 // and the audio_session_completed event) twice. Dropped again on failure so a
-// retry of a genuinely failed completion still goes through.
+// retry of a genuinely failed completion still goes through. This set only
+// covers one process: after a restart the same replay is caught by the
+// durable history in [StatsManager.addAudioCompleted].
 final Set<String> _recordedCompletions = {};
+
+/// Test seam: lets a test simulate the empty guard of a new process, which is
+/// what makes a platform replay reach the stats manager again.
+@visibleForTesting
+void clearRecordedCompletionsForTesting() => _recordedCompletions.clear();
 
 Future<bool> handleStats(
   Map<String, dynamic> payload, {
@@ -161,32 +233,49 @@ Future<bool> handleStats(
 
     var duration = payload[TypeConstants.durationIdKey];
 
-    await statsManager.addAudioCompleted(newAudioCompleted, duration);
-    AppLogger.d(
-      'STATS',
-      'Stats updated successfully for track ${newAudioCompleted.id}',
+    final recordedHere = await statsManager.addAudioCompleted(
+      newAudioCompleted,
+      duration,
     );
 
-    // Log Firebase analytics event for audio session completion
-    try {
-      final fileId = payload[TypeConstants.fileIdKey] as String?;
-      // Timer sessions report a fixed guide (native completion passes the
-      // empty artist), so they filter out of narrator stats in one place.
-      final guide = isTimerSessionId('${payload[TypeConstants.trackIdKey]}')
-          ? AnalyticsEventConstants.timerGuide
-          : payload[TypeConstants.guideIdKey] as String?;
-
-      await FirebaseAnalyticsService().logEvent(
-        name: AnalyticsEventConstants.audioSessionCompleted,
-        parameters: {
-          AnalyticsEventConstants.paramAudioFileId: fileId ?? 'unknown',
-          AnalyticsEventConstants.paramAudioFileGuide: guide ?? 'unknown',
-          AnalyticsEventConstants.paramAudioFileDuration: duration,
-        },
+    // Log Firebase analytics event for audio session completion. A replayed
+    // completion reaches here again with the history already holding it, so
+    // the event would be counted twice; everything below still runs, because
+    // the replay is also what rebuilds the end screen the user never saw.
+    if (recordedHere) {
+      AppLogger.d(
+        'STATS',
+        'Stats updated successfully for track ${newAudioCompleted.id}',
       );
-      AppLogger.d('STATS', 'Logged audio_session_completed event to Firebase');
-    } catch (analyticsError) {
-      AppLogger.e('STATS', 'Failed to log analytics event', analyticsError);
+      try {
+        final fileId = payload[TypeConstants.fileIdKey] as String?;
+        // Timer sessions report a fixed guide (native completion passes the
+        // empty artist), so they filter out of narrator stats in one place.
+        final guide = isTimerSessionId('${payload[TypeConstants.trackIdKey]}')
+            ? AnalyticsEventConstants.timerGuide
+            : payload[TypeConstants.guideIdKey] as String?;
+
+        await FirebaseAnalyticsService().logEvent(
+          name: AnalyticsEventConstants.audioSessionCompleted,
+          parameters: {
+            AnalyticsEventConstants.paramAudioFileId: fileId ?? 'unknown',
+            AnalyticsEventConstants.paramAudioFileGuide: guide ?? 'unknown',
+            AnalyticsEventConstants.paramAudioFileDuration: duration,
+          },
+        );
+        AppLogger.d(
+          'STATS',
+          'Logged audio_session_completed event to Firebase',
+        );
+      } catch (analyticsError) {
+        AppLogger.e('STATS', 'Failed to log analytics event', analyticsError);
+      }
+    } else {
+      AppLogger.d(
+        'STATS',
+        'Completion ${newAudioCompleted.id} was already in the history; '
+            'skipping the duplicate analytics event',
+      );
     }
 
     // Tell the session tracker this session completed so it clears the
@@ -476,10 +565,7 @@ Future<bool> editSessionDateTime({
     );
     if (!success) return false;
     await _refreshStatsAndUpNext();
-    await _rescheduleReminders(
-      endMs: DateTime.now().millisecondsSinceEpoch,
-      durationMs: 0,
-    );
+    await _rescheduleRemindersAfterHistoryChange(statsManager);
     return true;
   } catch (e) {
     AppLogger.e('STATS', 'Failed to edit session', e);
@@ -502,8 +588,7 @@ Future<bool> deleteSession({
 
     await _refreshStatsAndUpNext();
 
-    final nowMs = DateTime.now().millisecondsSinceEpoch;
-    await _rescheduleReminders(endMs: nowMs, durationMs: 0);
+    await _rescheduleRemindersAfterHistoryChange(statsManager);
 
     try {
       final updatedStats = await statsManager.localAllStats;
@@ -556,7 +641,13 @@ Future<bool> addManualSession({
     statsManager ??= StatsManager()..initialize();
 
     // Add the manual session (this will update streaks, consistency score, etc.)
-    await statsManager.addAudioCompleted(manualSession, durationMs);
+    // A manual entry may repeat a date + time the history already has: the
+    // sheet filters the filled days, so an identical entry is intentional.
+    await statsManager.addAudioCompleted(
+      manualSession,
+      durationMs,
+      allowDuplicate: true,
+    );
     AppLogger.d(
       'STATS',
       'Manual session added successfully for ${dateTime.toString()}',
@@ -565,7 +656,7 @@ Future<bool> addManualSession({
     // Refresh stats from local; upNextProvider rebuilds reactively.
     await _refreshStatsAndUpNext();
 
-    await _rescheduleReminders(endMs: timestamp, durationMs: durationMs);
+    await _rescheduleRemindersAfterHistoryChange(statsManager);
 
     // Update home widget with latest stats (fire-and-forget to avoid blocking)
     try {
@@ -608,7 +699,6 @@ Future<int> addManualSessions({
   // (setCurrentDateForTesting) flows through here too.
   final now = statsManager.currentDate;
   var added = 0;
-  int latestTimestamp = 0;
 
   for (final date in dates) {
     // Anchor at the shared manual-session hour so the calendar's streak
@@ -627,11 +717,13 @@ Future<int> addManualSessions({
         id: manualId,
         timestamp: dateTime.millisecondsSinceEpoch,
       );
-      await statsManager.addAudioCompleted(entry, durationMs, skipPost: true);
+      await statsManager.addAudioCompleted(
+        entry,
+        durationMs,
+        skipPost: true,
+        allowDuplicate: true,
+      );
       added++;
-      if (entry.timestamp > latestTimestamp) {
-        latestTimestamp = entry.timestamp;
-      }
     } catch (e) {
       AppLogger.e('STATS', 'Failed to add manual session in bulk for $date', e);
     }
@@ -658,7 +750,7 @@ Future<int> addManualSessions({
       );
     }
 
-    await _rescheduleReminders(endMs: latestTimestamp, durationMs: durationMs);
+    await _rescheduleRemindersAfterHistoryChange(statsManager);
   }
 
   return added;

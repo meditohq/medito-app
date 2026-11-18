@@ -3,6 +3,7 @@ import 'dart:async';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:medito/constants/types/type_constants.dart';
+import 'package:medito/constants/strings/analytics_event_constants.dart';
 import 'package:medito/models/pack/pack_model.dart';
 import 'package:medito/models/track/track.dart';
 import 'package:medito/providers/providers.dart';
@@ -47,9 +48,13 @@ class FakeTrackRepository implements TrackRepository {
 
 class FakeDownloaderRepository implements DownloaderRepository {
   final Set<String> files = {};
+  final Set<String> failures = {};
+  bool deleteFails = false;
+  final requests = <String>[];
 
   @override
   Future<void> deleteDownloadedFile(String fileName) async {
+    if (deleteFails) throw Exception('Deletion failed');
     files.remove(fileName);
   }
 
@@ -59,6 +64,8 @@ class FakeDownloaderRepository implements DownloaderRepository {
     required String fileName,
     void Function(int, int)? onReceiveProgress,
   }) async {
+    requests.add(fileName);
+    if (failures.contains(fileName)) throw Exception('Download failed');
     files.add(fileName);
   }
 
@@ -375,10 +382,10 @@ void main() {
     final notifier = active.read(batchDownloadProvider.notifier);
     final batch = notifier.startPackDownload(testPack);
     await waitUntil(() => files.pending.length == 2);
-    await notifier.cancelDownload();
+    final cancelling = notifier.cancelDownload();
     files.finish('t1-f1.mp3');
     files.finish('t2-f2.mp3');
-    await batch;
+    await Future.wait([batch, cancelling]);
     expect(active.read(batchDownloadProvider).status, BatchDownloadStatus.idle);
     expect(trackRepo.downloadedTracks.length, 2);
   });
@@ -419,6 +426,146 @@ void main() {
 
       expect(downloaderRepo.files.isEmpty, isTrue);
       expect(trackRepo.downloadedTracks.isEmpty, isTrue);
+    },
+  );
+
+  test('partial metadata failure cannot report a completed pack', () async {
+    trackRepo.tracksById.remove('t2');
+    await container
+        .read(batchDownloadProvider.notifier)
+        .startPackDownload(testPack);
+    final state = container.read(batchDownloadProvider);
+    expect(state.status, BatchDownloadStatus.error);
+    expect(state.completed, 1);
+    expect(state.total, 2);
+    expect(
+      analyticsService.loggedEvents,
+      isNot(contains(AnalyticsEventConstants.packBatchDownloadCompleted)),
+    );
+  });
+
+  test('new recordings are merged with existing downloaded variants', () async {
+    final old = testTrack1.voices.first.audioFiles.first.copyWith(id: 'old');
+    trackRepo.downloadedTracks = [
+      testTrack1.copyWith(
+        voices: [
+          testTrack1.voices.first.copyWith(audioFiles: [old]),
+        ],
+      ),
+    ];
+    downloaderRepo.files.add('t1-old.mp3');
+    await container
+        .read(batchDownloadProvider.notifier)
+        .startPackDownload(testPack);
+    final saved = trackRepo.downloadedTracks.firstWhere((t) => t.id == 't1');
+    expect(saved.voices.first.audioFiles.map((f) => f.id).toSet(), {
+      'old',
+      'f1',
+    });
+  });
+
+  test(
+    'cancel drains downloads before deletion and blocks a restart',
+    () async {
+      final files = ControlledDownloaderRepository();
+      final active = controlledContainer(files);
+      addTearDown(active.dispose);
+      final notifier = active.read(batchDownloadProvider.notifier);
+      final running = notifier.startPackDownload(testPack);
+      await waitUntil(() => files.pending.length == 2);
+      final cancelling = notifier.cancelDownload();
+      expect(identical(notifier.startPackDownload(testPack), running), isTrue);
+      final deleting = notifier.deletePackDownloads(testPack);
+      files.finish('t1-f1.mp3');
+      files.finish('t2-f2.mp3');
+      await Future.wait([running, cancelling]);
+      expect(await deleting, isTrue);
+      expect(trackRepo.downloadedTracks, isEmpty);
+      expect(files.files, isEmpty);
+      expect(files.calls.length, 2);
+    },
+  );
+
+  test(
+    'a voice without audio cannot prevent a usable voice downloading',
+    () async {
+      trackRepo.tracksById['t1'] = testTrack1.copyWith(
+        voices: [
+          const TrackVoice(guideName: 'Empty', audioFiles: []),
+          ...testTrack1.voices,
+        ],
+      );
+      await container
+          .read(batchDownloadProvider.notifier)
+          .startPackDownload(testPack);
+      expect(
+        container.read(batchDownloadProvider).status,
+        BatchDownloadStatus.completed,
+      );
+      expect(downloaderRepo.files, contains('t1-f1.mp3'));
+    },
+  );
+
+  test('a session with no audio reports an incomplete pack', () async {
+    trackRepo.tracksById['t1'] = testTrack1.copyWith(voices: []);
+    await container
+        .read(batchDownloadProvider.notifier)
+        .startPackDownload(testPack);
+    expect(
+      container.read(batchDownloadProvider).status,
+      BatchDownloadStatus.error,
+    );
+    expect(container.read(batchDownloadProvider).total, 2);
+    expect(container.read(batchDownloadProvider).completed, 1);
+  });
+
+  test(
+    'retry downloads only failed files and preserves completed files',
+    () async {
+      downloaderRepo.failures.add('t2-f2.mp3');
+      final notifier = container.read(batchDownloadProvider.notifier);
+      await notifier.startPackDownload(testPack);
+      expect(
+        container.read(batchDownloadProvider).status,
+        BatchDownloadStatus.error,
+      );
+      expect(trackRepo.downloadedTracks.map((t) => t.id), ['t1']);
+      downloaderRepo.failures.clear();
+      await notifier.startPackDownload(testPack);
+      expect(
+        container.read(batchDownloadProvider).status,
+        BatchDownloadStatus.completed,
+      );
+      expect(downloaderRepo.requests.where((f) => f == 't1-f1.mp3').length, 1);
+      expect(downloaderRepo.requests.where((f) => f == 't2-f2.mp3').length, 2);
+      expect(trackRepo.downloadedTracks.length, 2);
+    },
+  );
+
+  test('failed deletion returns failure and retains saved downloads', () async {
+    final notifier = container.read(batchDownloadProvider.notifier);
+    await notifier.startPackDownload(testPack);
+    downloaderRepo.deleteFails = true;
+    expect(await notifier.deletePackDownloads(testPack), isFalse);
+    expect(trackRepo.downloadedTracks.length, 2);
+    expect(downloaderRepo.files.length, 2);
+    downloaderRepo.deleteFails = false;
+    expect(await notifier.deletePackDownloads(testPack), isTrue);
+    expect(trackRepo.downloadedTracks, isEmpty);
+  });
+
+  test(
+    'missing metadata remains an error when other files already exist',
+    () async {
+      trackRepo.tracksById.remove('t2');
+      downloaderRepo.files.add('t1-f1.mp3');
+      await container
+          .read(batchDownloadProvider.notifier)
+          .startPackDownload(testPack);
+      final state = container.read(batchDownloadProvider);
+      expect(state.status, BatchDownloadStatus.error);
+      expect(state.completed, 1);
+      expect(state.total, 2);
     },
   );
 }

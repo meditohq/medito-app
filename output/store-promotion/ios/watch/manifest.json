@@ -1,0 +1,41 @@
+{
+  "appId": "1500780518",
+  "sourceBaseCommit": "1da3cc05",
+  "source": "Current native MeditoWatch SwiftUI views, including Health completion-title fix",
+  "capture": "Apple Watch Series 9 (45mm), watchOS 26.5; native 396x484 captures",
+  "fixture": "Example account with 7-day streak, 67% consistency, 2/10 course progress, two favourite packs. No real user data. Bundled assets/images/the_medito_course.png cached as native course cover.",
+  "captureHost": "Isolated copy of the native target. Only launch-time sample-data seeding and initial NavigationStack route selection differ; production source has no screenshot mode.",
+  "locale": "en-GB",
+  "uploadStatus": "Stored in App Store Connect Asset Library; Add for Review; staged for next release",
+  "releasePath": "ios/fastlane/screenshots/en-GB",
+  "assets": [
+    {
+      "filename": "medito-appleWatchSeries7-01-home.png",
+      "raw": "raw/01-home.png",
+      "pixels": [
+        396,
+        484
+      ],
+      "sha256": "1b627ef9d1cdc49df3e665ac963d16350c53aaa4a632634c0b8660d68189cd42"
+    },
+    {
+      "filename": "medito-appleWatchSeries7-02-favorites.png",
+      "raw": "raw/02-favorites.png",
+      "pixels": [
+        396,
+        484
+      ],
+      "sha256": "7f519657be8d529ee439e14f99f95630427e389f95ba92680a57ac937ea17120"
+    }
+  ],
+  "assetLibraryIds": [
+    "84400005-9741-87e6-8008-d70d854b76bf",
+    "99800005-9741-87e6-801b-b75f4ed86bcc"
+  ],
+  "releaseAutomation": "The iOS release lane attaches ios/fastlane/screenshots only after verifying an embedded Watch app in the IPA or the exact selected processed App Store Connect build. Existing galleries are preserved.",
+  "sourceHashes": {
+    "ios/MeditoWatch/ContentView.swift": "799a6dd1fcb437ed59d30dae4cc6483c5e9f04ec86487cce5d239916964668e9",
+    "ios/MeditoWatch/WatchStore.swift": "ce5deedfe37fd38deaa788a9664d5105494398944c0770aa74cb23f8b2ba3cef",
+    "ios/MeditoWatch/FavoritesScreen.swift": "e15439acd44271e35ad3e96fddff7c6d7f2cd7c2d3d83a6d8d008646c0bdc454"
+  }
+}

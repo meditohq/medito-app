@@ -59,18 +59,23 @@ final batchDownloadProvider =
 
 class BatchDownloadNotifier extends Notifier<BatchDownloadState> {
   bool _cancelled = false;
-  int _generation = 0;
+  Future<void>? _running;
+  bool _deleting = false;
   Future<void> _preferenceWrites = Future.value();
 
   @override
   BatchDownloadState build() => const BatchDownloadState();
 
-  Future<void> startPackDownload(PackModel pack) async {
-    if (state.isDownloading || !pack.canDownloadAll) return;
+  Future<void> startPackDownload(PackModel pack) {
+    // Cancellation drains active writes before another batch can reuse the
+    // same filenames. Never reset a cancellation flag under an older worker.
+    if (_deleting || !pack.canDownloadAll) return Future.value();
+    if (_running != null) return _running!;
     _cancelled = false;
-    final generation = ++_generation;
-    bool isCurrent() => !_cancelled && generation == _generation;
+    return _running = _downloadPack(pack).whenComplete(() => _running = null);
+  }
 
+  Future<void> _downloadPack(PackModel pack) async {
     state = BatchDownloadState(
       status: BatchDownloadStatus.fetchingTracks,
       packId: pack.id,
@@ -100,16 +105,19 @@ class BatchDownloadNotifier extends Notifier<BatchDownloadState> {
       final trackRepo = ref.read(trackRepositoryProvider);
       final downloaderRepo = ref.read(downloaderRepositoryProvider);
 
+      var hadFailures = false;
       final fetchedTracks = <Track>[];
       for (final item in trackItems) {
+        if (_cancelled || !ref.mounted) return;
         try {
           fetchedTracks.add(await trackRepo.fetchTrack(item.id));
         } catch (e) {
+          hadFailures = true;
           AppLogger.e('BATCH_DOWNLOAD', 'Failed to fetch track ${item.id}: $e');
         }
       }
 
-      if (!ref.mounted || !isCurrent()) return;
+      if (_cancelled || !ref.mounted) return;
 
       if (fetchedTracks.isEmpty) {
         state = state.copyWith(
@@ -121,54 +129,61 @@ class BatchDownloadNotifier extends Notifier<BatchDownloadState> {
 
       final itemsToDownload = <({String url, String fileName, Track track})>[];
       final tracksForPreference = <Track>[];
-      final alreadyDownloadedTracks = <Track>[];
 
       for (final track in fetchedTracks) {
-        if (track.voices.isEmpty) continue;
-        final (:voice, :file) = TrackVariantSelector.resolve(track);
+        if (_cancelled || !ref.mounted) return;
+        if (track.voices.isEmpty ||
+            track.voices.every((v) => v.audioFiles.isEmpty)) {
+          hadFailures = true;
+          continue;
+        }
+        final (:voice, :file) = TrackVariantSelector.resolve(
+          track.copyWith(
+            voices: track.voices.where((v) => v.audioFiles.isNotEmpty).toList(),
+          ),
+        );
         final fileName =
             '${track.id}-${file.id}${getAudioFileExtension(file.path)}';
         final isDownloaded = await downloaderRepo.isFileDownloaded(fileName);
+        if (_cancelled || !ref.mounted) return;
 
-        tracksForPreference.add(
-          Track(
-            id: track.id,
-            title: track.title,
-            description: track.description,
-            coverUrl: track.coverUrl,
-            isPublished: true,
-            hasBackgroundSound: track.hasBackgroundSound,
-            artist: track.artist,
-            voices: [
-              TrackVoice(guideName: voice.guideName, audioFiles: [file]),
-            ],
-          ),
+        final downloadedTrack = Track(
+          id: track.id,
+          title: track.title,
+          description: track.description,
+          coverUrl: track.coverUrl,
+          isPublished: true,
+          hasBackgroundSound: track.hasBackgroundSound,
+          artist: track.artist,
+          voices: [
+            TrackVoice(guideName: voice.guideName, audioFiles: [file]),
+          ],
         );
 
         if (!isDownloaded) {
           itemsToDownload.add((
             url: file.path,
             fileName: fileName,
-            track: tracksForPreference.last,
+            track: downloadedTrack,
           ));
         } else {
-          alreadyDownloadedTracks.add(tracksForPreference.last);
+          tracksForPreference.add(downloadedTrack);
         }
       }
 
-      if (!ref.mounted || !isCurrent()) return;
-      if (alreadyDownloadedTracks.isNotEmpty) {
-        await _saveDownloadedTracksToPreference(alreadyDownloadedTracks);
-      }
-      if (!ref.mounted || !isCurrent()) return;
+      if (_cancelled || !ref.mounted) return;
 
-      final totalItems = tracksForPreference.length;
-      final alreadyDownloadedCount = totalItems - itemsToDownload.length;
+      final totalItems = trackItems.length;
+      final alreadyDownloadedCount = tracksForPreference.length;
+      await _saveDownloadedTracksToPreference(tracksForPreference);
+      if (_cancelled || !ref.mounted) return;
 
       if (itemsToDownload.isEmpty) {
         state = state.copyWith(
-          status: BatchDownloadStatus.completed,
-          completed: totalItems,
+          status: hadFailures
+              ? BatchDownloadStatus.error
+              : BatchDownloadStatus.completed,
+          completed: alreadyDownloadedCount,
           total: totalItems,
         );
         return;
@@ -183,21 +198,35 @@ class BatchDownloadNotifier extends Notifier<BatchDownloadState> {
       var nextIndex = 0;
       Future<void> worker() async {
         while (nextIndex < itemsToDownload.length) {
-          if (!ref.mounted || !isCurrent()) return;
+          if (_cancelled || !ref.mounted) return;
           final item = itemsToDownload[nextIndex++];
-          await downloaderRepo.downloadFile(item.url, fileName: item.fileName);
-          if (!ref.mounted) return;
-          // Persist completed files even if cancellation happened in flight.
-          await _saveDownloadedTracksToPreference([item.track]);
-          if (!ref.mounted || !isCurrent()) return;
-          state = state.copyWith(completed: state.completed + 1);
+          try {
+            await downloaderRepo.downloadFile(
+              item.url,
+              fileName: item.fileName,
+            );
+            if (!ref.mounted) return;
+            // Keep finished files playable even if another download fails or
+            // the user cancels. Preference writes are serialized below.
+            await _saveDownloadedTracksToPreference([item.track]);
+            if (_cancelled || !ref.mounted) return;
+            state = state.copyWith(completed: state.completed + 1);
+          } catch (e) {
+            hadFailures = true;
+            AppLogger.e('BATCH_DOWNLOAD', 'Failed downloading a track: $e');
+          }
         }
       }
 
       final poolSize = min(4, itemsToDownload.length);
       await Future.wait(List.generate(poolSize, (_) => worker()));
 
-      if (!ref.mounted || !isCurrent()) return;
+      if (_cancelled || !ref.mounted) return;
+
+      if (hadFailures) {
+        state = state.copyWith(status: BatchDownloadStatus.error);
+        return;
+      }
 
       unawaited(
         ref
@@ -215,7 +244,7 @@ class BatchDownloadNotifier extends Notifier<BatchDownloadState> {
       );
     } catch (e) {
       AppLogger.e('BATCH_DOWNLOAD', 'Error during batch download: $e');
-      if (ref.mounted && isCurrent()) {
+      if (ref.mounted) {
         state = state.copyWith(
           status: BatchDownloadStatus.error,
           errorMessage: e.toString(),
@@ -225,22 +254,45 @@ class BatchDownloadNotifier extends Notifier<BatchDownloadState> {
   }
 
   Future<void> _saveDownloadedTracksToPreference(List<Track> newTracks) {
-    // Workers finish concurrently. Serialize read/merge/write so one finished
-    // track cannot overwrite another, and read persisted data rather than cache.
+    if (newTracks.isEmpty) return Future.value();
     final write = _preferenceWrites.then((_) async {
       if (!ref.mounted) return;
       await ref.read(downloadLibraryProvider).update((current) {
         final trackMap = {for (final t in current) t.id: t};
         for (final t in newTracks) {
-          trackMap.putIfAbsent(t.id, () => t);
+          final existing = trackMap[t.id];
+          if (existing == null) {
+            trackMap[t.id] = t;
+            continue;
+          }
+          final voices = [...existing.voices];
+          for (final voice in t.voices) {
+            final index = voices.indexWhere(
+              (v) => v.guideName == voice.guideName,
+            );
+            if (index < 0) {
+              voices.add(voice);
+              continue;
+            }
+            final files = {
+              for (final f in voices[index].audioFiles) f.id: f,
+              for (final f in voice.audioFiles) f.id: f,
+            };
+            voices[index] = voices[index].copyWith(
+              audioFiles: files.values.toList(),
+            );
+          }
+          trackMap[t.id] = existing.copyWith(voices: voices);
         }
         return trackMap.values.toList();
       });
-      if (!ref.mounted) return;
-      ref.invalidate(downloadedTracksProvider);
+      if (ref.mounted) ref.invalidate(downloadedTracksProvider);
     });
-    _preferenceWrites = write.catchError((Object e, StackTrace stackTrace) {
-      AppLogger.e('BATCH_DOWNLOAD', 'Failed saving tracks to preference: $e');
+    _preferenceWrites = write.catchError((Object error) {
+      AppLogger.e(
+        'BATCH_DOWNLOAD',
+        'Failed saving tracks to preference: $error',
+      );
     });
     return write;
   }
@@ -261,19 +313,28 @@ class BatchDownloadNotifier extends Notifier<BatchDownloadState> {
       );
     }
 
-    state = const BatchDownloadState(status: BatchDownloadStatus.idle);
+    await _running;
+    if (ref.mounted) {
+      state = const BatchDownloadState(status: BatchDownloadStatus.idle);
+    }
   }
 
-  Future<void> deletePackDownloads(PackModel pack) async {
+  Future<bool> deletePackDownloads(PackModel pack) async {
     final trackIds = pack.items
         .where((item) => item.type == TypeConstants.track)
         .map((item) => item.id)
         .toSet();
 
-    if (trackIds.isEmpty) return;
+    if (trackIds.isEmpty) return true;
+    if (_deleting) return false;
+    _deleting = true;
 
     try {
-      final current = await ref.read(downloadedTracksProvider.future);
+      await _running;
+      if (!ref.mounted) return false;
+      final current = await ref
+          .read(trackRepositoryProvider)
+          .fetchTrackFromPreference();
       final downloaderRepo = ref.read(downloaderRepositoryProvider);
 
       for (final track in current.where((t) => trackIds.contains(t.id))) {
@@ -291,7 +352,7 @@ class BatchDownloadNotifier extends Notifier<BatchDownloadState> {
           .update(
             (latest) => latest.where((t) => !trackIds.contains(t.id)).toList(),
           );
-      ref.invalidate(downloadedTracksProvider);
+      if (ref.mounted) ref.invalidate(downloadedTracksProvider);
 
       unawaited(
         ref
@@ -301,8 +362,12 @@ class BatchDownloadNotifier extends Notifier<BatchDownloadState> {
               parameters: {AnalyticsEventConstants.paramPackId: pack.id},
             ),
       );
+      return true;
     } catch (e) {
       AppLogger.e('BATCH_DOWNLOAD', 'Failed deleting pack downloads: $e');
+      return false;
+    } finally {
+      _deleting = false;
     }
   }
 }

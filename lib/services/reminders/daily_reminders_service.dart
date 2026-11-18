@@ -1,5 +1,6 @@
 import 'dart:convert';
 import 'dart:async';
+
 import '../notifications/supporter_campaign_api.dart';
 import '../../providers/donation/supporter_appeal_experiment.dart';
 import '../notifications/local_notifications.dart';
@@ -102,6 +103,59 @@ DateTime anchorPreferringSavedTime(
   );
 }
 
+/// The first occurrence of [anchor]'s wall clock that is still ahead of [now].
+///
+/// The series re-anchors from the last session, and a session can be
+/// backdated: a manual entry for an earlier day, or a completion the platform
+/// replayed days late. Its anchor then fell a day or more into the past, so
+/// every reminder in the series was scheduled before "now". The platform
+/// drops those, which silently ended the user's daily reminders until a
+/// session anchored in the future again.
+///
+/// Whole calendar days keep the chosen wall clock, and [sameLocalTimeAfterDays]
+/// keeps it across DST changes.
+DateTime firstFutureOccurrence(DateTime anchor, DateTime now) {
+  if (!anchor.isBefore(now)) return anchor;
+
+  // Start from the calendar-day gap, then step: DST makes the elapsed hours
+  // inexact, so the check itself is what decides. At most two extra steps.
+  final estimatedDays = DateTime(
+    now.year,
+    now.month,
+    now.day,
+  ).difference(DateTime(anchor.year, anchor.month, anchor.day)).inDays;
+  var days = estimatedDays > 0 ? estimatedDays : 0;
+  var candidate = sameLocalTimeAfterDays(anchor, days);
+  while (candidate.isBefore(now)) {
+    days++;
+    candidate = sameLocalTimeAfterDays(anchor, days);
+  }
+
+  return candidate;
+}
+
+/// The anchor after the history was changed by hand: a manual add, an edit or
+/// a delete.
+///
+/// None of those is a session that just happened, so the changed entry's own
+/// date must not decide when reminders fire. Anchoring on it scheduled the
+/// series from a past day when someone backfilled an old date, and reminded
+/// people at their usual time on a day they had already meditated. The series
+/// is still rebuilt, because the streak and consistency numbers are baked into
+/// each day's copy.
+///
+/// What decides the anchor is today: with a session today the next reminder is
+/// tomorrow at [time], otherwise it is the next occurrence of [time].
+DateTime anchorAfterHistoryChange(
+  DateTime now,
+  TimeOfDay time, {
+  required bool meditatedToday,
+}) {
+  if (!meditatedToday) return firstReminderAnchor(now, time);
+
+  return DateTime(now.year, now.month, now.day + 1, time.hour, time.minute);
+}
+
 class DailyRemindersService {
   final SharedPreferences prefs;
   final ReminderProvider reminders;
@@ -173,13 +227,25 @@ class DailyRemindersScheduler {
   final SharedPreferences prefs;
   final ReminderProvider reminders;
 
-  DailyRemindersScheduler({required this.prefs, required this.reminders});
+  /// Clock seam: tests pin it so a run that crosses a reminder time cannot
+  /// change whether the series is still ahead of "now".
+  final DateTime Function() _now;
+
+  DailyRemindersScheduler({
+    required this.prefs,
+    required this.reminders,
+    DateTime Function()? now,
+  }) : _now = now ?? DateTime.now;
 
   Future<void> scheduleSeriesFromAnchor(
     DateTime anchorLocal, {
     AppLocalizations? l10n,
   }) async {
     final localizations = l10n ?? _getFallbackLocalizations();
+    // A backdated session hands over an anchor in the past. Scheduling from
+    // it put all 16 reminders before "now", where the platform never fires
+    // them, so keep the wall clock and move the series to its next occurrence.
+    final anchor = firstFutureOccurrence(anchorLocal, _now());
     final items = <_SeriesItem>[];
 
     var streakCount = '1';
@@ -199,7 +265,7 @@ class DailyRemindersScheduler {
     }
 
     for (var i = 0; i < 15; i++) {
-      final when = sameLocalTimeAfterDays(anchorLocal, i);
+      final when = sameLocalTimeAfterDays(anchor, i);
       final tzWhen = tz.TZDateTime.from(when, tz.local);
       final copy = _copyForDay(
         i + 1,
@@ -222,7 +288,7 @@ class DailyRemindersScheduler {
       );
     }
 
-    final day30When = sameLocalTimeAfterDays(anchorLocal, 29);
+    final day30When = sameLocalTimeAfterDays(anchor, 29);
     final day30TzWhen = tz.TZDateTime.from(day30When, tz.local);
     final day30Copy = _copyForDay(
       30,
@@ -246,7 +312,7 @@ class DailyRemindersScheduler {
 
     AppLogger.d(
       'REMINDER',
-      'Scheduling daily reminder series from anchor: $anchorLocal',
+      'Scheduling daily reminder series from anchor: $anchor',
     );
 
     try {
@@ -291,7 +357,7 @@ class DailyRemindersScheduler {
       AppLogger.e('REMINDER', 'Error scheduling daily reminder series: $e', s);
     }
 
-    final first = TimeOfDay(hour: anchorLocal.hour, minute: anchorLocal.minute);
+    final first = TimeOfDay(hour: anchor.hour, minute: anchor.minute);
     await prefs.setInt(SharedPreferenceConstants.savedHours, first.hour);
     await prefs.setInt(SharedPreferenceConstants.savedMinutes, first.minute);
   }
@@ -312,6 +378,27 @@ class DailyRemindersScheduler {
     await scheduleSeriesFromAnchor(anchor, l10n: l10n);
   }
 
+  /// Rebuilds the series after a manual add, edit or delete. See
+  /// [anchorAfterHistoryChange] for why the changed entry is not the anchor.
+  Future<void> rescheduleAfterHistoryChange({
+    required bool meditatedToday,
+    DateTime? now,
+    AppLocalizations? l10n,
+  }) async {
+    final current = now ?? _now();
+    final savedHour = prefs.getInt(SharedPreferenceConstants.savedHours);
+    final savedMinute = prefs.getInt(SharedPreferenceConstants.savedMinutes);
+    // Without a chosen time there is nothing to keep, so use the current time
+    // of day, as a session-derived anchor would.
+    final time = savedHour == null || savedMinute == null
+        ? TimeOfDay.fromDateTime(current)
+        : TimeOfDay(hour: savedHour, minute: savedMinute);
+    await scheduleSeriesFromAnchor(
+      anchorAfterHistoryChange(current, time, meditatedToday: meditatedToday),
+      l10n: l10n,
+    );
+  }
+
   (String, String) _copyForDay(
     int day, {
     required AppLocalizations l10n,
@@ -330,7 +417,7 @@ class DailyRemindersScheduler {
           (l10n.reminderDay1TitleVar4, l10n.reminderDay1BodyVar4),
           (l10n.reminderDay1TitleVar5, l10n.reminderDay1BodyVar5),
         ];
-        final idx = DateTime.now().day % variants.length;
+        final idx = _now().day % variants.length;
         return variants[idx];
       case 2:
         final variants = [
@@ -340,7 +427,7 @@ class DailyRemindersScheduler {
           (l10n.reminderDay2TitleVar4, l10n.reminderDay2BodyVar4),
           (l10n.reminderDay2TitleVar5, l10n.reminderDay2BodyVar5),
         ];
-        final idx = (DateTime.now().day + 1) % variants.length;
+        final idx = (_now().day + 1) % variants.length;
         return variants[idx];
       case 3:
         final variants = [
@@ -350,7 +437,7 @@ class DailyRemindersScheduler {
           (l10n.reminderDay3TitleVar4, l10n.reminderDay3BodyVar4),
           (l10n.reminderDay3TitleVar5, l10n.reminderDay3BodyVar5),
         ];
-        final idx = (DateTime.now().day + 2) % variants.length;
+        final idx = (_now().day + 2) % variants.length;
         return variants[idx];
       case 4:
         return (l10n.reminderDay4Title, l10n.reminderDay4Body);

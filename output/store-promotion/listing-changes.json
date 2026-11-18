@@ -2,16 +2,20 @@
   "date": "2026-11-16",
   "apple": {
     "promotionalText": {
-      "en-GB": "Make room for calm on iPhone and iPad. Add Medito widgets to your Home Screen to see your streak, check your consistency and pick up your next meditation.",
-      "en-US": "Make room for calm on iPhone and iPad. Add Medito widgets to your Home Screen to see your streak, check your consistency and pick up your next meditation.",
-      "en-CA": "Make room for calm on iPhone and iPad. Add Medito widgets to your Home Screen to see your streak, check your consistency and pick up your next meditation.",
-      "fr-FR": "Sur iPhone et iPad, gardez votre pratique à portée de main : ajoutez des widgets Medito pour voir votre série, votre régularité et votre prochaine méditation.",
-      "de-DE": "Meditiere auf iPhone und iPad. Mit Medito-Widgets siehst du deine Serie, deine Regelmäßigkeit und deine nächste Meditation direkt auf dem Home-Bildschirm.",
-      "es-MX": "Medita en iPhone y iPad. Añade widgets de Medito a tu pantalla de inicio para ver tu racha, tu constancia y acceder a tu próxima meditación."
+      "en-GB": "Coming soon on Apple Watch. Meditate on iPhone and iPad, with widgets for your streak, consistency and next session. Always free.",
+      "en-US": "Coming soon on Apple Watch. Meditate on iPhone and iPad, with widgets for your streak, consistency and next session. Always free.",
+      "en-CA": "Coming soon on Apple Watch. Meditate on iPhone and iPad, with widgets for your streak, consistency and next session. Always free.",
+      "fr-FR": "Bientôt sur Apple Watch. Méditez sur iPhone et iPad. Des widgets pour votre série, votre régularité et votre prochaine séance. Toujours gratuit.",
+      "de-DE": "Bald auf der Apple Watch. Meditiere auf iPhone und iPad. Widgets zeigen deine Serie, Regelmäßigkeit und nächste Meditation. Immer kostenlos.",
+      "es-MX": "Próximamente en Apple Watch. Medita en iPhone y iPad, con widgets para tu racha, constancia y próxima sesión. Siempre gratis."
     },
     "version": "2611.11.0",
     "descriptionAndScreenshots": "Locked on released version; require next version",
-    "watch": "No watch app target in current medito_new iOS project; not advertised"
+    "watch": "Current live promo says Coming soon. The next release embeds the Watch app and uses launch promo copy plus Watch screenshots, guarded by binary verification.",
+    "watchScreenshotAssetIds": [
+      "84400005-9741-87e6-8008-d70d854b76bf",
+      "99800005-9741-87e6-801b-b75f4ed86bcc"
+    ]
   },
   "googlePlay": {
     "locale": "en-GB",

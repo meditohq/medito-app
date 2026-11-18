@@ -268,6 +268,7 @@ jobs:
           path: build/app/outputs/apk/prod/release/
 
       - name: Enable KVM
+        if: runner.os == 'Linux'
         run: |
           echo 'KERNEL=="kvm", GROUP="kvm", MODE="0666", OPTIONS+="static_node=kvm"' | sudo tee /etc/udev/rules.d/99-kvm4all.rules
           sudo udevadm control --reload-rules
@@ -289,7 +290,9 @@ jobs:
           ram-size: 4096M
           cores: 4
           force-avd-creation: false
-          emulator-options: -no-snapshot-save -no-window -gpu swiftshader_indirect -noaudio -no-boot-anim
+          # Use the supported software renderer without Vulkan: the Linux
+          # emulator vanished mid-flow with swiftshader_indirect on both boots.
+          emulator-options: -no-snapshot-save -no-window -gpu swiftshader -feature -Vulkan -noaudio -no-boot-anim
           disable-animations: true
           script: |
             curl -Ls "https://get.maestro.mobile.dev" | bash
@@ -325,7 +328,7 @@ jobs:
           ram-size: 4096M
           cores: 4
           force-avd-creation: false
-          emulator-options: -no-snapshot-save -no-window -gpu swiftshader_indirect -noaudio -no-boot-anim
+          emulator-options: -no-snapshot-save -no-window -gpu swiftshader -feature -Vulkan -noaudio -no-boot-anim
           disable-animations: true
           script: |
             curl -Ls "https://get.maestro.mobile.dev" | bash
@@ -354,7 +357,7 @@ jobs:
           ram-size: 4096M
           cores: 4
           force-avd-creation: false
-          emulator-options: -no-snapshot-save -no-window -gpu swiftshader_indirect -noaudio -no-boot-anim
+          emulator-options: -no-snapshot-save -no-window -gpu swiftshader -feature -Vulkan -noaudio -no-boot-anim
           disable-animations: true
           script: |
             curl -Ls "https://get.maestro.mobile.dev" | bash
@@ -440,9 +443,10 @@ jobs:
       - name: Resolve previous release tag
         id: prev
         run: |
+          CURRENT_VERSION=$(awk '/^version:/ { split($2, v, "+"); print v[1]; exit }' pubspec.yaml)
           PREV=$(git tag --list '[0-9]*.[0-9]*.[0-9]*' --sort=-v:refname \
-                 | grep -v "^${GITHUB_REF_NAME}$" \
-                 | head -1)
+                 | awk -v ref="$GITHUB_REF_NAME" -v current="$CURRENT_VERSION" \
+                   '$0 != ref && $0 != current && !found { print; found = 1 }')
           if [ -z "$PREV" ]; then
             echo "No previous release tag found." >> "$GITHUB_STEP_SUMMARY"
             echo "tag=" >> "$GITHUB_OUTPUT"
@@ -511,7 +515,9 @@ jobs:
       # each command on a single line and inline the app id.
       - name: Seed old version on emulator
         if: steps.gate.outputs.run == 'true'
-        timeout-minutes: 15
+        # Includes SDK/system-image installation on a fresh runner as well as
+        # the seed flow; a slow image download previously consumed all 15 min.
+        timeout-minutes: 25
         uses: reactivecircus/android-emulator-runner@v2.38.0
         with:
           api-level: 34
@@ -526,7 +532,7 @@ jobs:
           ram-size: 4096M
           cores: 4
           force-avd-creation: false
-          emulator-options: -no-snapshot-save -no-window -gpu swiftshader_indirect -noaudio -no-boot-anim
+          emulator-options: -no-snapshot-save -no-window -gpu swiftshader -feature -Vulkan -noaudio -no-boot-anim
           disable-animations: true
           script: |
             curl -Ls "https://get.maestro.mobile.dev" | bash
@@ -553,7 +559,7 @@ jobs:
           ram-size: 4096M
           cores: 4
           force-avd-creation: false
-          emulator-options: -no-snapshot-save -no-window -gpu swiftshader_indirect -noaudio -no-boot-anim
+          emulator-options: -no-snapshot-save -no-window -gpu swiftshader -feature -Vulkan -noaudio -no-boot-anim
           disable-animations: true
           script: |
             adb shell pm list packages | grep -q meditofoundation.medito || (echo "Seeded install did not survive the emulator restart" && exit 1)
@@ -1015,9 +1021,10 @@ jobs:
       - name: Resolve previous release tag
         id: prev
         run: |
+          CURRENT_VERSION=$(awk '/^version:/ { split($2, v, "+"); print v[1]; exit }' pubspec.yaml)
           PREV=$(git tag --list '[0-9]*.[0-9]*.[0-9]*' --sort=-v:refname \
-                 | grep -v "^${GITHUB_REF_NAME}$" \
-                 | head -1)
+                 | awk -v ref="$GITHUB_REF_NAME" -v current="$CURRENT_VERSION" \
+                   '$0 != ref && $0 != current && !found { print; found = 1 }')
           if [ -z "$PREV" ]; then
             echo "No previous release tag found." >> "$GITHUB_STEP_SUMMARY"
             echo "tag=" >> "$GITHUB_OUTPUT"

@@ -24,6 +24,7 @@ class MeditoIcons {
   static const downloadCircleSolid = AssetConstants.iconDownloadCircleSolid;
   static const downloadSquare = AssetConstants.iconDownloadSquare;
   static const fire = AssetConstants.iconFire;
+  static const fireSolid = AssetConstants.iconFireSolid;
   static const forward15 = AssetConstants.iconForward15;
   static const graphUp = AssetConstants.iconGraphUp;
   static const heart = AssetConstants.iconHeart;

@@ -254,25 +254,16 @@ class StreakCircleState extends ConsumerState<StreakCircle>
                               ),
                             )
                           else
-                            Stack(
-                              alignment: Alignment.center,
-                              children: [
-                                if (isStreakDoneToday)
-                                  MeditoIcon(
-                                    assetName: MeditoIcons.fire,
-                                    size: StreakCircleConstants.iconSize,
-                                    color: Theme.of(context)
-                                        .colorScheme
-                                        .onSurface,
-                                  ),
-                                MeditoIcon(
-                                  assetName: MeditoIcons.fire,
-                                  color: isStreakDoneToday
-                                      ? context.brandAccent
-                                      : Theme.of(context).colorScheme.onSurface,
-                                  size: StreakCircleConstants.innerIconSize,
-                                ),
-                              ],
+                            // Filled once today's meditation is done,
+                            // outlined until then.
+                            MeditoIcon(
+                              assetName: isStreakDoneToday
+                                  ? MeditoIcons.fireSolid
+                                  : MeditoIcons.fire,
+                              color: isStreakDoneToday
+                                  ? context.brandAccent
+                                  : Theme.of(context).colorScheme.onSurface,
+                              size: StreakCircleConstants.iconSize,
                             ),
                           const SizedBox(width: 8),
                           Text(
@@ -378,7 +369,7 @@ class StreakCircleState extends ConsumerState<StreakCircle>
                     child: ExcludeSemantics(
                       child: MeditoIcon(
                         assetName: isStreakDoneToday
-                            ? MeditoIcons.fire
+                            ? MeditoIcons.fireSolid
                             : MeditoIcons.sun,
                         size: StreakCircleConstants.iconSize,
                         color: isStreakDoneToday
