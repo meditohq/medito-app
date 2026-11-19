@@ -1,5 +1,8 @@
 import 'dart:math' as math;
+import 'dart:ui' show ImageFilter;
 
+import 'package:medito/widgets/adaptive/adaptive_content.dart';
+import 'package:medito/widgets/adaptive/adaptive_cover_split.dart';
 import 'package:medito/widgets/adaptive/adaptive_page_body.dart';
 import 'package:medito/constants/constants.dart';
 import 'package:medito/l10n/app_localizations.dart';
@@ -32,6 +35,23 @@ class PackView extends ConsumerStatefulWidget {
 class _PackViewState extends ConsumerState<PackView>
     with AutomaticKeepAliveClientMixin<PackView> {
   final ScrollController _scrollController = ScrollController();
+
+  /// The track list's own controller in the two-pane layout. Separate from
+  /// [_scrollController] so the two layouts never share one controller while
+  /// a fold or resize swaps them.
+  final ScrollController _wideListController = ScrollController();
+
+  /// Marks where the track list starts in the single-column layout.
+  final _listStartKey = GlobalKey();
+
+  /// [_listStartKey]'s top at scroll offset 0, kept from the last time it was
+  /// laid out (it is unmounted once scrolled far away).
+  double? _listTopAtZero;
+  bool? _wide;
+
+  /// How far the track list was scrolled when the layout last swapped, to be
+  /// re-applied to the new layout once it is laid out.
+  double? _pendingListScroll;
   // The inline play button and the Stack it docks into, measured on scroll.
   final _playButtonKey = GlobalKey();
   final _bodyKey = GlobalKey();
@@ -63,6 +83,8 @@ class _PackViewState extends ConsumerState<PackView>
 
   @override
   void dispose() {
+    _scrollController.dispose();
+    _wideListController.dispose();
     super.dispose();
   }
 
@@ -86,56 +108,284 @@ class _PackViewState extends ConsumerState<PackView>
         loading: () => backButton,
         error: (_, _) => backButton,
       ),
-      body: AdaptivePageBody(
-        maxWidth: 960,
-        child: packAsyncValue.when(
-          skipLoadingOnRefresh: false,
-          skipLoadingOnReload: false,
-          data: (data) {
-            final playable = PackPathButton.isPlayable(data);
-            if (playable) {
-              WidgetsBinding.instance.addPostFrameCallback(
-                (_) => mounted ? _measurePlaySlot() : null,
-              );
-            }
-            final slotTop = _playSlotTopAtZero;
-            final offset = _scrollController.hasClients
-                ? _scrollController.offset
-                : 0.0;
-            return Stack(
-              key: _bodyKey,
-              children: [
-                _buildScaffoldWithData(
-                  data,
-                  ref,
-                  floatingPlay: playable && slotTop != null,
-                ),
-                // One button, drawn above the app bar: it rides with the
-                // content, then sticks straddling the collapsed bar's edge
-                // (Spotify-style). No swap between copies, so no jump.
-                // Screen readers use the hidden inline copy instead, which
-                // reads in place rather than after the whole list.
-                if (playable && slotTop != null)
-                  Positioned(
-                    top: math.max(slotTop - offset, _dockedPlayTop),
-                    right: PackPathButton.rightInset,
-                    child: ExcludeSemantics(child: PackPlayButton(pack: data)),
-                  ),
-              ],
-            );
-          },
-          error: (err, stack) {
-            final error = err is AppError ? err : const UnknownError();
-            return MeditoErrorWidget(
-              error: error,
-              onTap: () => ref.refresh(packDataProvider(packId: widget.id)),
-              isLoading: packAsyncValue.isLoading,
-            );
-          },
-          loading: () => const FolderShimmerWidget(),
+      body: LayoutBuilder(
+        builder: (context, constraints) => _body(
+          packAsyncValue,
+          wide: AdaptiveCoverSplit.isWide(constraints.maxWidth),
         ),
       ),
     );
+  }
+
+  Widget _body(AsyncValue<PackModel> packAsyncValue, {required bool wide}) {
+    return AdaptivePageBody(
+      maxWidth: wide ? AdaptiveCoverSplit.maxWidth : 960,
+      child: packAsyncValue.when(
+        skipLoadingOnRefresh: false,
+        skipLoadingOnReload: false,
+        data: (data) {
+          _keepListScrollAcrossLayouts(wide);
+          if (wide) return _buildWide(data);
+          WidgetsBinding.instance.addPostFrameCallback(
+            (_) => mounted ? _measureListTop() : null,
+          );
+          final playable = PackPathButton.isPlayable(data);
+          if (playable) {
+            WidgetsBinding.instance.addPostFrameCallback(
+              (_) => mounted ? _measurePlaySlot() : null,
+            );
+          }
+          final slotTop = _playSlotTopAtZero;
+          final offset = _scrollController.hasClients
+              ? _scrollController.offset
+              : 0.0;
+          return Stack(
+            key: _bodyKey,
+            children: [
+              _buildScaffoldWithData(
+                data,
+                ref,
+                floatingPlay: playable && slotTop != null,
+              ),
+              // One button, drawn above the app bar: it rides with the
+              // content, then sticks straddling the collapsed bar's edge
+              // (Spotify-style). No swap between copies, so no jump.
+              // Screen readers use the hidden inline copy instead, which
+              // reads in place rather than after the whole list.
+              if (playable && slotTop != null)
+                Positioned(
+                  top: math.max(slotTop - offset, _dockedPlayTop),
+                  right: PackPathButton.rightInset,
+                  child: ExcludeSemantics(child: PackPlayButton(pack: data)),
+                ),
+            ],
+          );
+        },
+        error: (err, stack) {
+          final error = err is AppError ? err : const UnknownError();
+          return MeditoErrorWidget(
+            error: error,
+            onTap: () => ref.refresh(packDataProvider(packId: widget.id)),
+            isLoading: packAsyncValue.isLoading,
+          );
+        },
+        loading: () => const FolderShimmerWidget(),
+      ),
+    );
+  }
+
+  /// Full-height cover with a title, description and play card on the left;
+  /// the track list scrolls on its own on the right.
+  Widget _buildWide(PackModel pack) {
+    return LayoutBuilder(
+      builder: (context, constraints) => Row(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: [
+          SizedBox(
+            width: AdaptiveCoverSplit.coverWidth(constraints.maxWidth),
+            child: AdaptiveContent(child: _wideHeader(pack)),
+          ),
+          Expanded(
+            // Rows stop at the status bar instead of scrolling under it.
+            child: SafeArea(
+              bottom: false,
+              left: false,
+              right: false,
+              child: AdaptiveContent(
+                child: RefreshIndicator(
+                  onRefresh: _refresh,
+                  child: ListView(
+                    controller: _wideListController,
+                    physics: const AlwaysScrollableScrollPhysics(),
+                    padding: EdgeInsets.zero,
+                    children: [
+                      ..._listItems(pack, ref),
+                      _markAllButton(pack),
+                      height32,
+                    ],
+                  ),
+                ),
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  /// The cover fills the pane (covers are 3:4 portrait and at least as tall
+  /// as the pane in pixels, so it needs no softening); title, description and
+  /// play button sit on a frosted card at its foot (the announcement card's
+  /// glass).
+  Widget _wideHeader(PackModel pack) {
+    final playable = PackPathButton.isPlayable(pack);
+    final completed = pack.items
+        .where((item) => item.isCompleted == true)
+        .length;
+    final onSurface = Theme.of(context).colorScheme.onSurface;
+    final description = pack.description ?? '';
+    final theme = Theme.of(context);
+    final radius = BorderRadius.circular(20);
+    final card = ClipRRect(
+      borderRadius: radius,
+      child: BackdropFilter(
+        filter: ImageFilter.blur(sigmaX: 24, sigmaY: 24),
+        child: DecoratedBox(
+          decoration: BoxDecoration(
+            color: theme.cardColor.withValues(alpha: 0.72),
+            borderRadius: radius,
+            border: Border.all(
+              color: theme.brightness == Brightness.dark
+                  ? Colors.white.withValues(alpha: 0.12)
+                  : Colors.black.withValues(alpha: 0.08),
+              width: 0.5,
+            ),
+          ),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              Padding(
+                padding: const EdgeInsets.fromLTRB(20, 20, 20, 0),
+                child: Semantics(
+                  header: true,
+                  child: Text(pack.title, style: context.text.title),
+                ),
+              ),
+              if (description.isEmpty)
+                height20
+              else
+                // Not DescriptionWidget: its opaque surface would hide the glass.
+                Padding(
+                  padding: const EdgeInsets.all(20),
+                  child: MarkdownWidget(
+                    body: description,
+                    selectable: true,
+                    textAlign: WrapAlignment.start,
+                    p: context.text.body,
+                    a: context.text.body.copyWith(
+                      decoration: TextDecoration.underline,
+                    ),
+                  ),
+                ),
+              _packTags(pack, endReserve: 0),
+              if (playable) ...[
+                Padding(
+                  padding: const EdgeInsets.fromLTRB(20, 0, 20, 20),
+                  child: Align(
+                    alignment: Alignment.centerRight,
+                    child: PackPlayButton(pack: pack),
+                  ),
+                ),
+                // Same progress edge as the single-column header.
+                SizedBox(
+                  height: 3,
+                  child: ExcludeSemantics(
+                    child: LinearProgressIndicator(
+                      value: pack.items.isEmpty
+                          ? 0
+                          : completed / pack.items.length,
+                      backgroundColor: onSurface.withValues(alpha: 0.08),
+                      color: context.brandAccent,
+                    ),
+                  ),
+                ),
+              ],
+            ],
+          ),
+        ),
+      ),
+    );
+    return Stack(
+      fit: StackFit.expand,
+      children: [
+        const ColoredBox(color: ColorConstants.onyx),
+        NetworkImageWidget(
+          url: pack.coverUrl ?? '',
+          shouldCache: true,
+          errorWidget: const SizedBox(),
+        ),
+        Align(
+          alignment: Alignment.bottomCenter,
+          child: SingleChildScrollView(
+            padding: EdgeInsets.fromLTRB(
+              20,
+              MediaQuery.paddingOf(context).top + 20,
+              20,
+              20,
+            ),
+            child: card,
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget _headerContent(PackModel pack) => Column(
+    children: [
+      DescriptionWidget(
+        description: pack.description ?? '',
+        endReserve: PackPathButton.endReserve,
+      ),
+      _packTags(pack),
+    ],
+  );
+
+  Future<void> _refresh() async {
+    if (widget.id == 'favorites') {
+      // If this is the favorites screen, refresh the favorites list from the server
+      await ref.read(favoritesNotifierProvider.notifier).syncWithServer();
+    }
+    return ref.refresh(packDataProvider(packId: widget.id));
+  }
+
+  /// The single-column list scrolls together with its header; the two-pane
+  /// list scrolls alone. When a fold, unfold or resize swaps the layouts,
+  /// carry over how far the track list itself was scrolled so the same rows
+  /// stay in view.
+  void _keepListScrollAcrossLayouts(bool wide) {
+    final wasWide = _wide;
+    _wide = wide;
+    if (wasWide != null && wasWide != wide) {
+      final from = wasWide ? _wideListController : _scrollController;
+      final offset = from.hasClients ? from.offset : 0.0;
+      final listTop = _listTopAtZero;
+      _pendingListScroll = wasWide
+          ? offset
+          : (listTop == null ? 0.0 : offset - (listTop - _pinnedBarBottom));
+    }
+    if (_pendingListScroll == null) return;
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      final listScroll = _pendingListScroll;
+      if (!mounted || listScroll == null) return;
+      final to = wide ? _wideListController : _scrollController;
+      if (!to.hasClients) return;
+      if (!wide) _measureListTop();
+      final listTop = _listTopAtZero;
+      if (!wide && listTop == null) return;
+      _pendingListScroll = null;
+      if (listScroll <= 0) return;
+      final target = wide
+          ? listScroll
+          : listScroll + listTop! - _pinnedBarBottom;
+      to.jumpTo(target.clamp(0.0, to.position.maxScrollExtent));
+    });
+  }
+
+  /// Bottom edge of the collapsed app bar: where the visible track list
+  /// starts once the single-column header has scrolled away.
+  double get _pinnedBarBottom =>
+      MediaQuery.paddingOf(context).top + _collapsedAppBarHeight;
+
+  void _measureListTop() {
+    final marker = _listStartKey.currentContext?.findRenderObject();
+    final body = _bodyKey.currentContext?.findRenderObject();
+    if (marker is! RenderBox || body is! RenderBox || !marker.attached) return;
+    final offset = _scrollController.hasClients
+        ? _scrollController.offset
+        : 0.0;
+    _listTopAtZero =
+        marker.localToGlobal(Offset.zero, ancestor: body).dy + offset;
   }
 
   void _scrollListener() {
@@ -169,13 +419,7 @@ class _PackViewState extends ConsumerState<PackView>
     bool floatingPlay = false,
   }) {
     return RefreshIndicator(
-      onRefresh: () async {
-        if (widget.id == 'favorites') {
-          // If this is the favorites screen, refresh the favorites list from the server
-          await ref.read(favoritesNotifierProvider.notifier).syncWithServer();
-        }
-        return ref.refresh(packDataProvider(packId: widget.id));
-      },
+      onRefresh: _refresh,
       child: CustomScrollView(
         controller: _scrollController,
         physics: const AlwaysScrollableScrollPhysics(),
@@ -194,16 +438,9 @@ class _PackViewState extends ConsumerState<PackView>
                 buttonKey: _playButtonKey,
                 // The floating copy takes over once the slot is measured.
                 hideButton: floatingPlay,
-                child: Column(
-                  children: [
-                    DescriptionWidget(
-                      description: pack.description ?? '',
-                      endReserve: PackPathButton.endReserve,
-                    ),
-                    _packTags(pack),
-                  ],
-                ),
+                child: _headerContent(pack),
               ),
+              SizedBox(key: _listStartKey),
               ..._listItems(pack, ref),
               _markAllButton(pack),
               height32,
@@ -215,7 +452,10 @@ class _PackViewState extends ConsumerState<PackView>
   }
 
   /// Tags shared by most of the pack's tracks; nothing when unavailable.
-  Widget _packTags(PackModel pack) {
+  Widget _packTags(
+    PackModel pack, {
+    double endReserve = PackPathButton.endReserve,
+  }) {
     final trackIds = pack.items
         .where((item) => item.type == TypeConstants.track)
         .map((item) => item.id)
@@ -226,12 +466,7 @@ class _PackViewState extends ConsumerState<PackView>
       child: PackTagChips(
         trackIds: trackIds,
         // Right inset clears the play button on the header's lower edge.
-        padding: const EdgeInsets.fromLTRB(
-          20,
-          0,
-          20 + PackPathButton.endReserve,
-          16,
-        ),
+        padding: EdgeInsets.fromLTRB(20, 0, 20 + endReserve, 16),
       ),
     );
   }

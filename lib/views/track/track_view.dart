@@ -1,4 +1,6 @@
 // ignore_for_file: use_build_context_synchronously
+import 'package:medito/widgets/adaptive/adaptive_content.dart';
+import 'package:medito/widgets/adaptive/adaptive_cover_split.dart';
 import 'package:medito/widgets/adaptive/adaptive_page_body.dart';
 import 'package:medito/constants/constants.dart';
 import 'package:medito/exceptions/app_error.dart';
@@ -80,40 +82,104 @@ class _TrackViewState extends ConsumerState<TrackView>
         loading: () => backButton,
         error: (_, _) => backButton,
       ),
-      body: AdaptivePageBody(
-        maxWidth: 600,
-        child: SafeArea(
-          child: SingleChildScrollView(
-            child: Padding(
-              padding: const EdgeInsets.all(20.0),
-              child: trackAsyncValue.when(
-                data: (track) {
-                  final selection = TrackVariantSelector.resolve(
-                    track,
-                    guideName: guideName,
-                    durationMs: lastSelectedDuration,
-                  );
+      body: LayoutBuilder(
+        builder: (context, constraints) => trackAsyncValue.when(
+          data: (track) {
+            final selection = TrackVariantSelector.resolve(
+              track,
+              guideName: guideName,
+              durationMs: lastSelectedDuration,
+            );
+            if (AdaptiveCoverSplit.isWide(constraints.maxWidth)) {
+              return _buildWideLayout(
+                track,
+                selection.voice,
+                selection.file,
+                useCompactLayout,
+              );
+            }
+            return _column(
+              _buildPortraitLayout(
+                track,
+                selection.voice,
+                selection.file,
+                useCompactLayout,
+              ),
+            );
+          },
+          loading: () => _column(const TrackShimmerWidget()),
+          error: (err, stack) {
+            final error = err is AppError ? err : const UnknownError();
+            return _column(
+              MeditoErrorWidget(
+                error: error,
+                onTap: () =>
+                    ref.refresh(tracksProvider(trackId: widget.trackId)),
+                isScaffold: false,
+              ),
+            );
+          },
+        ),
+      ),
+    );
+  }
 
-                  return _buildPortraitLayout(
-                    track,
-                    selection.voice,
-                    selection.file,
-                    useCompactLayout,
-                  );
-                },
-                loading: () => const TrackShimmerWidget(),
-                error: (err, stack) {
-                  final error = err is AppError ? err : const UnknownError();
-                  return MeditoErrorWidget(
-                    error: error,
-                    onTap: () =>
-                        ref.refresh(tracksProvider(trackId: widget.trackId)),
-                    isScaffold: false,
-                  );
-                },
+  /// The single centred column used below the two-pane width.
+  Widget _column(Widget child) => AdaptivePageBody(
+    maxWidth: 600,
+    child: SafeArea(
+      child: SingleChildScrollView(
+        child: Padding(padding: const EdgeInsets.all(20.0), child: child),
+      ),
+    ),
+  );
+
+  /// Matches the pack screen's two panes: the cover fills the left one and
+  /// the title, description, pickers and play button sit centred in the right.
+  Widget _buildWideLayout(
+    Track track,
+    TrackVoice activeVoice,
+    TrackAudioFile activeFile,
+    bool useCompactLayout,
+  ) {
+    return AdaptivePageBody(
+      maxWidth: AdaptiveCoverSplit.maxWidth,
+      child: LayoutBuilder(
+        builder: (context, constraints) => Row(
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: [
+            SizedBox(
+              width: AdaptiveCoverSplit.coverWidth(constraints.maxWidth),
+              child: Stack(
+                fit: StackFit.expand,
+                children: [
+                  ColoredBox(color: Theme.of(context).cardColor),
+                  NetworkImageWidget(url: track.coverUrl, shouldCache: true),
+                ],
               ),
             ),
-          ),
+            Expanded(
+              child: SafeArea(
+                left: false,
+                child: AdaptiveContent(
+                  child: Center(
+                    child: SingleChildScrollView(
+                      padding: const EdgeInsets.all(24),
+                      child: ConstrainedBox(
+                        constraints: const BoxConstraints(maxWidth: 480),
+                        child: _buildTrackContent(
+                          track,
+                          activeVoice,
+                          activeFile,
+                          useCompactLayout: useCompactLayout,
+                        ),
+                      ),
+                    ),
+                  ),
+                ),
+              ),
+            ),
+          ],
         ),
       ),
     );

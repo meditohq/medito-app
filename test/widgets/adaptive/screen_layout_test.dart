@@ -25,7 +25,9 @@ import 'package:medito/views/splash_welcome_layout.dart';
 import 'package:medito/views/settings/settings_screen.dart';
 import 'package:medito/views/onboarding/onboarding_pager_screen.dart';
 import 'package:medito/providers/onboarding/onboarding_donation_timing_experiment.dart';
+
 import 'dart:ui' as ui;
+
 import 'package:shared_preferences/shared_preferences.dart';
 
 import 'package:cached_network_image/cached_network_image.dart';
@@ -130,8 +132,7 @@ class _JourneyTracks extends Tracks {
   Future<model.Track> build({required String trackId}) async => model.Track(
     id: trackId,
     title: 'Noting Thoughts',
-    description:
-        'Learn to notice your thoughts without getting caught up in them. This guided meditation helps you gently return your attention to the present moment.',
+    description: 'Learn to notice your thoughts without getting caught up in them. This guided meditation helps you gently return your attention to the present moment.',
     coverUrl: request.coverUrl,
     isPublished: true,
     hasBackgroundSound: true,
@@ -600,9 +601,8 @@ void main() {
             ],
             child: Builder(
               builder: (context) => MediaQuery(
-                data: MediaQuery.of(
-                  context,
-                ).copyWith(textScaler: TextScaler.linear(scale)),
+                data: MediaQuery.of(context)
+                    .copyWith(textScaler: TextScaler.linear(scale)),
                 child: Scaffold(
                   body: SafeArea(
                     top: false,
@@ -952,12 +952,10 @@ void main() {
                     ),
                   ],
                 ),
-                packDataProvider(
-                  packId: previewPack.id,
-                ).overrideWith((ref) async => previewPack),
-                tracksProvider(
-                  trackId: 'preview',
-                ).overrideWith(_JourneyTracks.new),
+                packDataProvider(packId: previewPack.id)
+                    .overrideWith((ref) async => previewPack),
+                tracksProvider(trackId: 'preview')
+                    .overrideWith(_JourneyTracks.new),
                 favoritesNotifierProvider.overrideWith(_JourneyFavorites.new),
                 statsProvider.overrideWith(_OnboardingStats.new),
                 tagCatalogProvider.overrideWithValue(
@@ -989,8 +987,7 @@ void main() {
                 fetchDonationPageProvider.overrideWith(
                   (ref) async => const DonationPageModel(
                     title: 'Keep meditation free',
-                    text:
-                        'Your support helps us make meditation accessible to everyone.',
+                    text: 'Your support helps us make meditation accessible to everyone.',
                     buttons: [
                       ButtonModel(
                         title: 'Donate',
@@ -1016,7 +1013,35 @@ void main() {
           }
           await tester.pump(const Duration(seconds: 3));
           expect(tester.takeException(), isNull, reason: '$name at $size');
-          if (name == 'track') {
+          if (name == 'pack') {
+            final title = tester.getTopLeft(find.text(previewPack.title).first);
+            final row = tester.getTopLeft(
+              find.text(previewPack.items.first.title).first,
+            );
+            if (size.width >= 840) {
+              // Two panes: the track list starts beside the cover and title.
+              expect(row.dx, greaterThan(300), reason: 'pack at $size');
+              expect(row.dy, lessThan(title.dy), reason: 'pack at $size');
+            } else {
+              // One column: the track list follows the header.
+              expect(row.dx, lessThan(100), reason: 'pack at $size');
+              expect(row.dy, greaterThan(title.dy), reason: 'pack at $size');
+            }
+          }
+          if (name == 'track' && size.width >= 840) {
+            // Two panes: the cover fills the left one, the details sit
+            // beside it.
+            final title = tester.getTopLeft(find.text('Noting Thoughts').first);
+            expect(title.dx, greaterThan(300), reason: 'track at $size');
+            expect(
+              find.descendant(
+                of: find.byType(TrackView),
+                matching: find.byType(AspectRatio),
+              ),
+              findsNothing,
+              reason: 'track at $size',
+            );
+          } else if (name == 'track') {
             final image = find
                 .descendant(
                   of: find.byType(TrackView),
@@ -1076,8 +1101,7 @@ void main() {
           child: QuoteShareScreen(
             data: HomeQuoteModel(
               id: 'layout-test',
-              quote:
-                  'The present moment is filled with joy and happiness. If you are attentive, you will see it.',
+              quote: 'The present moment is filled with joy and happiness. If you are attentive, you will see it.',
               author: 'Thich Nhat Hanh',
             ),
           ),
