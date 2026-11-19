@@ -99,6 +99,8 @@ class _PackViewState extends ConsumerState<PackView>
     final backButton = SingleBackButtonActionBar(onBackPressed: popContext);
 
     return Scaffold(
+      // Two panes: the cover runs the full height and the bar floats over it.
+      extendBody: AdaptiveCoverSplit.isWide(MediaQuery.sizeOf(context).width),
       bottomNavigationBar: packAsyncValue.when(
         data: (pack) => PackViewBottomBar(
           packId: widget.id,
@@ -169,7 +171,7 @@ class _PackViewState extends ConsumerState<PackView>
             isLoading: packAsyncValue.isLoading,
           );
         },
-        loading: () => const FolderShimmerWidget(),
+        loading: () => FolderShimmerWidget(wide: wide),
       ),
     );
   }
@@ -183,12 +185,16 @@ class _PackViewState extends ConsumerState<PackView>
         children: [
           SizedBox(
             width: AdaptiveCoverSplit.coverWidth(constraints.maxWidth),
-            child: AdaptiveContent(child: _wideHeader(pack)),
+            // Built under the Scaffold so its insets include the action bar
+            // floating over the cover.
+            child: AdaptiveContent(
+              child: Builder(builder: (context) => _wideHeader(context, pack)),
+            ),
           ),
           Expanded(
-            // Rows stop at the status bar instead of scrolling under it.
+            // Rows stop at the status bar and the floating action bar instead
+            // of scrolling under them.
             child: SafeArea(
-              bottom: false,
               left: false,
               right: false,
               child: AdaptiveContent(
@@ -217,13 +223,16 @@ class _PackViewState extends ConsumerState<PackView>
   /// as the pane in pixels, so it needs no softening); title, description and
   /// play button sit on a frosted card at its foot (the announcement card's
   /// glass).
-  Widget _wideHeader(PackModel pack) {
+  Widget _wideHeader(BuildContext context, PackModel pack) {
     final playable = PackPathButton.isPlayable(pack);
     final completed = pack.items
         .where((item) => item.isCompleted == true)
         .length;
     final onSurface = Theme.of(context).colorScheme.onSurface;
     final description = pack.description ?? '';
+    // A short window (a phone on its side) has little cover to show: the play
+    // button moves up beside the title so the card covers less of it.
+    final compact = MediaQuery.sizeOf(context).height < 600;
     final theme = Theme.of(context);
     final radius = BorderRadius.circular(20);
     final card = ClipRRect(
@@ -247,9 +256,19 @@ class _PackViewState extends ConsumerState<PackView>
             children: [
               Padding(
                 padding: const EdgeInsets.fromLTRB(20, 20, 20, 0),
-                child: Semantics(
-                  header: true,
-                  child: Text(pack.title, style: context.text.title),
+                child: Row(
+                  children: [
+                    Expanded(
+                      child: Semantics(
+                        header: true,
+                        child: Text(pack.title, style: context.text.title),
+                      ),
+                    ),
+                    if (playable && compact) ...[
+                      const SizedBox(width: 12),
+                      PackPlayButton(pack: pack),
+                    ],
+                  ],
                 ),
               ),
               if (description.isEmpty)
@@ -257,7 +276,7 @@ class _PackViewState extends ConsumerState<PackView>
               else
                 // Not DescriptionWidget: its opaque surface would hide the glass.
                 Padding(
-                  padding: const EdgeInsets.all(20),
+                  padding: EdgeInsets.fromLTRB(20, compact ? 12 : 20, 20, 20),
                   child: MarkdownWidget(
                     body: description,
                     selectable: true,
@@ -270,13 +289,14 @@ class _PackViewState extends ConsumerState<PackView>
                 ),
               _packTags(pack, endReserve: 0),
               if (playable) ...[
-                Padding(
-                  padding: const EdgeInsets.fromLTRB(20, 0, 20, 20),
-                  child: Align(
-                    alignment: Alignment.centerRight,
-                    child: PackPlayButton(pack: pack),
+                if (!compact)
+                  Padding(
+                    padding: const EdgeInsets.fromLTRB(20, 0, 20, 20),
+                    child: Align(
+                      alignment: Alignment.centerRight,
+                      child: PackPlayButton(pack: pack),
+                    ),
                   ),
-                ),
                 // Same progress edge as the single-column header.
                 SizedBox(
                   height: 3,
@@ -305,6 +325,7 @@ class _PackViewState extends ConsumerState<PackView>
           shouldCache: true,
           errorWidget: const SizedBox(),
         ),
+        const CoverBarFade(),
         Align(
           alignment: Alignment.bottomCenter,
           child: SingleChildScrollView(
@@ -312,7 +333,7 @@ class _PackViewState extends ConsumerState<PackView>
               20,
               MediaQuery.paddingOf(context).top + 20,
               20,
-              20,
+              MediaQuery.paddingOf(context).bottom + 8,
             ),
             child: card,
           ),

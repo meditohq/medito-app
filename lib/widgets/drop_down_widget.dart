@@ -87,7 +87,14 @@ class DropdownWidget<T> extends StatelessWidget {
                 if (iconData != null)
                   Icon(iconData, color: Theme.of(context).iconTheme.color),
                 if (iconData != null) const SizedBox(width: 12),
-                Expanded(child: Text(_getDisplayValue(), style: textStyle)),
+                Expanded(
+                  child: Text(
+                    _getDisplayValue(),
+                    style: textStyle,
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                  ),
+                ),
                 if (_isClickable)
                   Icon(
                     Icons.keyboard_arrow_down,

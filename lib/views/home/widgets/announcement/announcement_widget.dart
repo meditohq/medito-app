@@ -11,6 +11,7 @@ import 'package:medito/services/analytics/firebase_analytics_service.dart';
 import 'package:medito/utils/launch_source_tracker.dart';
 import 'package:medito/utils/utils.dart';
 import 'package:medito/widgets/widgets.dart';
+
 import 'dart:ui';
 
 import 'package:flutter/material.dart';
@@ -145,16 +146,30 @@ class _AnnouncementWidgetState extends ConsumerState<AnnouncementWidget>
             right: padding16,
             bottom: padding16,
           ),
-          child: _GlassCard(
-            child: Padding(
-              padding: const EdgeInsets.only(
-                left: padding20,
-                right: padding20,
-                bottom: padding12,
-                top: padding20,
+          // Where the shortcuts run four across (tablets, unfolded
+          // foldables) the card spans two of them, centred, instead of
+          // stretching the full width. Mirrors ShortcutsItemsWidget's grid:
+          // 16px page padding, 10px gaps.
+          child: Center(
+            child: ConstrainedBox(
+              constraints: BoxConstraints(
+                maxWidth: MediaQuery.sizeOf(context).width > 600
+                    ? (MediaQuery.sizeOf(context).width - 2 * padding16 - 10) /
+                          2
+                    : double.infinity,
               ),
-              child: Column(
-                children: [_text(context), height16, _actionBtn(context)],
+              child: _GlassCard(
+                child: Padding(
+                  padding: const EdgeInsets.only(
+                    left: padding20,
+                    right: padding20,
+                    bottom: padding12,
+                    top: padding20,
+                  ),
+                  child: Column(
+                    children: [_text(context), height16, _actionBtn(context)],
+                  ),
+                ),
               ),
             ),
           ),

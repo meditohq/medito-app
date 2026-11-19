@@ -2,6 +2,7 @@
 import 'package:medito/widgets/adaptive/adaptive_content.dart';
 import 'package:medito/widgets/adaptive/adaptive_cover_split.dart';
 import 'package:medito/widgets/adaptive/adaptive_page_body.dart';
+import 'package:medito/widgets/shimmers/widgets/box_shimmer_widget.dart';
 import 'package:medito/constants/constants.dart';
 import 'package:medito/exceptions/app_error.dart';
 import 'package:medito/l10n/app_localizations.dart';
@@ -68,10 +69,9 @@ class _TrackViewState extends ConsumerState<TrackView>
 
     final backButton = SingleBackButtonActionBar(onBackPressed: popContext);
 
-    // Using 700 as a threshold for "cramped" vertical space where compact layout is preferred
-    final useCompactLayout = MediaQuery.of(context).size.height < 700;
-
     return Scaffold(
+      // Two panes: the cover runs the full height and the bar floats over it.
+      extendBody: AdaptiveCoverSplit.isWide(MediaQuery.sizeOf(context).width),
       bottomNavigationBar: trackAsyncValue.when(
         data: (track) => TrackViewBottomBar(
           trackId: widget.trackId,
@@ -91,23 +91,31 @@ class _TrackViewState extends ConsumerState<TrackView>
               durationMs: lastSelectedDuration,
             );
             if (AdaptiveCoverSplit.isWide(constraints.maxWidth)) {
-              return _buildWideLayout(
-                track,
-                selection.voice,
-                selection.file,
-                useCompactLayout,
+              return _twoPanes(
+                cover: NetworkImageWidget(
+                  url: track.coverUrl,
+                  shouldCache: true,
+                ),
+                details: _buildTrackContent(
+                  track,
+                  selection.voice,
+                  selection.file,
+                ),
               );
             }
             return _column(
-              _buildPortraitLayout(
-                track,
-                selection.voice,
-                selection.file,
-                useCompactLayout,
-              ),
+              _buildPortraitLayout(track, selection.voice, selection.file),
             );
           },
-          loading: () => _column(const TrackShimmerWidget()),
+          loading: () => AdaptiveCoverSplit.isWide(constraints.maxWidth)
+              ? _twoPanes(
+                  cover: const BoxShimmerWidget(
+                    width: double.infinity,
+                    height: double.infinity,
+                  ),
+                  details: const TrackShimmerWidget(showCover: false),
+                )
+              : _column(const TrackShimmerWidget()),
           error: (err, stack) {
             final error = err is AppError ? err : const UnknownError();
             return _column(
@@ -136,12 +144,7 @@ class _TrackViewState extends ConsumerState<TrackView>
 
   /// Matches the pack screen's two panes: the cover fills the left one and
   /// the title, description, pickers and play button sit centred in the right.
-  Widget _buildWideLayout(
-    Track track,
-    TrackVoice activeVoice,
-    TrackAudioFile activeFile,
-    bool useCompactLayout,
-  ) {
+  Widget _twoPanes({required Widget cover, required Widget details}) {
     return AdaptivePageBody(
       maxWidth: AdaptiveCoverSplit.maxWidth,
       child: LayoutBuilder(
@@ -154,7 +157,8 @@ class _TrackViewState extends ConsumerState<TrackView>
                 fit: StackFit.expand,
                 children: [
                   ColoredBox(color: Theme.of(context).cardColor),
-                  NetworkImageWidget(url: track.coverUrl, shouldCache: true),
+                  cover,
+                  const CoverBarFade(),
                 ],
               ),
             ),
@@ -167,12 +171,7 @@ class _TrackViewState extends ConsumerState<TrackView>
                       padding: const EdgeInsets.all(24),
                       child: ConstrainedBox(
                         constraints: const BoxConstraints(maxWidth: 480),
-                        child: _buildTrackContent(
-                          track,
-                          activeVoice,
-                          activeFile,
-                          useCompactLayout: useCompactLayout,
-                        ),
+                        child: details,
                       ),
                     ),
                   ),
@@ -189,19 +188,13 @@ class _TrackViewState extends ConsumerState<TrackView>
     Track track,
     TrackVoice activeVoice,
     TrackAudioFile activeFile,
-    bool useCompactLayout,
   ) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         AspectRatio(aspectRatio: 16 / 9, child: _buildCoverImage(track)),
         const SizedBox(height: 24),
-        _buildTrackContent(
-          track,
-          activeVoice,
-          activeFile,
-          useCompactLayout: useCompactLayout,
-        ),
+        _buildTrackContent(track, activeVoice, activeFile),
       ],
     );
   }
@@ -222,9 +215,8 @@ class _TrackViewState extends ConsumerState<TrackView>
   Widget _buildTrackContent(
     Track track,
     TrackVoice activeVoice,
-    TrackAudioFile activeFile, {
-    required bool useCompactLayout,
-  }) {
+    TrackAudioFile activeFile,
+  ) {
     final showGuideNameDropdown = track.voices.first.guideName
         .isNotNullAndNotEmpty();
     final guideName = ref.watch(guideNamePreferenceProvider);
@@ -237,21 +229,13 @@ class _TrackViewState extends ConsumerState<TrackView>
         _getSubTitle(context, track.description),
         _tags(track),
         const SizedBox(height: 24),
-        if (useCompactLayout && showGuideNameDropdown)
+        // Voice and length share a row: stacked, a track with one length left
+        // a full-width box that looked like a broken picker.
+        if (showGuideNameDropdown)
           _buildCompactPickers(track, activeVoice, activeFile, guideName)
-        else ...[
-          if (showGuideNameDropdown) ...[
-            _guideNameDropdown(
-              track,
-              activeVoice,
-              isLandscape: false,
-              guideNameState: guideName,
-            ),
-            const SizedBox(height: 12),
-          ],
+        else
           _durationDropdown(activeVoice, activeFile, isLandscape: false),
-        ],
-        const SizedBox(height: 12),
+        const SizedBox(height: 16),
         _playBtn(ref, track, activeVoice, activeFile, isFullWidth: true),
       ],
     );
@@ -312,10 +296,13 @@ class _TrackViewState extends ConsumerState<TrackView>
               ? ColorConstants.black
               : Theme.of(context).colorScheme.onPrimary,
         ),
-        child: Icon(
-          Icons.play_arrow_rounded,
-          size: 32,
-          semanticLabel: AppLocalizations.of(context)!.play,
+        child: Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            const Icon(Icons.play_arrow_rounded, size: 28),
+            const SizedBox(width: 6),
+            Text(AppLocalizations.of(context)!.play),
+          ],
         ),
       ),
     );

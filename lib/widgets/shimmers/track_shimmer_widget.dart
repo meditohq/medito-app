@@ -5,13 +5,17 @@ import 'package:medito/providers/tags/tags_provider.dart';
 
 import 'widgets/box_shimmer_widget.dart';
 
-/// Loading placeholder for [TrackView]. Mirrors its portrait layout (16:9
-/// cover, title, description, tags, pickers, play button) so nothing jumps
-/// when the track arrives. Sizes itself to the parent's width — the caller
-/// supplies the page padding and scrolling, exactly as it does for the loaded
-/// content.
+/// Loading placeholder for [TrackView]. Mirrors its layout (16:9 cover,
+/// title, description, tags, pickers, play button) so nothing jumps when the
+/// track arrives. Sizes itself to the parent's width — the caller supplies
+/// the page padding and scrolling, exactly as it does for the loaded content.
+///
+/// The two-pane layout draws the cover in a pane of its own, so it passes
+/// [showCover] false and gets the details column alone.
 class TrackShimmerWidget extends ConsumerWidget {
-  const TrackShimmerWidget({super.key});
+  const TrackShimmerWidget({super.key, this.showCover = true});
+
+  final bool showCover;
 
   // Line boxes of the real text: font size × the theme's 1.3 line height.
   static const _titleLineHeight = 22 * 1.3;
@@ -21,8 +25,6 @@ class TrackShimmerWidget extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    // Same threshold TrackView uses to put the two pickers side by side.
-    final useCompactLayout = MediaQuery.of(context).size.height < 700;
     // Track tags only render once the catalog is loaded, so only reserve
     // their row then.
     final showTags = !ref.watch(tagCatalogProvider).isEmpty;
@@ -35,15 +37,17 @@ class TrackShimmerWidget extends ConsumerWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            const AspectRatio(
-              aspectRatio: 16 / 9,
-              child: BoxShimmerWidget(
-                width: double.infinity,
-                height: double.infinity,
-                borderRadius: 20,
+            if (showCover) ...const [
+              AspectRatio(
+                aspectRatio: 16 / 9,
+                child: BoxShimmerWidget(
+                  width: double.infinity,
+                  height: double.infinity,
+                  borderRadius: 20,
+                ),
               ),
-            ),
-            const SizedBox(height: 24),
+              SizedBox(height: 24),
+            ],
             const _LineShimmer(lineHeight: _titleLineHeight, widthFactor: 0.6),
             const SizedBox(height: 8),
             const _LineShimmer(lineHeight: _descriptionLineHeight),
@@ -72,26 +76,20 @@ class TrackShimmerWidget extends ConsumerWidget {
                 ),
               ),
             const SizedBox(height: 24),
-            // Guide + duration pickers
-            if (useCompactLayout)
-              const Row(
-                children: [
-                  Expanded(child: _PickerShimmer()),
-                  SizedBox(width: 12),
-                  Expanded(child: _PickerShimmer()),
-                ],
-              )
-            else ...const [
-              _PickerShimmer(),
-              SizedBox(height: 12),
-              _PickerShimmer(),
-            ],
-            const SizedBox(height: 12),
+            // Voice + length pickers, side by side as in TrackView.
+            const Row(
+              children: [
+                Expanded(child: _PickerShimmer()),
+                SizedBox(width: 12),
+                Expanded(child: _PickerShimmer()),
+              ],
+            ),
+            const SizedBox(height: 16),
             // Play button
             const BoxShimmerWidget(
               height: 56,
               width: double.infinity,
-              borderRadius: 28,
+              borderRadius: 8,
             ),
           ],
         ),
