@@ -330,6 +330,13 @@ class ApplePayService implements PaymentMethodService {
 
   ApplePayService(this.ref);
 
+  /// Set per payment in [createPaymentIntent]: when the request carries no
+  /// donor email, the Apple Pay sheet asks for one. Stripe's SDK copies the
+  /// sheet's contact email into the charge's billing details, and the donate
+  /// API fills the Customer's email from there — so a donor who never typed an
+  /// address still gets a receipt and can reach the billing portal.
+  bool _requestEmailOnSheet = false;
+
   @override
   Future<bool> isAvailable() async {
     return await ref.read(applePayAvailableProvider.future);
@@ -341,6 +348,8 @@ class ApplePayService implements PaymentMethodService {
   ) async {
     final paymentState = ref.read(paymentStateProvider.notifier);
     paymentState.setStatus(PaymentStatus.creatingPaymentIntent);
+    final email = request.metadata?['email'];
+    _requestEmailOnSheet = email is! String || email.trim().isEmpty;
 
     try {
       final donationClient = ref.read(donationServiceProvider);
@@ -392,6 +401,11 @@ class ApplePayService implements PaymentMethodService {
             merchantCountryCode:
                 StripeConstants.applePayConfig['countryCode'] as String,
             currencyCode: paymentIntent.currency,
+            // Email lives in Apple Pay's shipping contact; there is no
+            // billing-contact email field.
+            requiredShippingAddressFields: _requestEmailOnSheet
+                ? const [ApplePayContactFieldsType.emailAddress]
+                : null,
             cartItems: [
               ApplePayCartSummaryItem.immediate(
                 label: paymentLabel,
@@ -535,13 +549,11 @@ class OneTimePaymentController extends _$OneTimePaymentController {
         ...EndScreenDonationExperiment.paymentMetadata(
           ref.read(sharedPreferencesProvider),
         ),
-        ...SupporterAppealExperiment(
-          ref.read(sharedPreferencesProvider),
-        ).paymentMetadata(),
+        ...SupporterAppealExperiment(ref.read(sharedPreferencesProvider))
+            .paymentMetadata(),
         if (campaignMetadata.isNotEmpty)
-          ...SupporterAppealExperiment(
-            ref.read(sharedPreferencesProvider),
-          ).acquisitionMetadata(),
+          ...SupporterAppealExperiment(ref.read(sharedPreferencesProvider))
+              .acquisitionMetadata(),
         ...campaignMetadata,
       };
 
@@ -645,13 +657,11 @@ class MonthlySubscriptionController extends _$MonthlySubscriptionController {
         ...EndScreenDonationExperiment.paymentMetadata(
           ref.read(sharedPreferencesProvider),
         ),
-        ...SupporterAppealExperiment(
-          ref.read(sharedPreferencesProvider),
-        ).paymentMetadata(),
+        ...SupporterAppealExperiment(ref.read(sharedPreferencesProvider))
+            .paymentMetadata(),
         if (campaignMetadata.isNotEmpty)
-          ...SupporterAppealExperiment(
-            ref.read(sharedPreferencesProvider),
-          ).acquisitionMetadata(),
+          ...SupporterAppealExperiment(ref.read(sharedPreferencesProvider))
+              .acquisitionMetadata(),
         ...campaignMetadata,
       };
 
@@ -757,13 +767,11 @@ class YearlySubscriptionController extends _$YearlySubscriptionController {
         ...EndScreenDonationExperiment.paymentMetadata(
           ref.read(sharedPreferencesProvider),
         ),
-        ...SupporterAppealExperiment(
-          ref.read(sharedPreferencesProvider),
-        ).paymentMetadata(),
+        ...SupporterAppealExperiment(ref.read(sharedPreferencesProvider))
+            .paymentMetadata(),
         if (campaignMetadata.isNotEmpty)
-          ...SupporterAppealExperiment(
-            ref.read(sharedPreferencesProvider),
-          ).acquisitionMetadata(),
+          ...SupporterAppealExperiment(ref.read(sharedPreferencesProvider))
+              .acquisitionMetadata(),
         ...campaignMetadata,
       };
 

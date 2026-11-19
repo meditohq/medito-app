@@ -98,6 +98,12 @@ void main() {
   }
 
   Future<void> type(WidgetTester tester, String digits) async {
+    // The field sits behind the "Other amount" link until asked for.
+    if (find.byKey(customAmountFieldKey).evaluate().isEmpty) {
+      await tester.ensureVisible(find.text('Other amount'));
+      await tester.tap(find.text('Other amount'));
+      await tester.pumpAndSettle();
+    }
     await tester.enterText(find.byKey(customAmountFieldKey), digits);
     await tester.pumpAndSettle();
   }
@@ -110,9 +116,7 @@ void main() {
     // 25 major units -> 2500 minor. Not "$2,500", which is what reading the
     // typed digits as cents would have produced.
     expect(
-      find.text(
-        '\$25 a month — about \$0.83 a day to keep Medito free for millions.',
-      ),
+      find.text('About \$0.83 a day to keep Medito free for millions.'),
       findsOneWidget,
     );
   });
@@ -125,10 +129,7 @@ void main() {
     await type(tester, '1000');
 
     // JPY has no minor unit, so 1000 typed is ¥1,000 — not ¥10.
-    expect(
-      find.textContaining('¥1,000 a month — about ¥33 a day'),
-      findsOneWidget,
-    );
+    expect(find.textContaining('About ¥33 a day'), findsOneWidget);
   });
 
   testWidgets('shows no echo below the minimum', (tester) async {
@@ -137,7 +138,7 @@ void main() {
     // $1 is under the $2 floor: the validation error owns the field instead.
     await type(tester, '1');
 
-    expect(find.textContaining('a month'), findsNothing);
+    expect(find.textContaining('a day'), findsNothing);
     expect(find.text('Minimum amount is \$2'), findsOneWidget);
   });
 
@@ -181,10 +182,10 @@ void main() {
     await pump(tester, _config(currency: 'usd', monthly: [200, 500, 1000]));
 
     await type(tester, '25');
-    expect(find.textContaining('\$25 a month'), findsOneWidget);
+    expect(find.textContaining('Thank you.'), findsOneWidget);
 
     await type(tester, '');
-    expect(find.textContaining('\$25 a month'), findsNothing);
+    expect(find.textContaining('Thank you.'), findsNothing);
   });
 
   testWidgets('thanks rather than divides above the largest preset', (
@@ -195,7 +196,10 @@ void main() {
     // $100/month is ~$3.33 a day: no longer a trivial-sounding figure.
     await type(tester, '100');
 
-    expect(find.textContaining('\$100 a month — thank you.'), findsOneWidget);
+    expect(
+      find.textContaining('Thank you. That keeps Medito free'),
+      findsOneWidget,
+    );
     expect(find.textContaining('a day'), findsNothing);
   });
 
@@ -206,15 +210,13 @@ void main() {
 
     // The suggested preset ($2) starts selected.
     expect(
-      find.text(
-        '\$2 a month — about \$0.07 a day to keep Medito free for millions.',
-      ),
+      find.text('About \$0.07 a day to keep Medito free for millions.'),
       findsOneWidget,
     );
 
     await tester.tap(find.text('\$10'));
     await tester.pumpAndSettle();
-    expect(find.textContaining('\$10 a month — about \$0.33'), findsOneWidget);
+    expect(find.textContaining('About \$0.33 a day'), findsOneWidget);
   });
 
   testWidgets('refreshed pricing resets stale amounts and custom input', (
@@ -222,12 +224,12 @@ void main() {
   ) async {
     await pump(tester, _config(currency: 'usd', monthly: [200, 5000]));
     await type(tester, '25');
-    expect(find.text('Donate \$25/month'), findsOneWidget);
+    expect(find.text('Donate \$25'), findsOneWidget);
 
     // Keep the same mounted page while the asynchronous country/pricing
     // lookup replaces the configuration.
     await pump(tester, _config(currency: 'jpy', monthly: [300, 500, 1000]));
-    expect(find.text('Donate ¥300/month'), findsOneWidget);
+    expect(find.text('Donate ¥300'), findsOneWidget);
     expect(
       tester
           .widget<TextField>(find.byKey(customAmountFieldKey))
@@ -237,12 +239,10 @@ void main() {
     );
 
     await pump(tester, _config(currency: 'jpy', monthly: [500, 1000]));
-    expect(find.text('Donate ¥500/month'), findsOneWidget);
+    expect(find.text('Donate ¥500'), findsOneWidget);
   });
 
-  testWidgets('the full payment amount and cadence fit with large text', (
-    tester,
-  ) async {
+  testWidgets('the full payment amount fits with large text', (tester) async {
     tester.view.physicalSize = const Size(320, 700);
     tester.view.devicePixelRatio = 1;
     addTearDown(tester.view.resetPhysicalSize);
@@ -255,7 +255,7 @@ void main() {
     await type(tester, '50000');
     final labelFinder = find.descendant(
       of: find.byKey(donationPayButtonKey),
-      matching: find.text('Donate \$50,000/month'),
+      matching: find.text('Donate \$50,000'),
     );
     final label = tester.widget<Text>(labelFinder);
     final context = tester.element(labelFinder);
@@ -275,18 +275,20 @@ void main() {
     expect(tester.takeException(), isNull);
   });
 
-  testWidgets('puts the amount and cadence on the pay button', (tester) async {
+  testWidgets('puts the amount, not the cadence, on the pay button', (
+    tester,
+  ) async {
     await pump(tester, _config(currency: 'usd', monthly: [200, 500, 1000]));
 
     Finder label(String text) => find.descendant(
       of: find.byKey(donationPayButtonKey),
       matching: find.text(text),
     );
-    expect(label('Donate \$2/month'), findsOneWidget);
+    expect(label('Donate \$2'), findsOneWidget);
 
     await tester.tap(find.text('Yearly'));
     await tester.pumpAndSettle();
-    expect(label('Donate \$2/year'), findsOneWidget);
+    expect(label('Donate \$2'), findsOneWidget);
 
     // Nothing valid chosen: disabled, and no amount to name.
     await type(tester, '1');
@@ -297,15 +299,14 @@ void main() {
     'tiny recurring amounts keep their cadence when equivalents round to zero',
     (tester) async {
       await pump(tester, _config(currency: 'jpy', monthly: [1, 10]));
-      // Summary and pay button must both say this is a recurring commitment.
-      expect(find.text('Donate ¥1/month'), findsNWidgets(2));
-      expect(
-        find.text('Your ¥1 helps keep Medito free for millions.'),
-        findsNothing,
-      );
+      // The button carries the amount only, so the summary line must still
+      // say this is a recurring commitment.
+      expect(find.text('Donate ¥1/month'), findsOneWidget);
+      expect(find.text('Donate ¥1'), findsOneWidget);
+      expect(find.text('Helps keep Medito free for millions.'), findsNothing);
       await tester.tap(find.text('Yearly'));
       await tester.pumpAndSettle();
-      expect(find.text('Donate ¥1/year'), findsNWidgets(2));
+      expect(find.text('Donate ¥1/year'), findsOneWidget);
     },
   );
 }

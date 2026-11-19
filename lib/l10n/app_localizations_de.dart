@@ -2893,34 +2893,30 @@ class AppLocalizationsDe extends AppLocalizations {
   }
 
   @override
-  String donationCustomMonthly(String amount, String perDay) {
-    return '$amount im Monat – das sind etwa $perDay am Tag, damit Medito für Millionen kostenlos bleibt.';
+  String get donationReceiptEmailTitle =>
+      'Wohin sollen wir deine Quittung schicken?';
+
+  @override
+  String get donationReceiptEmailBody =>
+      'Danke – deine Spende ist angekommen. Gib deine E-Mail-Adresse an, um deine Quittung zu erhalten und deine Spende zu verwalten.';
+
+  @override
+  String donationCustomMonthly(String perDay) {
+    return 'Etwa $perDay am Tag, damit Medito für Millionen kostenlos bleibt.';
   }
 
   @override
-  String donationCustomYearly(String amount, String perMonth) {
-    return '$amount im Jahr – das sind etwa $perMonth im Monat, damit Medito für Millionen kostenlos bleibt.';
+  String donationCustomYearly(String perMonth) {
+    return 'Etwa $perMonth im Monat, damit Medito für Millionen kostenlos bleibt.';
   }
 
   @override
-  String donationCustomOneTime(String amount) {
-    return 'Deine $amount helfen, Medito für Millionen kostenlos zu halten.';
-  }
+  String get donationCustomOneTime =>
+      'Hilft, Medito für Millionen kostenlos zu halten.';
 
   @override
-  String donationCustomGenerousMonthly(String amount) {
-    return '$amount im Monat – danke. Damit bleibt Medito für viele Menschen kostenlos, die selbst nichts geben können.';
-  }
-
-  @override
-  String donationCustomGenerousYearly(String amount) {
-    return '$amount im Jahr – danke. Damit bleibt Medito für viele Menschen kostenlos, die selbst nichts geben können.';
-  }
-
-  @override
-  String donationCustomGenerousOneTime(String amount) {
-    return '$amount – danke. Damit bleibt Medito für viele Menschen kostenlos, die selbst nichts geben können.';
-  }
+  String get donationCustomGenerous =>
+      'Danke. Damit bleibt Medito für viele Menschen kostenlos, die selbst nichts geben können.';
 
   @override
   String get donationDisclosure =>
