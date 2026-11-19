@@ -1,5 +1,12 @@
 Unreleased
 
+2611.19.0
+- A new singing bowl sound for the session bell
+- The streak flame now fills in on days you have meditated
+- Fixed daily reminders stopping after adding a session to a past day
+- Fixed a session sometimes being counted twice
+- Fixed a deleted session coming back when it was the only one in your history
+
 2611.17.0
 - [ios] Medito, now on Apple Watch: continue your course, play your Daily or choose a favourite from your wrist.
 - [android] Take Medito to your Wear OS watch: continue your course, play your Daily or choose a favourite from your wrist.
