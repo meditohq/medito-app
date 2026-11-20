@@ -1,5 +1,10 @@
 Unreleased
 
+2611.20.0
+- [android] Improved foldable support
+- Session pages show voice and length side by side, with a clearer Play button
+- Home announcements stay a comfortable width on large screens
+
 2611.19.0
 - A new singing bowl sound for the session bell
 - The streak flame now fills in on days you have meditated
