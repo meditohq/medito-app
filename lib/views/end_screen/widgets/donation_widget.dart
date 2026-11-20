@@ -18,6 +18,7 @@ import '../../../widgets/dialogs/dialogs.dart';
 import '../../../widgets/snackbar_widget.dart';
 
 import '../../../models/events/donation/donation_page_model.dart';
+import '../../../models/stripe/payment_intent_model.dart';
 import '../../../models/stripe/payment_method_model.dart' as payment_models;
 import '../../../models/stripe/paywall_config_model.dart';
 import '../../../providers/donation/donation_page_provider.dart';
@@ -30,6 +31,7 @@ import '../../../repositories/auth/auth_repository.dart';
 import '../../../routes/routes.dart';
 import '../../../utils/logger.dart';
 import '../../../utils/receipt_email.dart';
+import '../../donation/receipt_email_prompt.dart';
 import 'donation_thank_you_card.dart';
 import 'end_screen_card.dart';
 import 'feedback_widget.dart';
@@ -198,6 +200,10 @@ class DonationWidgetState extends ConsumerState<DonationWidget>
     required payment_models.PaymentMethodType method,
   }) async {
     if (_isProcessingInlinePayment) return;
+    // Apple Pay with no address on file: the sheet asks for it, and it is
+    // confirmed (or asked for) once the payment has gone through.
+    final emailFromSheet =
+        method == payment_models.PaymentMethodType.applePay && email.isEmpty;
     // Remember the receipt address so the account prompt can prefill it.
     try {
       await ReceiptEmail.save(ref.read(sharedPreferencesProvider), email);
@@ -216,6 +222,7 @@ class DonationWidgetState extends ConsumerState<DonationWidget>
       },
     );
     setState(() => _isProcessingInlinePayment = true);
+    PaymentResult? result;
     try {
       // Stripe's publishable key / merchant id are applied when
       // paymentConfigProvider resolves (same preload the webview route does).
@@ -230,7 +237,7 @@ class DonationWidgetState extends ConsumerState<DonationWidget>
       }
       if (!mounted) return;
       final userId = ref.read(authRepositorySyncProvider).currentUser?.id;
-      await ref
+      result = await ref
           .read(paymentUIControllerProvider.notifier)
           .initiateMonthlySubscription(
             context: context,
@@ -239,13 +246,16 @@ class DonationWidgetState extends ConsumerState<DonationWidget>
             paymentMethod: method,
             paywallId: AnalyticsEventConstants.paywallIdEndScreenInline,
             userId: userId,
-            userEmail: email,
+            userEmail: email.isEmpty ? null : email,
             paywallSource: FirebaseAnalyticsService.paywallSourceEndScreen,
             variantId: _variant,
             experimentId: EndScreenDonationExperiment.experimentName,
           );
     } finally {
       if (mounted) setState(() => _isProcessingInlinePayment = false);
+    }
+    if (emailFromSheet && result is PaymentSuccess && mounted) {
+      await ensureReceiptEmail(context, ref, logTag: 'DONATION');
     }
   }
 

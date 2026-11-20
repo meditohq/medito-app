@@ -16,8 +16,6 @@ import 'package:medito/models/stripe/payment_method_model.dart'
 import 'package:medito/models/stripe/paywall_config_model.dart';
 import 'package:medito/models/stripe/payment_error_model.dart';
 import 'package:medito/models/stripe/payment_intent_model.dart';
-import 'package:medito/constants/http/http_constants.dart';
-import 'package:medito/providers/stripe/payment_providers.dart';
 import 'package:medito/providers/stripe/payment_ui_controller.dart';
 import 'package:medito/views/donation/receipt_email_prompt.dart';
 import 'package:medito/repositories/auth/auth_repository.dart';
@@ -435,49 +433,8 @@ class _NativeDonationPageState extends ConsumerState<NativeDonationPage> {
 
   /// After an Apple Pay donation made without an address on the page: confirm
   /// the Stripe Customer got one from the sheet, and ask the donor if not.
-  ///
-  /// The API fills the Customer from the charge as part of this call, so it
-  /// does not depend on the webhook having run yet. Every failure is swallowed
-  /// — the gift has already succeeded, and an API without this endpoint yet
-  /// must not hold the donor on the page.
-  Future<void> _ensureReceiptEmail() async {
-    try {
-      final intent = ref.read(paymentStateProvider).paymentIntent;
-      if (intent == null) return;
-      final client = ref.read(donationServiceProvider);
-      Future<bool> customerHasEmail([String? email]) async {
-        final response = await client
-            .postRequest(
-              HTTPConstants.receiptEmail,
-              body: {
-                'paymentIntentId': intent.id,
-                'clientSecret': intent.clientSecret,
-                'email': ?email,
-              },
-            )
-            .timeout(const Duration(seconds: 8));
-        final data = response['data'];
-        return data is Map && data['hasEmail'] == true;
-      }
-
-      if (await customerHasEmail()) return;
-      if (!mounted) return;
-      final email = await showReceiptEmailPrompt(context);
-      if (email == null) {
-        AppLogger.w(_logTag, 'Donor skipped the receipt email prompt');
-        return;
-      }
-      // A 200 can still say no (payment without a customer or charge, or a
-      // deleted customer). Only remember the address once Stripe has it.
-      if (!await customerHasEmail(email)) {
-        AppLogger.w(_logTag, 'Receipt email was not saved to the customer');
-        return;
-      }
-      await ReceiptEmail.save(ref.read(sharedPreferencesProvider), email);
-    } catch (e) {
-      AppLogger.w(_logTag, 'Could not confirm the receipt email: $e');
-    }
-  }
+  Future<void> _ensureReceiptEmail() =>
+      ensureReceiptEmail(context, ref, logTag: _logTag);
 
   Future<void> _handlePay(payment_models.PaymentMethodType method) async {
     if (_isProcessingPayment || _didDonate || _selectedAmount <= 0) return;

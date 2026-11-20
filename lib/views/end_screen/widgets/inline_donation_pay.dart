@@ -19,19 +19,19 @@ const inlineDonationPayButtonKey = Key('inline_donation_pay_button');
 @visibleForTesting
 const inlineDonationOtherAmountKey = Key('inline_donation_other_amount');
 
-typedef InlinePayCallback =
-    Future<void> Function({
-      required int amount,
-      required String email,
-      required payment_models.PaymentMethodType method,
-    });
+typedef InlinePayCallback = Future<void> Function({
+  required int amount,
+  required String email,
+  required payment_models.PaymentMethodType method,
+});
 
 /// Variant B body of the end-screen donation card (`end_screen_inline_pay`):
 /// the localized monthly ladder as chips, a donate button, and an
 /// "Other amount" escape to the full paywall. Pure presentation — the parent
 /// owns config loading, payment, analytics and the experiment gate — so it
 /// is testable without Stripe or Riverpod. Anonymous donors reveal an
-/// autofill-enabled email field on the first tap, then continue to payment.
+/// autofill-enabled email field on the first tap, then continue to payment —
+/// unless Apple Pay is on offer, whose sheet asks for the address itself.
 ///
 /// Drawn on the brand-accent card, so every foreground uses
 /// `context.onBrandAccent` like the control CTA does.
@@ -58,8 +58,10 @@ class InlineDonationPay extends StatefulWidget {
   final int? suggestedAmount;
 
   /// Donor email already on file, or null to ask for one inline. Stripe
-  /// creates the Customer before the sheet opens, so an address captured
-  /// later never reaches the receipt / billing portal.
+  /// creates the Customer before the PaymentSheet opens, so an address
+  /// captured later never reaches the receipt / billing portal. With Apple
+  /// Pay the sheet collects it instead and the parent confirms it afterwards,
+  /// so [onPay] then gets an empty email.
   final String? knownEmail;
 
   /// True only on iOS with a wallet: renders the Apple Pay button and
@@ -87,6 +89,10 @@ class _InlineDonationPayState extends State<InlineDonationPay> {
 
   bool get _asksForEmail =>
       widget.knownEmail == null || widget.knownEmail!.trim().isEmpty;
+
+  /// The donor has to type an address here: none on file and no Apple Pay
+  /// sheet to supply one.
+  bool get _needsTypedEmail => _asksForEmail && !widget.applePayAvailable;
 
   @override
   void initState() {
@@ -149,7 +155,7 @@ class _InlineDonationPayState extends State<InlineDonationPay> {
   Future<void> _submit() async {
     if (widget.isProcessing || _selectedAmount <= 0) return;
 
-    if (_asksForEmail && !_emailRevealed) {
+    if (_needsTypedEmail && !_emailRevealed) {
       setState(() => _emailRevealed = true);
       // Otherwise the tap seems to do nothing: the field appears silently
       // and the button only changes its label.
@@ -158,7 +164,7 @@ class _InlineDonationPayState extends State<InlineDonationPay> {
     }
 
     var email = widget.knownEmail?.trim() ?? '';
-    if (_asksForEmail) {
+    if (_needsTypedEmail) {
       if (!await _emailTypoConfirmation.confirm(context, _emailController)) {
         return;
       }
@@ -195,12 +201,12 @@ class _InlineDonationPayState extends State<InlineDonationPay> {
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
         _buildChips(context, fg),
-        if (_asksForEmail && _emailRevealed) ...[
+        if (_needsTypedEmail && _emailRevealed) ...[
           const SizedBox(height: 14),
           _buildEmailField(context, fg, l10n),
         ],
         const SizedBox(height: 14),
-        widget.applePayAvailable && !_asksForEmail
+        widget.applePayAvailable
             ? _buildApplePayButton(context, l10n)
             : _buildCardButton(context, l10n),
         const SizedBox(height: 10),
@@ -477,11 +483,11 @@ class _InlineDonationPayState extends State<InlineDonationPay> {
         child: widget.isProcessing
             ? _buildProcessingIndicator(context.brandAccent, l10n)
             : Text(
-                _asksForEmail && _emailRevealed
+                _needsTypedEmail && _emailRevealed
                     ? l10n.donationContinueToPayment
                     : l10n.donateAmountPerMonth(_amountLabel),
                 // "/month" was read as "slash month".
-                semanticsLabel: _asksForEmail && _emailRevealed
+                semanticsLabel: _needsTypedEmail && _emailRevealed
                     ? null
                     : l10n.donateAmountPerMonthSpoken(_spokenAmountLabel),
                 style: context.text.inherited.subtitle,

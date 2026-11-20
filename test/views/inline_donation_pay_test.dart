@@ -241,25 +241,34 @@ void main() {
     expect(calls.single.method, PaymentMethodType.applePay);
   });
 
-  testWidgets('anonymous Apple Pay donor supplies email before wallet opens', (
+  testWidgets(
+    'anonymous Apple Pay donor is never asked: the sheet supplies it',
+    (tester) async {
+      final calls = await pump(tester, applePay: true, knownEmail: '   ');
+      // Wallet button straight away, no email field now or after the tap.
+      expect(find.textContaining('Pay · \$10'), findsOneWidget);
+      expect(find.byKey(inlineDonationEmailFieldKey), findsNothing);
+      await tester.tap(find.text('\$5'));
+      await tester.tap(find.byKey(inlineDonationPayButtonKey));
+      await tester.pumpAndSettle();
+      expect(find.byKey(inlineDonationEmailFieldKey), findsNothing);
+      expect(find.text('Continue to payment'), findsNothing);
+      // Empty email tells the parent to let the Apple Pay sheet collect it.
+      expect(calls.single.email, isEmpty);
+      expect(calls.single.amount, 500);
+      expect(calls.single.method, PaymentMethodType.applePay);
+    },
+  );
+
+  testWidgets('no Apple Pay and no email: still asks before the card sheet', (
     tester,
   ) async {
-    final calls = await pump(tester, applePay: true, knownEmail: '   ');
-    expect(find.byKey(inlineDonationEmailFieldKey), findsNothing);
-    await tester.tap(find.text('\$5'));
+    final calls = await pump(tester, knownEmail: null);
     await tester.tap(find.byKey(inlineDonationPayButtonKey));
     await tester.pumpAndSettle();
     expect(calls, isEmpty);
+    expect(find.byKey(inlineDonationEmailFieldKey), findsOneWidget);
     expect(find.text('Continue to payment'), findsOneWidget);
-    await tester.enterText(
-      find.byKey(inlineDonationEmailFieldKey),
-      'wallet@example.com',
-    );
-    await tester.tap(find.byKey(inlineDonationPayButtonKey));
-    await tester.pumpAndSettle();
-    expect(calls.single.email, 'wallet@example.com');
-    expect(calls.single.amount, 500);
-    expect(calls.single.method, PaymentMethodType.applePay);
   });
 
   testWidgets('screen readers hear the currency and "per month"', (
@@ -311,8 +320,11 @@ void main() {
             knownEmail: 'donor@example.com',
             applePayAvailable: false,
             isProcessing: true,
-            onPay:
-                ({required amount, required email, required method}) async {},
+            onPay: ({
+              required amount,
+              required email,
+              required method,
+            }) async {},
             onOtherAmount: () {},
           ),
         ),
