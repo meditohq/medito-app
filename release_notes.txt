@@ -1,5 +1,8 @@
 Unreleased
 
+2611.20.1
+- Bug fixes
+
 2611.20.0
 - [android] Improved foldable support
 - Session pages show voice and length side by side, with a clearer Play button
