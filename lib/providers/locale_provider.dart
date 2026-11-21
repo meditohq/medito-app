@@ -11,7 +11,9 @@ import 'shared_preference/shared_preference_provider.dart';
 /// (Settings > Language & Region on iOS, Languages on Android). This is
 /// independent of [localeProvider], which is the in-app UI language (only
 /// languages with a translation); use this to tailor content to what the
-/// phone says the user reads. Overridable in tests.
+/// phone says the user reads. The app root invalidates it when the device
+/// languages change, so dependants re-resolve without a restart. Overridable
+/// in tests.
 final deviceLocalesProvider = Provider<List<Locale>>(
   (_) => PlatformDispatcher.instance.locales,
 );
@@ -23,6 +25,9 @@ final localeProvider = NotifierProvider<LocaleNotifier, Locale?>(() {
 class LocaleNotifier extends Notifier<Locale?> {
   @override
   Locale? build() {
+    // Watched so a "system" preference follows device language changes made
+    // while the app is running (see [deviceLocalesProvider]).
+    ref.watch(deviceLocalesProvider);
     final prefs = ref.read(sharedPreferencesProvider);
     final savedLocale = prefs.getString(
       SharedPreferenceConstants.localePreference,

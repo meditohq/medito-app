@@ -7,7 +7,7 @@ import 'package:medito/repositories/auth/auth_repository.dart';
 import 'package:package_info_plus/package_info_plus.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 import 'package:intl/intl.dart';
-import 'package:medito/providers/locale_provider.dart';
+import 'package:medito/constants/types/type_constants.dart';
 
 import '../../models/device_info/device_and_app_info_model.dart';
 import '../../models/me/me_model.dart';
@@ -53,20 +53,16 @@ class _LocaleInfo {
 }
 
 _LocaleInfo _getLocaleInfo(Ref ref) {
-  // Get the current locale from the locale provider (user's preference)
-  final currentLocale = ref.watch(localeProvider);
-
-  // Use the user's selected locale, fallback to system locale if not set
-  var languageCode =
-      currentLocale?.languageCode ??
-      PlatformDispatcher.instance.locale.languageCode;
+  // The `device-language` header asks the backend for content in this
+  // language. Content is English-only for now, so it stays pinned to English
+  // and deliberately ignores [localeProvider]: translating the UI must not
+  // change which content the API returns.
+  const languageCode = LocaleConstants.english;
   var currencyName =
       NumberFormat.simpleCurrency(locale: languageCode).currencyName ?? '';
 
   // Get country code (ISO format like "US", "GB")
-  var country =
-      currentLocale?.countryCode ??
-      PlatformDispatcher.instance.locale.countryCode;
+  var country = PlatformDispatcher.instance.locale.countryCode;
 
   // Get currency code (ISO format like "usd", "eur")
   var currency = _getCurrencyCode(country);

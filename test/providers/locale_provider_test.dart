@@ -66,5 +66,43 @@ void main() {
       await c.read(localeProvider.notifier).setLocale('system');
       expect(c.read(localeProvider), const Locale('en'));
     });
+    test('a "system" preference follows device language changes', () async {
+      SharedPreferences.setMockInitialValues({});
+      final prefs = await SharedPreferences.getInstance();
+      var device = const [Locale('en')];
+      final c = ProviderContainer(
+        overrides: [
+          sharedPreferencesProvider.overrideWithValue(prefs),
+          deviceLocalesProvider.overrideWith((_) => device),
+        ],
+      );
+      addTearDown(c.dispose);
+      c.listen(localeProvider, (_, _) {});
+      expect(c.read(localeProvider), const Locale('en'));
+
+      device = const [Locale('es', 'MX')];
+      c.invalidate(deviceLocalesProvider);
+      expect(c.read(localeProvider), const Locale('es'));
+    });
+
+    test('a saved language ignores device language changes', () async {
+      SharedPreferences.setMockInitialValues({
+        SharedPreferenceConstants.localePreference: 'de',
+      });
+      final prefs = await SharedPreferences.getInstance();
+      var device = const [Locale('en')];
+      final c = ProviderContainer(
+        overrides: [
+          sharedPreferencesProvider.overrideWithValue(prefs),
+          deviceLocalesProvider.overrideWith((_) => device),
+        ],
+      );
+      addTearDown(c.dispose);
+      c.listen(localeProvider, (_, _) {});
+
+      device = const [Locale('es')];
+      c.invalidate(deviceLocalesProvider);
+      expect(c.read(localeProvider), const Locale('de'));
+    });
   });
 }

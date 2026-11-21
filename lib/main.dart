@@ -334,21 +334,23 @@ class _ParentWidgetState extends ConsumerState<ParentWidget>
   Widget build(BuildContext context) {
     ref.watch(downloadAutomationProvider);
     final authRepo = ref.watch(authRepositoryProvider);
+    // Every app root uses the resolved locale, so the splash and the error
+    // screen honour a saved language instead of the device's first one.
+    final locale = ref.watch(localeProvider);
 
     return authRepo.when(
-      loading: () => const MaterialApp(
+      loading: () => MaterialApp(
         debugShowCheckedModeBanner: false,
-        home: LaunchSplashFrame(child: LaunchSplash()),
+        locale: locale,
+        localizationsDelegates: _localizationsDelegates,
+        supportedLocales: AppLocalizations.supportedLocales,
+        home: const LaunchSplashFrame(child: LaunchSplash()),
       ),
-      // Same delegates as the main app, so the message is localized; the raw
-      // error stays underneath for support screenshots.
+      // Localized like the main app; the raw error stays underneath for
+      // support screenshots.
       error: (error, stack) => MaterialApp(
-        localizationsDelegates: const [
-          AppLocalizations.delegate,
-          GlobalMaterialLocalizations.delegate,
-          GlobalWidgetsLocalizations.delegate,
-          GlobalCupertinoLocalizations.delegate,
-        ],
+        locale: locale,
+        localizationsDelegates: _localizationsDelegates,
         supportedLocales: AppLocalizations.supportedLocales,
         home: Builder(
           builder: (context) => Scaffold(
@@ -398,7 +400,6 @@ class _ParentWidgetState extends ConsumerState<ParentWidget>
           }),
         );
 
-        final locale = ref.watch(localeProvider);
         // Keep the widgets' "day"/"days" unit in the app's language. No-op
         // unless the locale changed.
         HomeWidgetService.setLocale(locale);
@@ -420,12 +421,7 @@ class _ParentWidgetState extends ConsumerState<ParentWidget>
               themeMode: themeMode,
               title: ParentWidget._title,
               locale: locale,
-              localizationsDelegates: const [
-                AppLocalizations.delegate,
-                GlobalMaterialLocalizations.delegate,
-                GlobalWidgetsLocalizations.delegate,
-                GlobalCupertinoLocalizations.delegate,
-              ],
+              localizationsDelegates: _localizationsDelegates,
               supportedLocales: AppLocalizations.supportedLocales,
               initialRoute: '/',
               routes: {
@@ -439,6 +435,21 @@ class _ParentWidgetState extends ConsumerState<ParentWidget>
         );
       },
     );
+  }
+
+  static const _localizationsDelegates = [
+    AppLocalizations.delegate,
+    GlobalMaterialLocalizations.delegate,
+    GlobalWidgetsLocalizations.delegate,
+    GlobalCupertinoLocalizations.delegate,
+  ];
+
+  /// The user changed the device languages while the app was running:
+  /// re-read them so a "system" language preference follows along.
+  @override
+  void didChangeLocales(List<Locale>? locales) {
+    super.didChangeLocales(locales);
+    ref.invalidate(deviceLocalesProvider);
   }
 
   @override
