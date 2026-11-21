@@ -2504,7 +2504,7 @@ class AppLocalizationsEs extends AppLocalizations {
 
   @override
   String upNextPackCompletedTitle(String packTitle) {
-    return 'You finished $packTitle';
+    return 'Has terminado $packTitle';
   }
 
   @override
@@ -2512,18 +2512,18 @@ class AppLocalizationsEs extends AppLocalizations {
     String _temp0 = intl.Intl.pluralLogic(
       count,
       locale: localeName,
-      other: '$count sessions complete',
-      one: '1 session complete',
+      other: '$count sesiones completadas',
+      one: '1 sesión completada',
     );
     return '$_temp0';
   }
 
   @override
-  String get upNextPackCompletedCta => 'Start the next pack';
+  String get upNextPackCompletedCta => 'Empezar el siguiente paquete';
 
   @override
   String upNextPackCompletedCtaNamed(String packTitle) {
-    return 'Start $packTitle';
+    return 'Empezar $packTitle';
   }
 
   @override
