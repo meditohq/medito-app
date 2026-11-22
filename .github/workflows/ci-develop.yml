@@ -50,7 +50,7 @@ jobs:
           persist-credentials: false
 
       - name: Java version
-        uses: actions/setup-java@v6.2.0
+        uses: actions/setup-java@v6.3.0
         with:
           distribution: 'temurin'
           java-version: '17'
