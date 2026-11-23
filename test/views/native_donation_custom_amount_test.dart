@@ -132,6 +132,22 @@ void main() {
     expect(find.textContaining('About ¥33 a day'), findsOneWidget);
   });
 
+  testWidgets('picking a preset puts the keypad away', (tester) async {
+    await pump(tester, _config(currency: 'usd', monthly: [200, 500, 5000]));
+
+    await tester.ensureVisible(find.text('Other amount'));
+    await tester.tap(find.text('Other amount'));
+    await tester.pumpAndSettle();
+    expect(tester.testTextInput.isVisible, isTrue);
+
+    await tester.ensureVisible(find.text('\$5'));
+    await tester.tap(find.text('\$5'));
+    await tester.pumpAndSettle();
+
+    // Left up, it covered the pay buttons.
+    expect(tester.testTextInput.isVisible, isFalse);
+  });
+
   testWidgets('shows no echo below the minimum', (tester) async {
     await pump(tester, _config(currency: 'usd', monthly: [200, 500, 1000]));
 

@@ -190,6 +190,12 @@ class CardPaymentService implements PaymentMethodService {
 
   CardPaymentService(this.ref);
 
+  /// Set per payment in [createPaymentIntent]: when the request carries no
+  /// donor email, the card sheet asks for one (Google Pay inside the sheet
+  /// is asked too). It lands on the charge's billing details, from which the
+  /// donate API fills the Customer's email, as for [ApplePayService].
+  bool _requestEmailOnSheet = false;
+
   @override
   Future<bool> isAvailable() async {
     return true;
@@ -201,6 +207,8 @@ class CardPaymentService implements PaymentMethodService {
   ) async {
     final paymentState = ref.read(paymentStateProvider.notifier);
     paymentState.setStatus(PaymentStatus.creatingPaymentIntent);
+    final email = request.metadata?['email'];
+    _requestEmailOnSheet = email is! String || email.trim().isEmpty;
 
     try {
       final donationClient = ref.read(donationServiceProvider);
@@ -242,6 +250,11 @@ class CardPaymentService implements PaymentMethodService {
           paymentSheetParameters: SetupPaymentSheetParameters(
             paymentIntentClientSecret: paymentIntent.clientSecret,
             merchantDisplayName: 'Medito Foundation',
+            billingDetailsCollectionConfiguration: _requestEmailOnSheet
+                ? const BillingDetailsCollectionConfiguration(
+                    email: CollectionMode.always,
+                  )
+                : null,
             applePay: PaymentSheetApplePay(
               merchantCountryCode:
                   StripeConstants.applePayConfig['countryCode'] as String,

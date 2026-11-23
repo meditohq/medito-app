@@ -115,6 +115,8 @@ class _NativeDonationPageState extends ConsumerState<NativeDonationPage> {
   late _Frequency _selectedFrequency;
   int _selectedAmount = 0;
   bool _isProcessingPayment = false;
+  // Which pay button was tapped, so the spinner shows on that one.
+  payment_models.PaymentMethodType? _processingMethod;
   bool _didDonate = false;
   bool _dismissLogged = false;
   bool _donateTapLogged = false;
@@ -125,16 +127,19 @@ class _NativeDonationPageState extends ConsumerState<NativeDonationPage> {
   // Anonymous donors have no account email, so without one the Stripe
   // Customer is created with none: no receipt, and no way into the hosted
   // billing portal (it authenticates by emailing a magic link) — i.e. a
-  // recurring charge the donor cannot cancel themselves. Card donors are
-  // therefore asked here; Apple Pay donors are asked on the Apple Pay sheet
-  // (see _emailRevealed).
+  // recurring charge the donor cannot cancel themselves. The page does not
+  // ask for it: the payment sheet does (Apple Pay's, or Stripe's card sheet,
+  // which also covers Google Pay), and a known address is sent as it is.
   final _emailController = TextEditingController();
   final _emailFocusNode = FocusNode();
-  // Where Apple Pay is offered the field starts hidden: the Apple Pay sheet
-  // asks for the address itself (see ApplePayService) and Stripe stores it on
-  // the charge, from which the donate API fills in the Customer. It is shown
-  // only once the donor picks the card button without a known address.
+  // With no known address the field is hidden: the sheet asks for it (see
+  // ApplePayService and CardPaymentService) and Stripe stores it on the
+  // charge, from which the donate API fills in the Customer. Revealed when a
+  // known address is malformed, so the donor can correct or clear it.
   bool _emailRevealed = false;
+  // Set once an address was prefilled; keeps the field in place while the
+  // donor edits or empties it.
+  bool _hadKnownEmail = false;
   final _emailTypoConfirmation = EmailTypoConfirmation();
   String? _emailError;
 
@@ -149,8 +154,8 @@ class _NativeDonationPageState extends ConsumerState<NativeDonationPage> {
   String? _customAmountError;
 
   /// Resolved in [initState]: paywall config → auth user (incl. tokens) →
-  /// SharedPreferences/secure storage — prefills the (always-visible) email
-  /// field so a known donor doesn't have to retype it.
+  /// the receipt address from an earlier donation → secure storage. A known
+  /// address is sent with the payment, so the sheet does not ask again.
   void _resolveKnownEmail() {
     final authRepository = ref.read(authRepositorySyncProvider);
     // getUserEmail() also covers the token-carried address, which currentUser
@@ -158,15 +163,27 @@ class _NativeDonationPageState extends ConsumerState<NativeDonationPage> {
     for (final candidate in [
       widget.config.email,
       authRepository.getUserEmail(),
+      _storedReceiptEmail(),
     ]) {
       if (candidate.isNotNullAndNotEmpty()) {
         _emailController.text = candidate!;
+        _hadKnownEmail = true;
         return;
       }
     }
     // Its storage fallback is fire-and-forget and returns before the read
     // lands, so a returning donor still looks anonymous here — read directly.
     unawaited(_prefillEmailFromStorage());
+  }
+
+  /// The address typed for an earlier donation's receipt on this install.
+  String? _storedReceiptEmail() {
+    try {
+      return ReceiptEmail.read(ref.read(sharedPreferencesProvider));
+    } catch (e) {
+      AppLogger.w(_logTag, 'Could not read the stored receipt email: $e');
+      return null;
+    }
   }
 
   Future<void> _prefillEmailFromStorage() async {
@@ -177,6 +194,7 @@ class _NativeDonationPageState extends ConsumerState<NativeDonationPage> {
       if (_emailController.text.trim().isNotEmpty) return;
       setState(() {
         _emailController.text = stored!;
+        _hadKnownEmail = true;
         _emailError = null;
       });
     } catch (e) {
@@ -311,6 +329,9 @@ class _NativeDonationPageState extends ConsumerState<NativeDonationPage> {
   }
 
   void _selectPresetAmount(int amount) {
+    // A preset replaces the typed amount, so the keypad has nothing left to
+    // do and would only cover the pay buttons.
+    _customAmountFocusNode.unfocus();
     setState(() {
       _selectedAmount = amount;
       _customAmountController.clear();
@@ -429,10 +450,14 @@ class _NativeDonationPageState extends ConsumerState<NativeDonationPage> {
     );
   }
 
-  bool get _emailFieldHidden => !_emailRevealed && _applePayOfferedOrPending;
+  /// With no known address there is nothing to show: the sheet asks. A known
+  /// one is shown where Apple Pay is not offered, so a stale address can be
+  /// corrected rather than silently billed against.
+  bool get _emailFieldHidden =>
+      !_emailRevealed && (_applePayOfferedOrPending || !_hadKnownEmail);
 
-  /// After an Apple Pay donation made without an address on the page: confirm
-  /// the Stripe Customer got one from the sheet, and ask the donor if not.
+  /// After a donation made without an address on the page: confirm the Stripe
+  /// Customer got one from the sheet, and ask the donor if not.
   Future<void> _ensureReceiptEmail() =>
       ensureReceiptEmail(context, ref, logTag: _logTag);
 
@@ -440,30 +465,20 @@ class _NativeDonationPageState extends ConsumerState<NativeDonationPage> {
     if (_isProcessingPayment || _didDonate || _selectedAmount <= 0) return;
     // Lock before email confirmation/storage can yield, so two taps cannot
     // create separate payment attempts. Freeze the amount and cadence tapped.
-    setState(() => _isProcessingPayment = true);
+    setState(() {
+      _isProcessingPayment = true;
+      _processingMethod = method;
+    });
     final amount = _selectedAmount;
     final frequency = _selectedFrequency;
     final currency = widget.config.currencyCode;
     try {
-      // Apple Pay with no address on the page: the sheet collects it, so there
-      // is nothing to validate or store here. An address that is present
-      // (known donor, or typed after revealing the field) is still used.
-      final emailFromSheet =
-          method == payment_models.PaymentMethodType.applePay &&
-          _emailController.text.trim().isEmpty;
+      // No address on the page: the payment sheet collects it, so there is
+      // nothing to validate or store here. An address that is present (a
+      // known donor's) is still used.
+      final emailFromSheet = _emailController.text.trim().isEmpty;
       String? userEmail;
       if (!emailFromSheet) {
-        // Card needs it up front: the Customer is created before the card
-        // sheet opens, and that sheet does not ask for one.
-        if (_emailFieldHidden && _emailController.text.trim().isEmpty) {
-          // Not an error: the donor was never asked. The field's helper line
-          // says what the address is for.
-          setState(() => _emailRevealed = true);
-          WidgetsBinding.instance.addPostFrameCallback((_) {
-            if (mounted) _emailFocusNode.requestFocus();
-          });
-          return;
-        }
         if (!await _emailTypoConfirmation.confirm(context, _emailController)) {
           return;
         }
@@ -590,7 +605,12 @@ class _NativeDonationPageState extends ConsumerState<NativeDonationPage> {
         widget.onNativeUnavailable?.call();
       }
     } finally {
-      if (mounted) setState(() => _isProcessingPayment = false);
+      if (mounted) {
+        setState(() {
+          _isProcessingPayment = false;
+          _processingMethod = null;
+        });
+      }
     }
   }
 
@@ -1107,6 +1127,10 @@ class _NativeDonationPageState extends ConsumerState<NativeDonationPage> {
               m.isAvailable,
         );
 
+    final applePaySpinning =
+        _isProcessingPayment &&
+        _processingMethod == payment_models.PaymentMethodType.applePay;
+
     return Column(
       children: [
         if (hasApplePay) ...[
@@ -1130,31 +1154,44 @@ class _NativeDonationPageState extends ConsumerState<NativeDonationPage> {
               ),
               // Screen readers can't speak the U+F8FF glyph below, which left
               // this announced as "Donate with Pay".
-              child: Semantics(
-                label: l10n.donateWithApplePay,
-                excludeSemantics: true,
-                child: Wrap(
-                  alignment: WrapAlignment.center,
-                  crossAxisAlignment: WrapCrossAlignment.center,
-                  spacing: 6,
-                  children: [
-                    Text(
-                      l10n.donateWithApplePayPrefix,
-                      style: context.text.inherited.subtitle,
+              child: applePaySpinning
+                  ? SizedBox(
+                      width: 20,
+                      height: 20,
+                      child: CircularProgressIndicator(
+                        strokeWidth: 2,
+                        color: Colors.black,
+                        semanticsLabel: l10n.processingDonation,
+                      ),
+                    )
+                  : Semantics(
+                      label: l10n.donateWithApplePay,
+                      excludeSemantics: true,
+                      child: Wrap(
+                        alignment: WrapAlignment.center,
+                        crossAxisAlignment: WrapCrossAlignment.center,
+                        spacing: 6,
+                        children: [
+                          Text(
+                            l10n.donateWithApplePayPrefix,
+                            style: context.text.inherited.subtitle,
+                          ),
+                          // U+F8FF (Apple logo), drawn by the iOS system font — this
+                          // button is iOS-only.
+                          Row(
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              const Text('', style: TextStyle(fontSize: 20)),
+                              const SizedBox(width: 3),
+                              Text(
+                                'Pay',
+                                style: context.text.inherited.subtitle,
+                              ),
+                            ],
+                          ),
+                        ],
+                      ),
                     ),
-                    // U+F8FF (Apple logo), drawn by the iOS system font — this
-                    // button is iOS-only.
-                    Row(
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        const Text('', style: TextStyle(fontSize: 20)),
-                        const SizedBox(width: 3),
-                        Text('Pay', style: context.text.inherited.subtitle),
-                      ],
-                    ),
-                  ],
-                ),
-              ),
             ),
           ),
           const SizedBox(height: 12),
@@ -1189,7 +1226,7 @@ class _NativeDonationPageState extends ConsumerState<NativeDonationPage> {
                       borderRadius: BorderRadius.circular(8),
                     ),
                   ),
-            child: _isProcessingPayment
+            child: _isProcessingPayment && !applePaySpinning
                 ? SizedBox(
                     width: 20,
                     height: 20,

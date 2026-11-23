@@ -99,6 +99,33 @@ class _CapturePayment extends PaymentUIController {
   }
 }
 
+/// A payment still in flight: the sheet is up and nothing has come back yet.
+class _PendingPayment extends PaymentUIController {
+  final release = Completer<void>();
+  @override
+  void build() {}
+
+  @override
+  Future<PaymentResult> initiateMonthlySubscription({
+    required BuildContext context,
+    required int amount,
+    required String currency,
+    required PaymentMethodType paymentMethod,
+    String? paywallId,
+    String? userId,
+    String? userEmail,
+    String? paywallSource,
+    String? variantId,
+    String? experimentId,
+    VoidCallback? onSuccess,
+    bool showSuccessFeedback = true,
+    Map<String, String> campaignMetadata = const {},
+  }) async {
+    await release.future;
+    return const PaymentResult.cancelled();
+  }
+}
+
 /// A payment that goes through, as the real controller reports it.
 class _SucceedingPayment extends PaymentUIController {
   @override
@@ -244,13 +271,11 @@ void main() {
     await tester.pumpAndSettle();
   }
 
-  testWidgets('asks anonymous donors for an email', (tester) async {
+  testWidgets('does not ask anonymous donors for an email on the page', (
+    tester,
+  ) async {
     await pump(tester);
-    expect(find.text('Email address'), findsOneWidget);
-    expect(
-      find.text('For your receipt and to manage your donation.'),
-      findsOneWidget,
-    );
+    expect(find.byKey(donationEmailFieldKey), findsNothing);
   });
 
   testWidgets(
@@ -300,8 +325,11 @@ void main() {
     expect(field.controller!.text, 'donor@example.com');
   });
 
-  testWidgets('blocks pay when the email is empty', (tester) async {
-    await pump(tester);
+  testWidgets('pays without an email: the card sheet collects it', (
+    tester,
+  ) async {
+    final payments = _CapturePayment();
+    await pump(tester, payments: payments);
 
     final payButton = find.byKey(donationPayButtonKey);
     await tester.ensureVisible(payButton);
@@ -309,22 +337,22 @@ void main() {
     await tester.tap(payButton);
     await tester.pumpAndSettle();
 
-    expect(
-      find.text('Enter your email so we can send a receipt.'),
-      findsOneWidget,
-    );
+    expect(payments.methods, [PaymentMethodType.card]);
+    expect(payments.emails, [null]);
+    expect(find.byKey(donationEmailFieldKey), findsNothing);
   });
 
-  testWidgets('blocks pay when the email is malformed', (tester) async {
-    await pump(tester);
+  testWidgets('blocks pay when a known email is malformed', (tester) async {
+    final payments = _CapturePayment();
+    await pump(tester, knownEmail: 'donor@example', payments: payments);
 
-    await tester.enterText(find.byKey(donationEmailFieldKey), 'donor@example');
     final payButton = find.byKey(donationPayButtonKey);
     await tester.ensureVisible(payButton);
     await tester.pumpAndSettle();
     await tester.tap(payButton);
     await tester.pumpAndSettle();
 
+    expect(payments.amounts, isEmpty);
     expect(
       find.text('That email address does not look right.'),
       findsOneWidget,
@@ -334,7 +362,7 @@ void main() {
   testWidgets('clears the error once the donor edits the field', (
     tester,
   ) async {
-    await pump(tester);
+    await pump(tester, knownEmail: 'donor@example');
 
     final payButton = find.byKey(donationPayButtonKey);
     await tester.ensureVisible(payButton);
@@ -342,7 +370,7 @@ void main() {
     await tester.tap(payButton);
     await tester.pumpAndSettle();
     expect(
-      find.text('Enter your email so we can send a receipt.'),
+      find.text('That email address does not look right.'),
       findsOneWidget,
     );
 
@@ -351,10 +379,41 @@ void main() {
       'donor@example.com',
     );
     await tester.pumpAndSettle();
-    expect(
-      find.text('Enter your email so we can send a receipt.'),
-      findsNothing,
-    );
+    expect(find.text('That email address does not look right.'), findsNothing);
+  });
+
+  testWidgets('an emptied known email is left to the sheet', (tester) async {
+    final payments = _CapturePayment();
+    await pump(tester, knownEmail: 'donor@example.com', payments: payments);
+
+    await tester.enterText(find.byKey(donationEmailFieldKey), '');
+    await tester.pumpAndSettle();
+    // The field stays put while it is being edited.
+    expect(find.byKey(donationEmailFieldKey), findsOneWidget);
+
+    final payButton = find.byKey(donationPayButtonKey);
+    await tester.ensureVisible(payButton);
+    await tester.tap(payButton);
+    await tester.pumpAndSettle();
+    expect(payments.emails, [null]);
+  });
+
+  testWidgets('reuses the receipt email from an earlier donation', (
+    tester,
+  ) async {
+    SharedPreferences.setMockInitialValues({
+      SharedPreferenceConstants.emailAddressForReceipt: 'earlier@example.com',
+    });
+    final prefs = await SharedPreferences.getInstance();
+    addTearDown(() => SharedPreferences.setMockInitialValues({}));
+    final payments = _CapturePayment();
+    await pump(tester, prefs: prefs, payments: payments);
+
+    final payButton = find.byKey(donationPayButtonKey);
+    await tester.ensureVisible(payButton);
+    await tester.tap(payButton);
+    await tester.pumpAndSettle();
+    expect(payments.emails, ['earlier@example.com']);
   });
 
   testWidgets('prefills an auth-resolved email instead of asking', (
@@ -400,7 +459,42 @@ void main() {
       });
     });
 
-    testWidgets('card asks for the email before paying', (tester) async {
+    testWidgets('the spinner shows on the Apple Pay button that was tapped', (
+      tester,
+    ) async {
+      await onIOS(() async {
+        final payments = _PendingPayment();
+        await pump(tester, payments: payments, applePay: true);
+
+        await tester.ensureVisible(applePayButton);
+        await tester.tap(applePayButton);
+        await tester.pump();
+
+        // The card button keeps its label; it used to take the spinner.
+        final cardButton = find.byKey(donationPayButtonKey);
+        expect(
+          find.descendant(
+            of: cardButton,
+            matching: find.byType(CircularProgressIndicator),
+          ),
+          findsNothing,
+        );
+        expect(
+          find.descendant(
+            of: cardButton,
+            matching: find.text('Donate with card'),
+          ),
+          findsOneWidget,
+        );
+        expect(find.byType(CircularProgressIndicator), findsOneWidget);
+
+        payments.release.complete();
+        await tester.pumpAndSettle();
+        expect(find.byType(CircularProgressIndicator), findsNothing);
+      });
+    });
+
+    testWidgets('card needs no email on the page either', (tester) async {
       await onIOS(() async {
         final payments = _CapturePayment();
         await pump(tester, payments: payments, applePay: true);
@@ -409,27 +503,10 @@ void main() {
         await tester.tap(find.byKey(donationPayButtonKey));
         await tester.pumpAndSettle();
 
-        expect(payments.amounts, isEmpty);
-        expect(find.byKey(donationEmailFieldKey), findsOneWidget);
-        // Asked, not scolded: the helper line shows, not a "required" error.
-        expect(
-          find.text('For your receipt and to manage your donation.'),
-          findsOneWidget,
-        );
-        expect(
-          find.text('Enter your email so we can send a receipt.'),
-          findsNothing,
-        );
-
-        // A second tap with it still empty is the donor's omission.
-        await tester.ensureVisible(find.byKey(donationPayButtonKey));
-        await tester.tap(find.byKey(donationPayButtonKey));
-        await tester.pumpAndSettle();
-        expect(payments.amounts, isEmpty);
-        expect(
-          find.text('Enter your email so we can send a receipt.'),
-          findsOneWidget,
-        );
+        // No address is sent: the card sheet collects it instead.
+        expect(payments.methods, [PaymentMethodType.card]);
+        expect(payments.emails, [null]);
+        expect(find.byKey(donationEmailFieldKey), findsNothing);
       });
     });
 
