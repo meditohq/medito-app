@@ -1,6 +1,9 @@
+import 'package:flutter/foundation.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:timezone/data/latest.dart' as tz;
 import 'package:medito/utils/logger.dart';
+
 import 'notification_timing.dart';
 
 /// The one initialisation of flutter_local_notifications, shared by reminders
@@ -18,6 +21,9 @@ class LocalNotifications {
   static final FlutterLocalNotificationsPlugin plugin =
       FlutterLocalNotificationsPlugin();
 
+  static const _badgeChannel = MethodChannel(
+    'com.medito.app/notification_badge',
+  );
   static Future<void>? _initFuture;
 
   /// Receives taps on notifications while the app is running (foreground or
@@ -32,6 +38,17 @@ class LocalNotifications {
         _initFuture = null;
         Error.throwWithStackTrace(error, stack);
       });
+
+  static Future<void> clearBadge() async {
+    if (kIsWeb || defaultTargetPlatform != TargetPlatform.iOS) return;
+
+    // iOS 27 can reject an empty notification used to reset the badge.
+    try {
+      await _badgeChannel.invokeMethod<void>('clearBadge');
+    } catch (e, stack) {
+      AppLogger.e('NOTIFICATIONS', 'Could not clear app badge', e, stack);
+    }
+  }
 
   /// Cancelling an optional campaign must never turn a successful donation
   /// or a settings change into an error if the OS notification service fails.

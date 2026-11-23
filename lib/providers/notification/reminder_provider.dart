@@ -1,5 +1,5 @@
-import 'dart:io';
 import 'dart:async';
+
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:timezone/timezone.dart' as tz;
@@ -15,33 +15,12 @@ final reminderProvider = Provider<ReminderProvider>((ref) {
 class ReminderProvider {
   final FlutterLocalNotificationsPlugin _flutterLocalNotificationsPlugin =
       LocalNotifications.plugin;
-  // Shared with push: initialising the plugin separately here replaced its
-  // tap callback with none, so reminder taps were never recorded.
-  final Future<void> _initFuture = LocalNotifications.ensureInitialized();
 
-  Future<void> clearBadge() async {
-    await _initFuture;
-    if (Platform.isIOS) {
-      const iOSPlatformChannelSpecifics = DarwinNotificationDetails(
-        badgeNumber: 0,
-        presentAlert: false,
-        presentBadge: false,
-        presentSound: false,
-      );
-      await _flutterLocalNotificationsPlugin.show(
-        id: 0,
-        title: null,
-        body: null,
-        notificationDetails: const NotificationDetails(
-          iOS: iOSPlatformChannelSpecifics,
-        ),
-      );
-    }
-  }
+  Future<void> clearBadge() => LocalNotifications.clearBadge();
 
   Future<void> cancelDailyNotification() async {
-    await _initFuture;
     try {
+      await LocalNotifications.ensureInitialized();
       await _flutterLocalNotificationsPlugin.cancel(id: dailyNotificationId);
       AppLogger.d(
         'REMINDER',
@@ -55,24 +34,16 @@ class ReminderProvider {
         reason: 'Failed to cancel daily notification',
       );
     }
-    try {
-      await clearBadge();
-    } catch (e, s) {
-      AppLogger.e(
-        'REMINDER',
-        'Error clearing badge after cancelling daily notification: $e',
-        s,
-      );
-    }
+    await clearBadge();
   }
 
   Future<void> scheduleReminderSeries(List<ScheduledReminder> items) async {
-    await _initFuture;
     AppLogger.d(
       'XXXX',
       'scheduleReminderSeries called with ${items.length} items',
     );
     try {
+      await LocalNotifications.ensureInitialized();
       for (final item in items) {
         try {
           final payload = item.payload;
@@ -157,10 +128,10 @@ class ReminderProvider {
   }
 
   Future<void> cancelReminderSeries() async {
-    await _initFuture;
-    final pending = await getPendingNotifications();
-    final payloads = {for (final item in pending) item.id: item.payload};
     try {
+      await LocalNotifications.ensureInitialized();
+      final pending = await getPendingNotifications();
+      final payloads = {for (final item in pending) item.id: item.payload};
       var cancelledCount = 0;
       for (var i = 0; i < reminderSeriesCount; i++) {
         try {
@@ -208,21 +179,13 @@ class ReminderProvider {
         reason: 'Failed to cancel daily reminder series',
       );
     }
-    try {
-      await clearBadge();
-    } catch (e, s) {
-      AppLogger.e(
-        'REMINDER',
-        'Error clearing badge after cancelling daily reminders: $e',
-        s,
-      );
-    }
+    await clearBadge();
   }
 
   Future<List<PendingNotificationRequest>> getPendingNotifications() async {
-    await _initFuture;
     AppLogger.d('REMINDER', 'Getting pending notifications...');
     try {
+      await LocalNotifications.ensureInitialized();
       final pendingNotifications = await _flutterLocalNotificationsPlugin
           .pendingNotificationRequests();
       AppLogger.d(

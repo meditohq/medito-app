@@ -30,11 +30,10 @@ import '../../views/bottom_navigation/bottom_navigation_bar_view.dart';
 import 'package:medito/utils/session_origin.dart';
 
 final firebaseMessagingProvider = Provider<FirebaseMessagingHandler>((ref) {
-  return FirebaseMessagingHandler(ref);
+  return FirebaseMessagingHandler();
 });
 
 class FirebaseMessagingHandler {
-  final Ref ref;
   final FlutterLocalNotificationsPlugin _flutterLocalNotificationsPlugin =
       LocalNotifications.plugin;
 
@@ -45,8 +44,6 @@ class FirebaseMessagingHandler {
 
   // Create a channel for Android notifications
   static AndroidNotificationChannel? _channel;
-
-  FirebaseMessagingHandler(this.ref);
 
   Future<void> initialize(BuildContext context, WidgetRef ref) async {
     if (isMockMode) {
@@ -397,28 +394,6 @@ class FirebaseMessagingHandler {
       );
     }
   }
-
-  Future<void> _clearIOSBadge() async {
-    if (Platform.isIOS) {
-      // Clear any badge notifications
-      const iOSPlatformChannelSpecifics = DarwinNotificationDetails(
-        badgeNumber: 0,
-        presentAlert: false,
-        presentBadge: false,
-        presentSound: false,
-      );
-
-      // This approach ensures the badge is cleared
-      await _flutterLocalNotificationsPlugin.show(
-        id: 0,
-        title: null,
-        body: null,
-        notificationDetails: const NotificationDetails(
-          iOS: iOSPlatformChannelSpecifics,
-        ),
-      );
-    }
-  }
 }
 
 @pragma('vm:entry-point')
@@ -442,12 +417,7 @@ Future<void> _firebaseMessagingBackgroundHandler(RemoteMessage message) async {
   // The system will handle it based on the AndroidManifest.xml configuration
   // This prevents duplicate notifications
 
-  // Handle iOS badge count
-  if (Platform.isIOS) {
-    final container = ProviderContainer();
-    final handler = container.read(firebaseMessagingProvider);
-    await handler._clearIOSBadge();
-  }
+  await LocalNotifications.clearBadge();
 
   AppLogger.d('FIREBASE', 'Handling a background message ${message.messageId}');
 }
