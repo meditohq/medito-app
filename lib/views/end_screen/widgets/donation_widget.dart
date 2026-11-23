@@ -475,6 +475,10 @@ class DonationWidgetState extends ConsumerState<DonationWidget>
           height: 18,
           child: CircularProgressIndicator(
             strokeWidth: 2,
+            // Drawn on the brand-accent card: the theme's colours are for
+            // the page, and its grey track read as a solid ring here.
+            color: context.onBrandAccent,
+            backgroundColor: Colors.transparent,
             semanticsLabel: AppLocalizations.of(context)!.loading,
           ),
         ),

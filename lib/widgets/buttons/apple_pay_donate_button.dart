@@ -60,6 +60,9 @@ class ApplePayDonateButton extends StatelessWidget {
           child: CircularProgressIndicator(
             strokeWidth: 2,
             color: foreground,
+            // The theme's grey track made the spinner read as a solid ring
+            // on a filled button.
+            backgroundColor: Colors.transparent,
             // Otherwise the busy button has no name while it spins.
             semanticsLabel: l10n.processingDonation,
           ),

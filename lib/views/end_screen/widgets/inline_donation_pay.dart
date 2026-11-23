@@ -413,6 +413,9 @@ class _InlineDonationPayState extends State<InlineDonationPay> {
       child: CircularProgressIndicator(
         strokeWidth: 2,
         color: color,
+        // The theme's grey track made the spinner read as a solid ring on a
+        // filled button.
+        backgroundColor: Colors.transparent,
         // Otherwise the disabled button has no name while it spins.
         semanticsLabel: l10n.processingDonation,
       ),
