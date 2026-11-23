@@ -131,24 +131,11 @@ class AnalyticsEventConstants {
   /// Event logged when user completes onboarding flow
   static const String onboardingCompleted = 'onboarding_completed';
 
-  // Onboarding "first meditation" experiment (onboarding_first_meditation).
   /// Fired once per install when onboarding assigns the user to an experiment
   /// arm. Carries paramExperimentName + paramVariantId so the test is queryable
   /// with the same BigQuery convention as the paywall experiments.
   static const String onboardingExperimentExposure =
       'onboarding_experiment_exposure';
-
-  /// The first-meditation screen (variant arm) was shown.
-  static const String onboardingFirstMeditationShown =
-      'onboarding_first_meditation_shown';
-
-  /// User tapped "Begin" to start the first meditation from onboarding.
-  static const String onboardingFirstMeditationBeginTap =
-      'onboarding_first_meditation_begin_tap';
-
-  /// User skipped the first meditation ("Maybe later").
-  static const String onboardingFirstMeditationSkipTap =
-      'onboarding_first_meditation_skip_tap';
 
   /// Parameter on onboardingReminderSetTap: which time-of-day chip the user
   /// picked — 'morning', 'evening', 'night', or 'custom'. (Chips shipped to

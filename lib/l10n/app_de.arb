@@ -488,15 +488,6 @@
   "trackingPermissionBody": "Deine Privatsphäre ist uns wichtig. Mithilfe anonymer Daten verstehen wir, wie Menschen Medito nutzen, und können die App für alle verbessern. Wir erfassen niemals persönliche Informationen und verkaufen deine Daten nicht.",
   "trackingPermissionPrivacyNote": "Deine Daten bleiben anonym und werden niemals an Dritte weitergegeben.",
   "trackingPermissionAllow": "Weiter",
-  "onboardingFirstMeditationTitle": "Deine erste Meditation",
-  "onboardingFirstMeditationHook": "Dein erster Moment der Ruhe.",
-  "onboardingFirstMeditationDuration": "Etwas mehr als 2 Minuten",
-  "onboardingFirstMeditationSubtitle": "Du musst nichts richtig machen. Lehn dich einfach zurück und höre zu.",
-  "onboardingFirstMeditationBegin": "Starten",
-  "onboardingFirstMeditationSkip": "Vielleicht später",
-  "onboardingFirstMeditationSkipShort": "Überspringen",
-  "onboardingFirstMeditationDone": "Das war's. Du hast gerade meditiert.",
-  "onboardingFirstMeditationContinue": "Weiter",
   "splashHeadline": "Meditation leicht gemacht",
   "splashBenefit1Subtitle": "Entdecke stundenlange geführte Meditationen, Kurse für Fortgeschrittene und vieles mehr. Ohne Bezahlschranke.",
   "splashBenefit2Subtitle": "Bleib täglich motiviert, verfolge deinen Fortschritt und entwickle dauerhafte Gewohnheiten.",
@@ -1577,34 +1568,6 @@
   "onboardingAttributionOtherHint": "Erzähle uns, wo du von uns gehört hast",
   "@onboardingAttributionOtherHint": {
     "description": "Placeholder text inside the free-text attribution field"
-  },
-  "onboardingResultLearnHeading": "Du bist hier genau richtig.",
-  "@onboardingResultLearnHeading": {
-    "description": "Heading on the onboarding result screen for users who are new or want to learn (State A)"
-  },
-  "onboardingResultLearnBody": "Wir fangen mit nur einer Minute an und steigern uns dann langsam. Du brauchst keine Vorkenntnisse – komm einfach vorbei.",
-  "@onboardingResultLearnBody": {
-    "description": "Body text on the onboarding result screen for State A"
-  },
-  "onboardingResultEaseInHeading": "Schön, dass du da bist.",
-  "@onboardingResultEaseInHeading": {
-    "description": "Heading on the onboarding result screen for users with some experience (State B)"
-  },
-  "onboardingResultEaseInBody": "Wir werden dich mit kurzen, aufeinander aufbauenden Einheiten wieder langsam heranführen. Mach in dem Tempo weiter, das dir am besten passt.",
-  "@onboardingResultEaseInBody": {
-    "description": "Body text on the onboarding result screen for State B"
-  },
-  "onboardingResultPracticeHeading": "Willkommen bei Medito.",
-  "@onboardingResultPracticeHeading": {
-    "description": "Heading on the onboarding result screen for users with a regular practice (State C)"
-  },
-  "onboardingResultPracticeBody": "Deine tägliche Meditation hilft dir, dranzubleiben. Jeden Tag wartet eine neue Sitzung auf dich.",
-  "@onboardingResultPracticeBody": {
-    "description": "Body text on the onboarding result screen for State C"
-  },
-  "onboardingResultCta": "Loslegen",
-  "@onboardingResultCta": {
-    "description": "CTA button label on the onboarding result screen"
   },
   "addToFavorites": "Zu Favoriten hinzufügen",
   "@addToFavorites": {

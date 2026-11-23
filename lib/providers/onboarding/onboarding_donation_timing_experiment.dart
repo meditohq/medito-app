@@ -1,13 +1,6 @@
 import 'package:shared_preferences/shared_preferences.dart';
 
-enum OnboardingStep {
-  question,
-  donation,
-  notifications,
-  battery,
-  tracking,
-  result,
-}
+enum OnboardingStep { question, donation, notifications, battery, tracking }
 
 /// Independent of the server's pricing experiment and the experienced-user test.
 ///
@@ -63,7 +56,6 @@ class OnboardingDonationTimingExperiment {
     OnboardingStep.notifications,
     if (showBattery) OnboardingStep.battery,
     if (showTracking) OnboardingStep.tracking,
-    OnboardingStep.result,
     if (variant == variantLast) OnboardingStep.donation,
   ];
 }

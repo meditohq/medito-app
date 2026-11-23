@@ -694,15 +694,6 @@
   "trackingPermissionBody": "Your privacy matters. We use anonymous data to understand how people use Medito, so we can make it better for everyone. We never collect personal information or sell your data.",
   "trackingPermissionPrivacyNote": "Your data stays anonymous and is never shared with third parties.",
   "trackingPermissionAllow": "Continue",
-  "onboardingFirstMeditationTitle": "Your first meditation",
-  "onboardingFirstMeditationHook": "Your first moment of calm.",
-  "onboardingFirstMeditationDuration": "Just over 2 minutes",
-  "onboardingFirstMeditationSubtitle": "Nothing to get right. Just sit back and listen.",
-  "onboardingFirstMeditationBegin": "Start",
-  "onboardingFirstMeditationSkip": "Maybe later",
-  "onboardingFirstMeditationSkipShort": "Skip",
-  "onboardingFirstMeditationDone": "That's it. You just meditated.",
-  "onboardingFirstMeditationContinue": "Continue",
   "splashHeadline": "Meditation Made Simple",
   "splashSubtitle": "Free forever. No ads. Not-for-profit.",
   "@splashSubtitle": {
@@ -1958,34 +1949,6 @@
   "onboardingAttributionOtherHint": "Tell us where you heard about us",
   "@onboardingAttributionOtherHint": {
     "description": "Placeholder text inside the free-text attribution field"
-  },
-  "onboardingResultLearnHeading": "You're in the right place.",
-  "@onboardingResultLearnHeading": {
-    "description": "Heading on the onboarding result screen for users who are new or want to learn (State A)"
-  },
-  "onboardingResultLearnBody": "We'll start you off with just 1 minute and build from there. No experience needed — just show up.",
-  "@onboardingResultLearnBody": {
-    "description": "Body text on the onboarding result screen for State A"
-  },
-  "onboardingResultEaseInHeading": "Good to have you here.",
-  "@onboardingResultEaseInHeading": {
-    "description": "Heading on the onboarding result screen for users with some experience (State B)"
-  },
-  "onboardingResultEaseInBody": "We'll ease you back in with short sessions that build on each other. Go at whatever pace suits you.",
-  "@onboardingResultEaseInBody": {
-    "description": "Body text on the onboarding result screen for State B"
-  },
-  "onboardingResultPracticeHeading": "Welcome to Medito.",
-  "@onboardingResultPracticeHeading": {
-    "description": "Heading on the onboarding result screen for users with a regular practice (State C)"
-  },
-  "onboardingResultPracticeBody": "Your Daily is a great place to keep your practice going. A fresh session is waiting for you every day.",
-  "@onboardingResultPracticeBody": {
-    "description": "Body text on the onboarding result screen for State C"
-  },
-  "onboardingResultCta": "Get started",
-  "@onboardingResultCta": {
-    "description": "CTA button label on the onboarding result screen"
   },
   "addToFavorites": "Add to favorites",
   "@addToFavorites": {

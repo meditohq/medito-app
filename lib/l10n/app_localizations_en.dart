@@ -1319,34 +1319,6 @@ class AppLocalizationsEn extends AppLocalizations {
   String get trackingPermissionAllow => 'Continue';
 
   @override
-  String get onboardingFirstMeditationTitle => 'Your first meditation';
-
-  @override
-  String get onboardingFirstMeditationHook => 'Your first moment of calm.';
-
-  @override
-  String get onboardingFirstMeditationDuration => 'Just over 2 minutes';
-
-  @override
-  String get onboardingFirstMeditationSubtitle =>
-      'Nothing to get right. Just sit back and listen.';
-
-  @override
-  String get onboardingFirstMeditationBegin => 'Start';
-
-  @override
-  String get onboardingFirstMeditationSkip => 'Maybe later';
-
-  @override
-  String get onboardingFirstMeditationSkipShort => 'Skip';
-
-  @override
-  String get onboardingFirstMeditationDone => 'That\'s it. You just meditated.';
-
-  @override
-  String get onboardingFirstMeditationContinue => 'Continue';
-
-  @override
   String get splashHeadline => 'Meditation Made Simple';
 
   @override
@@ -2697,30 +2669,6 @@ class AppLocalizationsEn extends AppLocalizations {
   @override
   String get onboardingAttributionOtherHint =>
       'Tell us where you heard about us';
-
-  @override
-  String get onboardingResultLearnHeading => 'You\'re in the right place.';
-
-  @override
-  String get onboardingResultLearnBody =>
-      'We\'ll start you off with just 1 minute and build from there. No experience needed — just show up.';
-
-  @override
-  String get onboardingResultEaseInHeading => 'Good to have you here.';
-
-  @override
-  String get onboardingResultEaseInBody =>
-      'We\'ll ease you back in with short sessions that build on each other. Go at whatever pace suits you.';
-
-  @override
-  String get onboardingResultPracticeHeading => 'Welcome to Medito.';
-
-  @override
-  String get onboardingResultPracticeBody =>
-      'Your Daily is a great place to keep your practice going. A fresh session is waiting for you every day.';
-
-  @override
-  String get onboardingResultCta => 'Get started';
 
   @override
   String get addToFavorites => 'Add to favorites';

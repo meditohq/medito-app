@@ -61,7 +61,6 @@ import 'package:medito/widgets/onboarding/onboarding_option_button.dart';
 import 'package:medito/widgets/onboarding/progress_indicator_widget.dart';
 
 import 'package:medito/views/onboarding/onboarding_donation_screen.dart';
-import 'package:medito/views/onboarding/onboarding_result_screen.dart';
 import 'package:medito/views/onboarding/tracking_permission_screen.dart';
 import 'package:medito/views/onboarding/battery_optimization_screen.dart';
 import 'package:medito/models/local_all_stats.dart';
@@ -540,29 +539,6 @@ void main() {
         headerImage: AssetConstants.onboardingImage3,
         onNext: () {},
       ),
-      'first-meditation': () => OnboardingResultScreen(
-        headerImage: AssetConstants.onboardingImage3,
-        state: OnboardingResultState.stateA,
-        showMeditation: true,
-        onGetStarted: () {},
-      ),
-      'returning-meditation': () => OnboardingResultScreen(
-        headerImage: AssetConstants.onboardingImage3,
-        state: OnboardingResultState.stateB,
-        showMeditation: true,
-        onGetStarted: () {},
-      ),
-      'experienced-meditation': () => OnboardingResultScreen(
-        headerImage: AssetConstants.onboardingImage3,
-        state: OnboardingResultState.stateC,
-        showMeditation: true,
-        onGetStarted: () {},
-      ),
-      'get-started': () => OnboardingResultScreen(
-        headerImage: AssetConstants.onboardingImage3,
-        state: OnboardingResultState.stateC,
-        onGetStarted: () {},
-      ),
     };
     for (final entry in steps.entries) {
       for (final configuration in [
@@ -609,12 +585,10 @@ void main() {
                     child: Column(
                       children: [
                         Expanded(child: entry.value()),
-                        if (!entry.key.contains('meditation') &&
-                            entry.key != 'get-started')
-                          const OnboardingProgressIndicator(
-                            currentIndex: 1,
-                            totalSteps: 3,
-                          ),
+                        const OnboardingProgressIndicator(
+                          currentIndex: 1,
+                          totalSteps: 3,
+                        ),
                       ],
                     ),
                   ),
@@ -671,18 +645,13 @@ void main() {
     for (final width in [1200.0, 820.0]) {
       tester.view.physicalSize = Size(width, 900);
       for (final variant in ['A', 'B']) {
-        for (final experience in [0, 1, 2, 3]) {
-          // 2/3 exercise both regular-practice experiment assignments.
+        for (final experience in [0, 1, 2]) {
           await tester.pumpWidget(const SizedBox());
           await tester.pumpWidget(
             PreviewShell(
               prefs: {
                 ...prefsDark,
                 OnboardingDonationTimingExperiment.preferenceKey: variant,
-                SharedPreferenceConstants
-                    .onboardingExperiencedMeditationVariant: experience == 3
-                    ? 'offered'
-                    : 'control',
               },
               overrides: [
                 onboardingTrackingStepProvider.overrideWithValue(true),
@@ -715,9 +684,7 @@ void main() {
           final question = tester.widget<OnboardingQuestionScreen>(
             find.byType(OnboardingQuestionScreen),
           );
-          await tester.tap(
-            find.text(question.options[experience > 1 ? 2 : experience]),
-          );
+          await tester.tap(find.text(question.options[experience]));
           await tester.pump(const Duration(milliseconds: 250));
           await tester.pump();
           await tester.pump(const Duration(seconds: 1));
@@ -736,26 +703,12 @@ void main() {
             await tester.pump(const Duration(seconds: 3));
             await tester.pump(const Duration(seconds: 1));
             final step = steps[index];
-            if (step == OnboardingStep.result) {
-              expect(find.byType(OnboardingProgressIndicator), findsNothing);
-              final result = tester.widget<OnboardingResultScreen>(
-                find.byType(OnboardingResultScreen),
-              );
-              expect(result.showMeditation, experience != 2);
-              await checkLayout('${index + 1}-result-$experience');
-            } else if (experience == 0) {
+            if (experience == 0) {
               final progress = tester.widget<OnboardingProgressIndicator>(
                 find.byType(OnboardingProgressIndicator),
               );
               expect(progress.totalSteps, 4);
-              expect(
-                progress.currentIndex,
-                steps
-                        .take(index + 1)
-                        .where((s) => s != OnboardingStep.result)
-                        .length -
-                    1,
-              );
+              expect(progress.currentIndex, index);
               await checkLayout('${index + 1}-${step.name}');
             }
           }

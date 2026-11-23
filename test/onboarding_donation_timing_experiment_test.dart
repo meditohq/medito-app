@@ -65,9 +65,8 @@ void main() {
           showTracking: tracking,
         );
         expect(a[1], OnboardingStep.donation);
-        expect(a.last, OnboardingStep.result);
+        expect(a.last, isNot(OnboardingStep.donation));
         expect(b.last, OnboardingStep.donation);
-        expect(b[b.length - 2], OnboardingStep.result);
         expect(
           a.where((x) => x != OnboardingStep.donation).toList(),
           b.where((x) => x != OnboardingStep.donation).toList(),

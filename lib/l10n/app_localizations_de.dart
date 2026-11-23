@@ -1346,35 +1346,6 @@ class AppLocalizationsDe extends AppLocalizations {
   String get trackingPermissionAllow => 'Weiter';
 
   @override
-  String get onboardingFirstMeditationTitle => 'Deine erste Meditation';
-
-  @override
-  String get onboardingFirstMeditationHook => 'Dein erster Moment der Ruhe.';
-
-  @override
-  String get onboardingFirstMeditationDuration => 'Etwas mehr als 2 Minuten';
-
-  @override
-  String get onboardingFirstMeditationSubtitle =>
-      'Du musst nichts richtig machen. Lehn dich einfach zurück und höre zu.';
-
-  @override
-  String get onboardingFirstMeditationBegin => 'Starten';
-
-  @override
-  String get onboardingFirstMeditationSkip => 'Vielleicht später';
-
-  @override
-  String get onboardingFirstMeditationSkipShort => 'Überspringen';
-
-  @override
-  String get onboardingFirstMeditationDone =>
-      'Das war\'s. Du hast gerade meditiert.';
-
-  @override
-  String get onboardingFirstMeditationContinue => 'Weiter';
-
-  @override
   String get splashHeadline => 'Meditation leicht gemacht';
 
   @override
@@ -2753,30 +2724,6 @@ class AppLocalizationsDe extends AppLocalizations {
   @override
   String get onboardingAttributionOtherHint =>
       'Erzähle uns, wo du von uns gehört hast';
-
-  @override
-  String get onboardingResultLearnHeading => 'Du bist hier genau richtig.';
-
-  @override
-  String get onboardingResultLearnBody =>
-      'Wir fangen mit nur einer Minute an und steigern uns dann langsam. Du brauchst keine Vorkenntnisse – komm einfach vorbei.';
-
-  @override
-  String get onboardingResultEaseInHeading => 'Schön, dass du da bist.';
-
-  @override
-  String get onboardingResultEaseInBody =>
-      'Wir werden dich mit kurzen, aufeinander aufbauenden Einheiten wieder langsam heranführen. Mach in dem Tempo weiter, das dir am besten passt.';
-
-  @override
-  String get onboardingResultPracticeHeading => 'Willkommen bei Medito.';
-
-  @override
-  String get onboardingResultPracticeBody =>
-      'Deine tägliche Meditation hilft dir, dranzubleiben. Jeden Tag wartet eine neue Sitzung auf dich.';
-
-  @override
-  String get onboardingResultCta => 'Loslegen';
 
   @override
   String get addToFavorites => 'Zu Favoriten hinzufügen';

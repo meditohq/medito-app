@@ -1338,34 +1338,6 @@ class AppLocalizationsEs extends AppLocalizations {
   String get trackingPermissionAllow => 'Continuar';
 
   @override
-  String get onboardingFirstMeditationTitle => 'Tu primera meditación';
-
-  @override
-  String get onboardingFirstMeditationHook => 'Tu primer momento de calma.';
-
-  @override
-  String get onboardingFirstMeditationDuration => 'Poco más de 2 minutos';
-
-  @override
-  String get onboardingFirstMeditationSubtitle =>
-      'No hay nada que hacer bien. Solo relájate y escucha.';
-
-  @override
-  String get onboardingFirstMeditationBegin => 'Empezar';
-
-  @override
-  String get onboardingFirstMeditationSkip => 'Quizás más tarde';
-
-  @override
-  String get onboardingFirstMeditationSkipShort => 'Omitir';
-
-  @override
-  String get onboardingFirstMeditationDone => 'Eso es todo. Acabas de meditar.';
-
-  @override
-  String get onboardingFirstMeditationContinue => 'Continuar';
-
-  @override
   String get splashHeadline => 'Meditación Hecha Simple';
 
   @override
@@ -2732,30 +2704,6 @@ class AppLocalizationsEs extends AppLocalizations {
 
   @override
   String get onboardingAttributionOtherHint => 'Cuéntanos dónde nos conociste';
-
-  @override
-  String get onboardingResultLearnHeading => 'Estás en el lugar correcto.';
-
-  @override
-  String get onboardingResultLearnBody =>
-      'Empezaremos con solo 1 minuto e iremos avanzando. Sin experiencia necesaria, solo preséntate.';
-
-  @override
-  String get onboardingResultEaseInHeading => 'Qué bueno tenerte aquí.';
-
-  @override
-  String get onboardingResultEaseInBody =>
-      'Te reintroduciremos con sesiones cortas que se complementan entre sí. Ve a tu propio ritmo.';
-
-  @override
-  String get onboardingResultPracticeHeading => 'Bienvenido a Medito.';
-
-  @override
-  String get onboardingResultPracticeBody =>
-      'Tu Diario es un gran lugar para mantener tu práctica. Una nueva sesión te espera cada día.';
-
-  @override
-  String get onboardingResultCta => 'Empezar';
 
   @override
   String get addToFavorites => 'Agregar a favoritos';

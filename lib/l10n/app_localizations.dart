@@ -2392,60 +2392,6 @@ abstract class AppLocalizations {
   /// **'Continue'**
   String get trackingPermissionAllow;
 
-  /// No description provided for @onboardingFirstMeditationTitle.
-  ///
-  /// In en, this message translates to:
-  /// **'Your first meditation'**
-  String get onboardingFirstMeditationTitle;
-
-  /// No description provided for @onboardingFirstMeditationHook.
-  ///
-  /// In en, this message translates to:
-  /// **'Your first moment of calm.'**
-  String get onboardingFirstMeditationHook;
-
-  /// No description provided for @onboardingFirstMeditationDuration.
-  ///
-  /// In en, this message translates to:
-  /// **'Just over 2 minutes'**
-  String get onboardingFirstMeditationDuration;
-
-  /// No description provided for @onboardingFirstMeditationSubtitle.
-  ///
-  /// In en, this message translates to:
-  /// **'Nothing to get right. Just sit back and listen.'**
-  String get onboardingFirstMeditationSubtitle;
-
-  /// No description provided for @onboardingFirstMeditationBegin.
-  ///
-  /// In en, this message translates to:
-  /// **'Start'**
-  String get onboardingFirstMeditationBegin;
-
-  /// No description provided for @onboardingFirstMeditationSkip.
-  ///
-  /// In en, this message translates to:
-  /// **'Maybe later'**
-  String get onboardingFirstMeditationSkip;
-
-  /// No description provided for @onboardingFirstMeditationSkipShort.
-  ///
-  /// In en, this message translates to:
-  /// **'Skip'**
-  String get onboardingFirstMeditationSkipShort;
-
-  /// No description provided for @onboardingFirstMeditationDone.
-  ///
-  /// In en, this message translates to:
-  /// **'That\'s it. You just meditated.'**
-  String get onboardingFirstMeditationDone;
-
-  /// No description provided for @onboardingFirstMeditationContinue.
-  ///
-  /// In en, this message translates to:
-  /// **'Continue'**
-  String get onboardingFirstMeditationContinue;
-
   /// No description provided for @splashHeadline.
   ///
   /// In en, this message translates to:
@@ -4845,48 +4791,6 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Tell us where you heard about us'**
   String get onboardingAttributionOtherHint;
-
-  /// Heading on the onboarding result screen for users who are new or want to learn (State A)
-  ///
-  /// In en, this message translates to:
-  /// **'You\'re in the right place.'**
-  String get onboardingResultLearnHeading;
-
-  /// Body text on the onboarding result screen for State A
-  ///
-  /// In en, this message translates to:
-  /// **'We\'ll start you off with just 1 minute and build from there. No experience needed — just show up.'**
-  String get onboardingResultLearnBody;
-
-  /// Heading on the onboarding result screen for users with some experience (State B)
-  ///
-  /// In en, this message translates to:
-  /// **'Good to have you here.'**
-  String get onboardingResultEaseInHeading;
-
-  /// Body text on the onboarding result screen for State B
-  ///
-  /// In en, this message translates to:
-  /// **'We\'ll ease you back in with short sessions that build on each other. Go at whatever pace suits you.'**
-  String get onboardingResultEaseInBody;
-
-  /// Heading on the onboarding result screen for users with a regular practice (State C)
-  ///
-  /// In en, this message translates to:
-  /// **'Welcome to Medito.'**
-  String get onboardingResultPracticeHeading;
-
-  /// Body text on the onboarding result screen for State C
-  ///
-  /// In en, this message translates to:
-  /// **'Your Daily is a great place to keep your practice going. A fresh session is waiting for you every day.'**
-  String get onboardingResultPracticeBody;
-
-  /// CTA button label on the onboarding result screen
-  ///
-  /// In en, this message translates to:
-  /// **'Get started'**
-  String get onboardingResultCta;
 
   /// Accessibility label for the favorite button when the item is not yet favorited
   ///
