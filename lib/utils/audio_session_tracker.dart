@@ -57,6 +57,8 @@ class AudioSessionTracker {
     required String fileId,
     String? guide,
     required int durationMs,
+    String? startSource,
+    String? packId,
   }) async {
     // Switching tracks: the previous session never completed.
     if (_active != null && !_active!.ended) {
@@ -78,8 +80,14 @@ class AudioSessionTracker {
       AnalyticsEventConstants.paramAudioFileGuide: session.guide,
       AnalyticsEventConstants.paramAudioFileDuration: session.durationMs,
       AnalyticsEventConstants.paramNetworkType: await NetworkType.current(),
+      AnalyticsEventConstants.paramStartSource: ?startSource,
+      AnalyticsEventConstants.paramPackId: ?packId,
     });
-    AppLogger.d('SESSION', 'audio_session_started: ${session.fileId}');
+    AppLogger.d(
+      'SESSION',
+      'audio_session_started: ${session.fileId} '
+          '(source: $startSource, pack: $packId)',
+    );
   }
 
   /// Fed by the position stream (~1/s on both platforms). Keeps the last known

@@ -59,6 +59,38 @@ void main() {
       expect(await persisted(), isNotNull);
     });
 
+    test('carries the start source and pack when given', () async {
+      await tracker.onStarted(
+        fileId: 'f1',
+        guide: 'Will',
+        durationMs: 1000,
+        startSource: 'pack_track_row',
+        packId: 'p1',
+      );
+
+      final params = of(AnalyticsEventConstants.audioSessionStarted)
+          .single
+          .params;
+      expect(
+        params[AnalyticsEventConstants.paramStartSource],
+        'pack_track_row',
+      );
+      expect(params[AnalyticsEventConstants.paramPackId], 'p1');
+    });
+
+    test('leaves the start source and pack out when unknown', () async {
+      await tracker.onStarted(fileId: 'f1', guide: 'Will', durationMs: 1000);
+
+      final params = of(AnalyticsEventConstants.audioSessionStarted)
+          .single
+          .params;
+      expect(
+        params.containsKey(AnalyticsEventConstants.paramStartSource),
+        isFalse,
+      );
+      expect(params.containsKey(AnalyticsEventConstants.paramPackId), isFalse);
+    });
+
     test('missing guide falls back to unknown', () async {
       await tracker.onStarted(fileId: 'f1', guide: null, durationMs: 1000);
       expect(

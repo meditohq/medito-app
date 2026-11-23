@@ -540,6 +540,12 @@ class AnalyticsEventConstants {
 
   static const String paramPackTotalSessions = 'pack_total_sessions';
 
+  /// On audioSessionStarted: the screen the session was started from, one of
+  /// the `SessionOrigin` values ('home_up_next', 'pack_button',
+  /// 'pack_track_row', 'search', … or 'other'). [paramPackId] rides along
+  /// when the track was reached through a pack.
+  static const String paramStartSource = 'start_source';
+
   // Your Path (Up Next) pack selection from the pack screen
   /// The user set a pack as Your Path via the pack screen button.
   /// Params: [paramPackId], [paramPreviousPackId].

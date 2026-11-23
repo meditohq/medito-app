@@ -12,6 +12,7 @@ import 'package:medito/utils/tag_labels.dart';
 import 'package:medito/views/explore/widgets/track_list_sliver.dart';
 import 'package:medito/widgets/headers/medito_app_bar_small.dart';
 import 'package:medito/widgets/widgets.dart';
+import 'package:medito/utils/session_origin.dart';
 
 /// Every track carrying one tag, strongest match first.
 class TagView extends ConsumerStatefulWidget {
@@ -63,7 +64,10 @@ class _TagViewState extends ConsumerState<TagView> {
             }
             return CustomScrollView(
               slivers: [
-                TrackListSliver(tracks: tracks),
+                TrackListSliver(
+                  tracks: tracks,
+                  sessionSource: SessionOrigin.tag,
+                ),
                 SliverPadding(
                   padding: EdgeInsets.only(
                     bottom: MediaQuery.paddingOf(context).bottom + padding16,

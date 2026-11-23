@@ -22,6 +22,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../widgets/headers/description_widget.dart';
+import 'package:medito/utils/session_origin.dart';
 
 class PackView extends ConsumerStatefulWidget {
   const PackView({super.key, required this.id});
@@ -592,7 +593,14 @@ class _PackViewState extends ConsumerState<PackView>
   }
 
   void _onListItemTap(String id, String type, BuildContext context) {
-    handleNavigation(type, [id], context, ref: ref);
+    handleNavigation(
+      type,
+      [id],
+      context,
+      ref: ref,
+      sessionSource: SessionOrigin.packTrackRow,
+      sessionPackId: widget.id,
+    );
   }
 
   @override

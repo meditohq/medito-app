@@ -27,6 +27,7 @@ import 'package:medito/widgets/calendar_stamp.dart';
 import 'manual_session_dialog.dart';
 import 'edit_session_dialog.dart';
 import 'session_actions_sheet.dart';
+import 'package:medito/utils/session_origin.dart';
 
 /// Streak-freeze blue for light mode: [ColorConstants.lightBlue] is only
 /// ~2.3:1 on the light card. This one is ~4.9:1 as text.
@@ -1210,6 +1211,9 @@ class _SessionItemWidget extends ConsumerWidget {
               return;
             }
             if (action != SessionAction.open) return;
+            if (!isTimer) {
+              SessionOrigin.instance.note(session.id, SessionOrigin.history);
+            }
             Navigator.push(
               context,
               MaterialPageRoute(

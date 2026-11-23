@@ -27,6 +27,7 @@ import '../../providers/donation/supporter_appeal_provider.dart';
 import '../../providers/donation/supporter_appeal_experiment.dart';
 import '../../routes/routes.dart';
 import '../../views/bottom_navigation/bottom_navigation_bar_view.dart';
+import 'package:medito/utils/session_origin.dart';
 
 final firebaseMessagingProvider = Provider<FirebaseMessagingHandler>((ref) {
   return FirebaseMessagingHandler(ref);
@@ -386,6 +387,7 @@ class FirebaseMessagingHandler {
         [payload.id.toString().getIdFromPath(), payload.path],
         context,
         ref: ref,
+        sessionSource: SessionOrigin.notification,
       );
     } else {
       Navigator.of(context).push(

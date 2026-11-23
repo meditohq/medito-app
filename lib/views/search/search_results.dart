@@ -14,6 +14,7 @@ import 'package:medito/views/explore/widgets/pack_grid_sliver.dart';
 import 'package:medito/views/explore/widgets/track_list_sliver.dart';
 import 'package:medito/widgets/medito_icon.dart';
 import 'package:medito/widgets/widgets.dart';
+import 'package:medito/utils/session_origin.dart';
 
 /// Packs whose title or subtitle contains [query]; all packs for an empty
 /// query.
@@ -246,6 +247,7 @@ class _SearchResultsState extends ConsumerState<SearchResults> {
           if (shownTracks.isNotEmpty)
             TrackListSliver(
               tracks: shownTracks,
+              sessionSource: SessionOrigin.search,
               onBeforeNavigate: widget.onBeforeNavigate,
             ),
           SliverPadding(

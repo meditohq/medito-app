@@ -1,6 +1,7 @@
 // ignore_for_file: use_build_context_synchronously
 
 import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:medito/constants/constants.dart';
@@ -28,6 +29,7 @@ import 'package:medito/views/settings/analytics_settings_screen.dart';
 import 'package:medito/views/shop/product_screen.dart';
 import 'package:medito/views/shop/shop_screen.dart';
 import 'package:medito/services/shop/fourthwall_service.dart';
+import 'package:medito/utils/session_origin.dart';
 
 extension SanitisePath on String {
   String sanitisePath() => replaceFirst('/', '');
@@ -47,13 +49,24 @@ Future<void> handleNavigation(
   // Arbitrary key/values stamped into Stripe metadata on donation flows,
   // for experiment/campaign attribution. Non-donation routes ignore it.
   Map<String, String> donationCampaignMetadata = const {},
+  // Where a track is being opened from (a `SessionOrigin` value) and the
+  // pack it was reached through, for audio_session_started. Other routes
+  // ignore both.
+  String? sessionSource,
+  String? sessionPackId,
 }) async {
   ids.removeWhere((element) => element == null);
 
   if (type == null) return;
 
   if (type.contains('tracks') || type.contains('track')) {
-    await _handleTrackNavigation(ids, ref, timerSource: timerSource);
+    await _handleTrackNavigation(
+      ids,
+      ref,
+      timerSource: timerSource,
+      sessionSource: sessionSource,
+      sessionPackId: sessionPackId,
+    );
   } else if (type.contains('pack')) {
     var packId = type.contains('pack3')
         ? ids[2]!
@@ -178,6 +191,8 @@ Future<void> _handleTrackNavigation(
   List<String?> ids,
   WidgetRef? ref, {
   String? timerSource,
+  String? sessionSource,
+  String? sessionPackId,
 }) async {
   try {
     var trackId = ids.first!;
@@ -192,6 +207,11 @@ Future<void> _handleTrackNavigation(
       );
       return;
     }
+    SessionOrigin.instance.note(
+      trackId,
+      sessionSource ?? SessionOrigin.other,
+      packId: sessionPackId,
+    );
     await _pushRoute(TrackView(trackId: trackId), ref);
     ref?.read(statsProvider.notifier).refresh();
   } catch (e, s) {

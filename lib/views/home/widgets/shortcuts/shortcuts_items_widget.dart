@@ -14,6 +14,7 @@ import 'package:medito/utils/utils.dart';
 import '../../../../widgets/medito_icon.dart';
 import '../../home_styles.dart';
 import '../home_gradient_border.dart';
+import 'package:medito/utils/session_origin.dart';
 
 class ShortcutsItemsWidget extends ConsumerWidget {
   const ShortcutsItemsWidget({super.key, required this.data});
@@ -50,6 +51,7 @@ class ShortcutsItemsWidget extends ConsumerWidget {
       context,
       ref: ref,
       timerSource: AnalyticsEventConstants.sourceShortcut,
+      sessionSource: SessionOrigin.homeShortcut,
     );
   }
 

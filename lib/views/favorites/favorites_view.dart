@@ -13,6 +13,7 @@ import 'package:medito/views/pack/widgets/pack_item_widget.dart';
 import 'package:medito/views/player/widgets/bottom_actions/single_back_action_bar.dart';
 import 'package:medito/widgets/headers/medito_app_bar_small.dart';
 import 'package:medito/utils/utils.dart';
+import 'package:medito/utils/session_origin.dart';
 
 enum FavoritesFilter {
   all,
@@ -281,6 +282,7 @@ class FavoritesViewState extends ConsumerState<FavoritesView> {
       [item.id],
       context,
       ref: ref,
+      sessionSource: SessionOrigin.favorites,
     );
   }
 
