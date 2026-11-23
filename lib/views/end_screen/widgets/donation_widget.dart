@@ -254,8 +254,17 @@ class DonationWidgetState extends ConsumerState<DonationWidget>
     } finally {
       if (mounted) setState(() => _isProcessingInlinePayment = false);
     }
-    if (emailFromSheet && result is PaymentSuccess && mounted) {
-      await ensureReceiptEmail(context, ref, logTag: 'DONATION');
+    if (result is! PaymentSuccess || !mounted) return;
+    const source = FirebaseAnalyticsService.paywallSourceEndScreen;
+    if (emailFromSheet) {
+      await ensureReceiptEmail(
+        context,
+        ref,
+        logTag: 'DONATION',
+        paywallSource: source,
+      );
+    } else {
+      logDonationEmailOutcome('known', source);
     }
   }
 

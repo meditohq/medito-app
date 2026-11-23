@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:medito/constants/http/http_constants.dart';
+import 'package:medito/constants/strings/analytics_event_constants.dart';
+import 'package:medito/services/analytics/firebase_analytics_service.dart';
 import 'package:medito/constants/theme/medito_text.dart';
 import 'package:medito/l10n/app_localizations.dart';
 import 'package:medito/providers/shared_preference/shared_preference_provider.dart';
@@ -24,10 +26,38 @@ Future<void> ensureReceiptEmail(
   BuildContext context,
   WidgetRef ref, {
   required String logTag,
+  String? paywallSource,
+}) async {
+  final outcome = await _ensureReceiptEmail(context, ref, logTag: logTag);
+  if (outcome != null) logDonationEmailOutcome(outcome, paywallSource);
+}
+
+/// Logs [AnalyticsEventConstants.donationEmailOutcome]; [source] is one of
+/// the [AnalyticsEventConstants.paramEmailSource] values.
+void logDonationEmailOutcome(String source, String? paywallSource) {
+  debugDonationEmailOutcomes?.add(source);
+  FirebaseAnalyticsService().logEvent(
+    name: AnalyticsEventConstants.donationEmailOutcome,
+    parameters: {
+      AnalyticsEventConstants.paramEmailSource: source,
+      AnalyticsEventConstants.paramPaywallSource: paywallSource ?? 'unknown',
+    },
+  );
+}
+
+/// When set, every logged outcome is also appended here.
+@visibleForTesting
+List<String>? debugDonationEmailOutcomes;
+
+/// Returns the email outcome, or null when there was no payment to check.
+Future<String?> _ensureReceiptEmail(
+  BuildContext context,
+  WidgetRef ref, {
+  required String logTag,
 }) async {
   try {
     final intent = ref.read(paymentStateProvider).paymentIntent;
-    if (intent == null) return;
+    if (intent == null) return null;
     final client = ref.read(donationServiceProvider);
     Future<bool> customerHasEmail([String? email]) async {
       final response = await client
@@ -44,23 +74,26 @@ Future<void> ensureReceiptEmail(
       return data is Map && data['hasEmail'] == true;
     }
 
-    if (await customerHasEmail()) return;
-    if (!context.mounted) return;
+    if (await customerHasEmail()) return 'sheet';
+    if (!context.mounted) return 'prompt_skipped';
     final email = await showReceiptEmailPrompt(context);
     if (email == null) {
       AppLogger.w(logTag, 'Donor skipped the receipt email prompt');
-      return;
+      return 'prompt_skipped';
     }
     // A 200 can still say no (payment without a customer or charge, or a
     // deleted customer). Only remember the address once Stripe has it.
     if (!await customerHasEmail(email)) {
       AppLogger.w(logTag, 'Receipt email was not saved to the customer');
-      return;
+      return 'prompt_not_saved';
     }
-    if (!context.mounted) return;
-    await ReceiptEmail.save(ref.read(sharedPreferencesProvider), email);
+    if (context.mounted) {
+      await ReceiptEmail.save(ref.read(sharedPreferencesProvider), email);
+    }
+    return 'prompt';
   } catch (e) {
     AppLogger.w(logTag, 'Could not confirm the receipt email: $e');
+    return 'check_failed';
   }
 }
 

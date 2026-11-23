@@ -72,6 +72,10 @@ class AnalyticsEventConstants {
   /// Event logged when a payment fails
   static const String paymentFailed = 'payment_failed';
 
+  /// After a successful donation: where the donor's email came from. One per
+  /// donation on the surfaces that can pay without an address on the page.
+  static const String donationEmailOutcome = 'donation_email_outcome';
+
   /// Event logged when a payment is cancelled by the user
   static const String paymentCancelled = 'payment_cancelled';
 
@@ -389,6 +393,13 @@ class AnalyticsEventConstants {
   /// 'apple_pay' | 'google_pay' | 'card'. Only iOS with a wallet gets the
   /// one-tap confirm; everything else falls through to the full PaymentSheet.
   static const String paramPaymentMethod = 'payment_method';
+
+  /// 'known' (sent with the payment) | 'sheet' (Stripe had it after the
+  /// payment sheet) | 'prompt' (typed afterwards) | 'prompt_skipped' |
+  /// 'prompt_not_saved' | 'check_failed' (could not ask the donate API).
+  /// The last three leave the Stripe Customer without an address unless the
+  /// webhook backfill finds one.
+  static const String paramEmailSource = 'email_source';
 
   /// 'one_time' | 'monthly' | 'yearly'.
   static const String paramPaymentFrequency = 'payment_frequency';

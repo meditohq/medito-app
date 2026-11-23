@@ -458,8 +458,12 @@ class _NativeDonationPageState extends ConsumerState<NativeDonationPage> {
 
   /// After a donation made without an address on the page: confirm the Stripe
   /// Customer got one from the sheet, and ask the donor if not.
-  Future<void> _ensureReceiptEmail() =>
-      ensureReceiptEmail(context, ref, logTag: _logTag);
+  Future<void> _ensureReceiptEmail() => ensureReceiptEmail(
+    context,
+    ref,
+    logTag: _logTag,
+    paywallSource: widget.source,
+  );
 
   Future<void> _handlePay(payment_models.PaymentMethodType method) async {
     if (_isProcessingPayment || _didDonate || _selectedAmount <= 0) return;
@@ -537,6 +541,7 @@ class _NativeDonationPageState extends ConsumerState<NativeDonationPage> {
         // Also keeps the pay buttons off while the receipt check below runs.
         setState(() => _didDonate = true);
         if (!emailFromSheet) {
+          logDonationEmailOutcome('known', widget.source);
           widget.onNext();
           return;
         }

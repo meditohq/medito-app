@@ -14,6 +14,7 @@ import 'package:medito/providers/onboarding/onboarding_donation_timing_experimen
 import 'package:medito/providers/onboarding/onboarding_native_pay_experiment.dart';
 import 'package:medito/utils/currency.dart';
 import 'package:medito/utils/logger.dart';
+import 'package:package_info_plus/package_info_plus.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:medito/providers/shared_preference/shared_preference_provider.dart';
@@ -182,6 +183,7 @@ abstract class PaymentMethodService {
 
 @Riverpod(keepAlive: true)
 CardPaymentService cardPaymentService(Ref ref) {
+  warmPaymentAppMetadata();
   return CardPaymentService(ref);
 }
 
@@ -335,6 +337,7 @@ class CardPaymentService implements PaymentMethodService {
 
 @Riverpod(keepAlive: true)
 ApplePayService applePayService(Ref ref) {
+  warmPaymentAppMetadata();
   return ApplePayService(ref);
 }
 
@@ -552,6 +555,7 @@ class OneTimePaymentController extends _$OneTimePaymentController {
         'experiment_name': ?experimentId,
         'experiment_variant': ?experimentVariant,
         'paywall_source': ?paywallSource,
+        ...paymentAppMetadata(),
         ...utmParams,
         ...OnboardingDonationTimingExperiment.paymentMetadata(
           ref.read(sharedPreferencesProvider),
@@ -660,6 +664,7 @@ class MonthlySubscriptionController extends _$MonthlySubscriptionController {
         'experiment_name': ?experimentId,
         'experiment_variant': ?experimentVariant,
         'paywall_source': ?paywallSource,
+        ...paymentAppMetadata(),
         ...utmParams,
         ...OnboardingDonationTimingExperiment.paymentMetadata(
           ref.read(sharedPreferencesProvider),
@@ -770,6 +775,7 @@ class YearlySubscriptionController extends _$YearlySubscriptionController {
         'experiment_name': ?experimentId,
         'experiment_variant': ?experimentVariant,
         'paywall_source': ?paywallSource,
+        ...paymentAppMetadata(),
         ...utmParams,
         ...OnboardingDonationTimingExperiment.paymentMetadata(
           ref.read(sharedPreferencesProvider),
@@ -881,6 +887,57 @@ Map<String, String> _getStoredUtmParameters(SharedPreferences prefs) {
 }
 
 // Helper function to convert PaymentMethodType to string
+/// `app_version` and `platform` for the Stripe metadata. Stripe has no other
+/// way to tell which build took a payment, so experiment readouts could not
+/// be split by release or by iOS/Android from the money side.
+///
+/// Synchronous on purpose: the version is read ahead of time (see
+/// [warmPaymentAppMetadata]) so the pay path never waits on a plugin call. A
+/// payment made before the read lands simply goes without `app_version`.
+Map<String, String> paymentAppMetadata() {
+  warmPaymentAppMetadata();
+  final version = _paymentAppVersion;
+  return {
+    'app_version': ?version,
+    'platform': switch (defaultTargetPlatform) {
+      TargetPlatform.iOS => 'ios',
+      TargetPlatform.android => 'android',
+      final other => other.name,
+    },
+  };
+}
+
+@visibleForTesting
+Future<String> Function() paymentAppVersionLoader = () async =>
+    (await PackageInfo.fromPlatform()).version;
+
+String? _paymentAppVersion;
+bool _paymentAppVersionRequested = false;
+
+/// Starts reading the app version once; called when the payment services are
+/// created, which is when a donation surface first appears.
+void warmPaymentAppMetadata() {
+  if (_paymentAppVersionRequested) return;
+  _paymentAppVersionRequested = true;
+  unawaited(
+    Future.sync(paymentAppVersionLoader)
+        .then<void>((version) => _paymentAppVersion = version)
+        .catchError((Object e) {
+          AppLogger.w('PAYMENT', 'Could not read the app version: $e');
+        }),
+  );
+}
+
+@visibleForTesting
+void debugResetPaymentAppMetadata() {
+  _paymentAppVersion = null;
+  _paymentAppVersionRequested = false;
+}
+
+/// The wire/analytics name of a payment method ('apple_pay' | 'card' | …).
+String paymentMethodAnalyticsName(local_models.PaymentMethodType method) =>
+    _paymentMethodToString(method);
+
 String _paymentMethodToString(local_models.PaymentMethodType method) {
   switch (method) {
     case local_models.PaymentMethodType.googlePay:

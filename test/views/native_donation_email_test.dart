@@ -31,7 +31,7 @@ import 'package:medito/utils/receipt_email.dart';
 import 'package:medito/providers/stripe/payment_ui_controller.dart';
 import 'package:medito/services/network/donation_api_service.dart';
 import 'package:medito/views/donation/receipt_email_prompt.dart'
-    show receiptEmailPromptFieldKey;
+    show debugDonationEmailOutcomes, receiptEmailPromptFieldKey;
 import 'package:medito/repositories/auth/auth_repository.dart';
 import 'package:medito/views/donation/native_donation_page.dart'
     show NativeDonationPage, donationEmailFieldKey, donationPayButtonKey;
@@ -212,6 +212,12 @@ PaywallConfigModel _config({String? email}) => PaywallConfigModel(
 
 void main() {
   setUp(FirebaseAnalyticsTestHelper.setupFirebaseAnalyticsMocks);
+  final emailOutcomes = <String>[];
+  setUp(() {
+    emailOutcomes.clear();
+    debugDonationEmailOutcomes = emailOutcomes;
+  });
+  tearDown(() => debugDonationEmailOutcomes = null);
 
   Future<void> pump(
     WidgetTester tester, {
@@ -537,6 +543,7 @@ void main() {
         ]);
         expect(find.byKey(receiptEmailPromptFieldKey), findsNothing);
         expect(advanced, 1);
+        expect(emailOutcomes, ['sheet']);
       });
     });
 
@@ -640,6 +647,7 @@ void main() {
 
         expect(api.bodies, hasLength(1));
         expect(advanced, 1);
+        expect(emailOutcomes, ['prompt_skipped']);
       });
     });
 

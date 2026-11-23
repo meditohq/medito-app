@@ -12,6 +12,7 @@ import 'package:medito/services/analytics/firebase_analytics_service.dart';
 import 'package:medito/services/analytics/meta_sdk_service.dart';
 import 'package:medito/constants/strings/analytics_event_constants.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
+
 import '../me/me_provider.dart';
 import '../donation/donation_snooze_provider.dart';
 
@@ -68,6 +69,7 @@ class PaymentUIController extends _$PaymentUIController {
           context,
           result,
           paywallId,
+          paymentMethod,
           'onetime',
           userId,
           paywallSource,
@@ -130,6 +132,7 @@ class PaymentUIController extends _$PaymentUIController {
           context,
           result,
           paywallId,
+          paymentMethod,
           'monthly',
           userId,
           paywallSource,
@@ -196,6 +199,7 @@ class PaymentUIController extends _$PaymentUIController {
           context,
           result,
           paywallId,
+          paymentMethod,
           'yearly',
           userId,
           paywallSource,
@@ -256,6 +260,7 @@ class PaymentUIController extends _$PaymentUIController {
     BuildContext context,
     PaymentResult result,
     String? paywallId,
+    local_models.PaymentMethodType paymentMethod,
     String frequency,
     String? userId,
     String? paywallSource,
@@ -264,6 +269,8 @@ class PaymentUIController extends _$PaymentUIController {
     VoidCallback? onSuccess,
     bool showSuccessFeedback,
   ) async {
+    // On every outcome, so a drop at the sheet can be read per method.
+    final method = paymentMethodAnalyticsName(paymentMethod);
     await result.when<Future<void>>(
       success: (paymentIntentId, amount, currency) async {
         // Track successful donation
@@ -285,6 +292,7 @@ class PaymentUIController extends _$PaymentUIController {
               currency,
             ),
             AnalyticsEventConstants.paramCurrency: currency.toUpperCase(),
+            AnalyticsEventConstants.paramPaymentMethod: method,
             AnalyticsEventConstants.paramPaywallId: paywallId ?? 'unknown',
             AnalyticsEventConstants.paramMeditoUserId: userId ?? 'unknown',
             AnalyticsEventConstants.paramPaywallSource:
@@ -337,6 +345,7 @@ class PaymentUIController extends _$PaymentUIController {
         );
 
         final eventParams = {
+          AnalyticsEventConstants.paramPaymentMethod: method,
           AnalyticsEventConstants.paramPaywallId: paywallId ?? 'unknown',
           AnalyticsEventConstants.paramMeditoUserId: userId ?? 'unknown',
           AnalyticsEventConstants.paramPaywallSource:
@@ -374,9 +383,8 @@ class PaymentUIController extends _$PaymentUIController {
           context,
           PaymentError(
             type: PaymentErrorType.genericError,
-            message: AppLocalizations.of(
-              context,
-            )!.paymentFailedMessage(paymentIntentId ?? 'unknown'),
+            message: AppLocalizations.of(context)!
+                .paymentFailedMessage(paymentIntentId ?? 'unknown'),
             userFriendlyMessage: errorMessage,
           ),
         );
@@ -385,6 +393,7 @@ class PaymentUIController extends _$PaymentUIController {
         AppLogger.d('PAYMENT_UI', 'ℹ️ Showing cancellation message');
 
         final eventParams = {
+          AnalyticsEventConstants.paramPaymentMethod: method,
           AnalyticsEventConstants.paramPaywallId: paywallId ?? 'unknown',
           AnalyticsEventConstants.paramMeditoUserId: userId ?? 'unknown',
           AnalyticsEventConstants.paramPaywallSource:
