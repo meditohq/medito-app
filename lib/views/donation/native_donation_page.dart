@@ -26,6 +26,7 @@ import 'package:medito/providers/shared_preference/shared_preference_provider.da
 import 'package:medito/utils/logger.dart';
 import 'package:medito/utils/receipt_email.dart';
 import 'package:medito/utils/utils.dart';
+import 'package:medito/widgets/buttons/apple_pay_donate_button.dart';
 import 'package:medito/widgets/medito_icon.dart';
 import 'package:medito/widgets/inputs/email_typo_hint.dart';
 import 'package:medito/constants/theme/medito_text.dart';
@@ -58,12 +59,11 @@ const donationPayButtonKey = Key('donation_pay_button');
 
 // Native fallback copy mirrors the paywall webview page (which is
 // English-only; localized copy arrives via the experiment config).
-const _defaultEyebrow = 'Help keep Medito free';
 const _defaultHeading = 'Keep meditation free\nfor the next million';
 const _defaultSubcopy =
     '4.1 million people meditate with Medito for free. '
     'No ads, no paywalls — funded entirely by donors like you.';
-// Registration line under the localized disclosure (l10n.donationDisclosure).
+// Registration line in the small print under the pay buttons.
 const _registrationCopy =
     'Stichting Medito · Non-profit registered in the Netherlands · KvK 75284251';
 
@@ -736,18 +736,22 @@ class _NativeDonationPageState extends ConsumerState<NativeDonationPage> {
 
   Widget _buildHero(BuildContext context, Color onSurface) {
     final config = widget.config;
-    final eyebrow = config.heroEyebrow ?? _defaultEyebrow;
+    // No default eyebrow: it only restated the heading. An experiment can
+    // still send one.
+    final eyebrow = config.heroEyebrow;
     final heading = config.heroHeading ?? _defaultHeading;
     final subcopy = config.heroSubcopy ?? _defaultSubcopy;
 
     return Column(
       children: [
-        Text(
-          eyebrow.toUpperCase(),
-          style: context.text.label.copyWith(color: context.brandAccent),
-          textAlign: TextAlign.center,
-        ),
-        const SizedBox(height: 16),
+        if (eyebrow != null && eyebrow.isNotEmpty) ...[
+          Text(
+            eyebrow.toUpperCase(),
+            style: context.text.label.copyWith(color: context.brandAccent),
+            textAlign: TextAlign.center,
+          ),
+          const SizedBox(height: 16),
+        ],
         Semantics(
           container: true,
           header: true,
@@ -1043,12 +1047,12 @@ class _NativeDonationPageState extends ConsumerState<NativeDonationPage> {
     );
   }
 
-  // A recurring amount is shown as its small daily/monthly equivalent, which
-  // makes it easier to say yes to — but only while that equivalent is small.
-  // Above the largest preset the per-day figure stops looking trivial (and no
-  // "less than a coffee" line holds across amounts and currencies), so those
-  // gifts get thanks and what they do for others instead. The ladder is
-  // already localized per currency, so it is the yardstick for "large".
+  // A recurring gift states what is charged and how often, right where the
+  // amount is chosen: about half of cancelling donors said they thought the
+  // gift was one-time. The small daily/monthly equivalent rides along while
+  // it is small; above the largest preset it stops looking trivial, so it is
+  // left out. The ladder is already localized per currency, so it is the
+  // yardstick for "large".
   String _amountSummary(AppLocalizations l10n) {
     final currency = widget.config.currencyCode;
     final amount = formatCurrencyAmount(_selectedAmount, currency);
@@ -1057,23 +1061,30 @@ class _NativeDonationPageState extends ConsumerState<NativeDonationPage> {
         ladder.isNotEmpty &&
         _selectedAmount > ladder.reduce((a, b) => a > b ? a : b);
 
-    if (isGenerous) return l10n.donationCustomGenerous;
     switch (_selectedFrequency) {
       case _Frequency.monthly:
         final perDay = (_selectedAmount / 30).round();
         // Rounds to nothing only for amounts far below any real ladder.
-        if (perDay <= 0) return l10n.donateAmountPerMonth(amount);
+        if (isGenerous || perDay <= 0) {
+          return l10n.donationRecurringMonthly(amount);
+        }
         return l10n.donationCustomMonthly(
+          amount,
           formatCurrencyAmount(perDay, currency),
         );
       case _Frequency.yearly:
         final perMonth = (_selectedAmount / 12).round();
-        if (perMonth <= 0) return l10n.donateAmountPerYear(amount);
+        if (isGenerous || perMonth <= 0) {
+          return l10n.donationRecurringYearly(amount);
+        }
         return l10n.donationCustomYearly(
+          amount,
           formatCurrencyAmount(perMonth, currency),
         );
       case _Frequency.oneTime:
-        return l10n.donationCustomOneTime;
+        return isGenerous
+            ? l10n.donationCustomGenerous
+            : l10n.donationCustomOneTime;
     }
   }
 
@@ -1140,64 +1151,14 @@ class _NativeDonationPageState extends ConsumerState<NativeDonationPage> {
       children: [
         if (hasApplePay) ...[
           // Apple Pay offered first on iOS (App Review Guideline 3.2.1(vi)).
-          SizedBox(
-            width: double.infinity,
-            child: ElevatedButton(
-              onPressed: canPay
-                  ? () => _handlePay(payment_models.PaymentMethodType.applePay)
-                  : null,
-              // White button per Apple Pay HIG for dark backgrounds; the
-              // "Donate with (apple) Pay" label is Apple's official variant
-              // for nonprofits.
-              style: ElevatedButton.styleFrom(
-                minimumSize: const Size(0, 48),
-                backgroundColor: Colors.white,
-                foregroundColor: Colors.black,
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(8),
-                ),
-              ),
-              // Screen readers can't speak the U+F8FF glyph below, which left
-              // this announced as "Donate with Pay".
-              child: applePaySpinning
-                  ? SizedBox(
-                      width: 20,
-                      height: 20,
-                      child: CircularProgressIndicator(
-                        strokeWidth: 2,
-                        color: Colors.black,
-                        semanticsLabel: l10n.processingDonation,
-                      ),
-                    )
-                  : Semantics(
-                      label: l10n.donateWithApplePay,
-                      excludeSemantics: true,
-                      child: Wrap(
-                        alignment: WrapAlignment.center,
-                        crossAxisAlignment: WrapCrossAlignment.center,
-                        spacing: 6,
-                        children: [
-                          Text(
-                            l10n.donateWithApplePayPrefix,
-                            style: context.text.inherited.subtitle,
-                          ),
-                          // U+F8FF (Apple logo), drawn by the iOS system font — this
-                          // button is iOS-only.
-                          Row(
-                            mainAxisSize: MainAxisSize.min,
-                            children: [
-                              const Text('', style: TextStyle(fontSize: 20)),
-                              const SizedBox(width: 3),
-                              Text(
-                                'Pay',
-                                style: context.text.inherited.subtitle,
-                              ),
-                            ],
-                          ),
-                        ],
-                      ),
-                    ),
-            ),
+          ApplePayDonateButton(
+            onPressed: canPay
+                ? () => _handlePay(payment_models.PaymentMethodType.applePay)
+                : null,
+            isProcessing: applePaySpinning,
+            onLightSurface:
+                Theme.of(context).scaffoldBackgroundColor.computeLuminance() >
+                0.5,
           ),
           const SizedBox(height: 12),
         ],
@@ -1273,7 +1234,7 @@ class _NativeDonationPageState extends ConsumerState<NativeDonationPage> {
     return Column(
       children: [
         Text(
-          '${l10n.donationDisclosure}\n$_registrationCopy',
+          _registrationCopy,
           style: context.text.caption.copyWith(color: faint),
           textAlign: TextAlign.center,
         ),

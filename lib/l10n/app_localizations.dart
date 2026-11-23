@@ -4900,12 +4900,6 @@ abstract class AppLocalizations {
   /// **'Donate {amount}/month'**
   String donateAmountPerMonth(String amount);
 
-  /// Text before the Apple Pay mark on the Apple Pay button
-  ///
-  /// In en, this message translates to:
-  /// **'Donate with'**
-  String get donateWithApplePayPrefix;
-
   /// Link on the inline end-screen donation card that opens the full donation page
   ///
   /// In en, this message translates to:
@@ -4996,17 +4990,29 @@ abstract class AppLocalizations {
   /// **'Thank you — your donation went through. Add your email to get your receipt and manage your donation.'**
   String get donationReceiptEmailBody;
 
-  /// Under the amounts on the donation page, monthly gift. perDay is the monthly amount divided by 30.
+  /// Under the amounts on the donation page, monthly gift: states the recurring charge. perDay is the monthly amount divided by 30.
   ///
   /// In en, this message translates to:
-  /// **'About {perDay} a day to keep Medito free for millions.'**
-  String donationCustomMonthly(String perDay);
+  /// **'{amount} every month, about {perDay} a day. Cancel any time.'**
+  String donationCustomMonthly(String amount, String perDay);
 
-  /// Under the amounts on the donation page, yearly gift. perMonth is the yearly amount divided by 12.
+  /// Under the amounts on the donation page, yearly gift: states the recurring charge. perMonth is the yearly amount divided by 12.
   ///
   /// In en, this message translates to:
-  /// **'About {perMonth} a month to keep Medito free for millions.'**
-  String donationCustomYearly(String perMonth);
+  /// **'{amount} every year, about {perMonth} a month. Cancel any time.'**
+  String donationCustomYearly(String amount, String perMonth);
+
+  /// Under the amounts on the donation page, monthly gift, when no per-day equivalent is shown (very large or very small amounts).
+  ///
+  /// In en, this message translates to:
+  /// **'{amount} every month. Cancel any time.'**
+  String donationRecurringMonthly(String amount);
+
+  /// Under the amounts on the donation page, yearly gift, when no per-month equivalent is shown.
+  ///
+  /// In en, this message translates to:
+  /// **'{amount} every year. Cancel any time.'**
+  String donationRecurringYearly(String amount);
 
   /// Under the amounts on the donation page, one-time gift.
   ///
@@ -5019,12 +5025,6 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Thank you. That keeps Medito free for many people who can’t afford to give.'**
   String get donationCustomGenerous;
-
-  /// Small print under the pay buttons on the donation page
-  ///
-  /// In en, this message translates to:
-  /// **'Your donation helps keep Medito free for everyone — no ads, no paywalls. You will receive an email confirmation shortly.'**
-  String get donationDisclosure;
 
   /// Trust line under the donation page disclosure
   ///

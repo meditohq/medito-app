@@ -17,6 +17,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:shared_preferences_platform_interface/shared_preferences_platform_interface.dart';
+import 'package:medito/widgets/buttons/apple_pay_donate_button.dart';
 import 'package:medito/constants/strings/shared_preference_constants.dart';
 import 'package:medito/providers/shared_preference/shared_preference_provider.dart';
 import 'package:medito/models/stripe/payment_intent_model.dart';
@@ -446,7 +447,7 @@ void main() {
       }
     }
 
-    final applePayButton = find.widgetWithText(ElevatedButton, 'Pay');
+    final applePayButton = find.byType(ApplePayDonateButton);
 
     testWidgets('Apple Pay needs no email on the page', (tester) async {
       await onIOS(() async {

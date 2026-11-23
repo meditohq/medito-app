@@ -70,6 +70,10 @@ class DonationWidgetState extends ConsumerState<DonationWidget>
   // a late config success must not swap the button under the user's thumb.
   bool _inlineFellBack = false;
   bool _isProcessingInlinePayment = false;
+  // Apple Pay looked available but a payment through it failed (not a
+  // cancel): offer the card sheet for the rest of this visit, so the retry
+  // is not the same dead end.
+  bool _applePayFailed = false;
 
   // Recovery from a transient load failure. When a session ends with the
   // screen off, this widget mounts on the next app resume, and on Android the
@@ -252,7 +256,15 @@ class DonationWidgetState extends ConsumerState<DonationWidget>
             experimentId: EndScreenDonationExperiment.experimentName,
           );
     } finally {
-      if (mounted) setState(() => _isProcessingInlinePayment = false);
+      if (mounted) {
+        final applePayFailed =
+            method == payment_models.PaymentMethodType.applePay &&
+            result is PaymentFailure;
+        setState(() {
+          _isProcessingInlinePayment = false;
+          if (applePayFailed) _applePayFailed = true;
+        });
+      }
     }
     if (result is! PaymentSuccess || !mounted) return;
     const source = FirebaseAnalyticsService.paywallSourceEndScreen;
@@ -383,7 +395,9 @@ class DonationWidgetState extends ConsumerState<DonationWidget>
           _isInlineVariant
               ? _buildInlineOrFallback(donationPageModel, context)
               : _buildButtonRow(donationPageModel.buttons, context),
-          if (donationPageModel.footerText != null)
+          // The inline card already carries title, body and the monthly
+          // disclosure; the footer only restates the body below the pay button.
+          if (!_isInlineVariant && donationPageModel.footerText != null)
             Padding(
               padding: const EdgeInsets.only(top: 14.0),
               child: Text(
@@ -423,7 +437,7 @@ class DonationWidgetState extends ConsumerState<DonationWidget>
     if (canRenderInline && !_inlineFellBack) {
       _inlineCapTimer?.cancel();
       _logImpression(isSnoozed: false, inlineRendered: true);
-      final applePayAvailable = Platform.isIOS
+      final applePayAvailable = Platform.isIOS && !_applePayFailed
           ? (ref.watch(applePayAvailableProvider).value ?? false)
           : false;
       return InlineDonationPay(

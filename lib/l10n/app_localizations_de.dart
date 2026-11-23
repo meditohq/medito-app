@@ -2785,9 +2785,6 @@ class AppLocalizationsDe extends AppLocalizations {
   }
 
   @override
-  String get donateWithApplePayPrefix => 'Spenden mit';
-
-  @override
   String get donateOtherAmount => 'Anderer Betrag';
 
   @override
@@ -2848,13 +2845,23 @@ class AppLocalizationsDe extends AppLocalizations {
       'Danke – deine Spende ist angekommen. Gib deine E-Mail-Adresse an, um deine Quittung zu erhalten und deine Spende zu verwalten.';
 
   @override
-  String donationCustomMonthly(String perDay) {
-    return 'Etwa $perDay am Tag, damit Medito für Millionen kostenlos bleibt.';
+  String donationCustomMonthly(String amount, String perDay) {
+    return '$amount pro Monat, etwa $perDay am Tag. Jederzeit kündbar.';
   }
 
   @override
-  String donationCustomYearly(String perMonth) {
-    return 'Etwa $perMonth im Monat, damit Medito für Millionen kostenlos bleibt.';
+  String donationCustomYearly(String amount, String perMonth) {
+    return '$amount pro Jahr, etwa $perMonth im Monat. Jederzeit kündbar.';
+  }
+
+  @override
+  String donationRecurringMonthly(String amount) {
+    return '$amount pro Monat. Jederzeit kündbar.';
+  }
+
+  @override
+  String donationRecurringYearly(String amount) {
+    return '$amount pro Jahr. Jederzeit kündbar.';
   }
 
   @override
@@ -2864,10 +2871,6 @@ class AppLocalizationsDe extends AppLocalizations {
   @override
   String get donationCustomGenerous =>
       'Danke. Damit bleibt Medito für viele Menschen kostenlos, die selbst nichts geben können.';
-
-  @override
-  String get donationDisclosure =>
-      'Deine Spende hilft, Medito für alle kostenlos zu halten – ohne Werbung, ohne Bezahlschranken. Du erhältst in Kürze eine Bestätigung per E-Mail.';
 
   @override
   String get donationStripeTrust => 'Sichere Zahlung über Stripe';

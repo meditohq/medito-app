@@ -116,7 +116,7 @@ void main() {
     // 25 major units -> 2500 minor. Not "$2,500", which is what reading the
     // typed digits as cents would have produced.
     expect(
-      find.text('About \$0.83 a day to keep Medito free for millions.'),
+      find.text('\$25 every month, about \$0.83 a day. Cancel any time.'),
       findsOneWidget,
     );
   });
@@ -129,7 +129,7 @@ void main() {
     await type(tester, '1000');
 
     // JPY has no minor unit, so 1000 typed is ¥1,000 — not ¥10.
-    expect(find.textContaining('About ¥33 a day'), findsOneWidget);
+    expect(find.textContaining('about ¥33 a day'), findsOneWidget);
   });
 
   testWidgets('picking a preset puts the keypad away', (tester) async {
@@ -198,13 +198,13 @@ void main() {
     await pump(tester, _config(currency: 'usd', monthly: [200, 500, 1000]));
 
     await type(tester, '25');
-    expect(find.textContaining('Thank you.'), findsOneWidget);
+    expect(find.textContaining('every month'), findsOneWidget);
 
     await type(tester, '');
-    expect(find.textContaining('Thank you.'), findsNothing);
+    expect(find.textContaining('every month'), findsNothing);
   });
 
-  testWidgets('thanks rather than divides above the largest preset', (
+  testWidgets('states the charge without dividing above the largest preset', (
     tester,
   ) async {
     await pump(tester, _config(currency: 'usd', monthly: [200, 500, 1000]));
@@ -213,7 +213,7 @@ void main() {
     await type(tester, '100');
 
     expect(
-      find.textContaining('Thank you. That keeps Medito free'),
+      find.text('\$100 every month. Cancel any time.'),
       findsOneWidget,
     );
     expect(find.textContaining('a day'), findsNothing);
@@ -226,13 +226,13 @@ void main() {
 
     // The suggested preset ($2) starts selected.
     expect(
-      find.text('About \$0.07 a day to keep Medito free for millions.'),
+      find.text('\$2 every month, about \$0.07 a day. Cancel any time.'),
       findsOneWidget,
     );
 
     await tester.tap(find.text('\$10'));
     await tester.pumpAndSettle();
-    expect(find.textContaining('About \$0.33 a day'), findsOneWidget);
+    expect(find.textContaining('about \$0.33 a day'), findsOneWidget);
   });
 
   testWidgets('refreshed pricing resets stale amounts and custom input', (
@@ -317,12 +317,12 @@ void main() {
       await pump(tester, _config(currency: 'jpy', monthly: [1, 10]));
       // The button carries the amount only, so the summary line must still
       // say this is a recurring commitment.
-      expect(find.text('Donate ¥1/month'), findsOneWidget);
+      expect(find.text('¥1 every month. Cancel any time.'), findsOneWidget);
       expect(find.text('Donate ¥1'), findsOneWidget);
       expect(find.text('Helps keep Medito free for millions.'), findsNothing);
       await tester.tap(find.text('Yearly'));
       await tester.pumpAndSettle();
-      expect(find.text('Donate ¥1/year'), findsOneWidget);
+      expect(find.text('¥1 every year. Cancel any time.'), findsOneWidget);
     },
   );
 }
