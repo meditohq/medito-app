@@ -236,7 +236,13 @@ def verify_watch_release!(options, use_existing_build:)
       return_spaceship_testflight_build: false
     )
     watch_bundle_id = "#{ENV.fetch('DEVELOPER_APP_IDENTIFIER')}.watchkitapp"
-    verified = WatchReleaseGuard.build_contains_watch_app?(build, watch_bundle_id)
+    # App Store Connect's build_bundles lists only the app (and clips), not the
+    # nested Watch app, so it can't prove the Watch app is present (2611.20.1
+    # was blocked by exactly that). Prefer the IPA the beta lane just exported
+    # in this same job (gym writes it to ios/); keep the ASC list as a fallback.
+    local_ipas = Dir.glob(File.expand_path("../*.ipa", __dir__)).sort_by { |f| File.mtime(f) }
+    verified = local_ipas.last && WatchReleaseGuard.ipa_contains_watch_app?(local_ipas.last)
+    verified ||= WatchReleaseGuard.build_contains_watch_app?(build, watch_bundle_id)
   else
     verified = WatchReleaseGuard.ipa_contains_watch_app?(lane_context[SharedValues::IPA_OUTPUT_PATH])
   end
