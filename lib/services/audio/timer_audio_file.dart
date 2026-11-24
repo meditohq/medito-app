@@ -31,7 +31,8 @@ class TimerAudioFile {
     Directory? directory,
   }) async {
     final dir = directory ?? await getTemporaryDirectory();
-    final file = File('${dir.path}/$_filePrefix${duration.inMilliseconds}.wav');
+    final name = '$_filePrefix${duration.inMilliseconds}.wav';
+    final file = File('${dir.path}/$name');
     final dataBytes = dataLength(duration);
 
     if (!await file.exists() ||
@@ -45,7 +46,7 @@ class TimerAudioFile {
       }
     }
 
-    await _deleteOthers(dir, keep: file.path);
+    await _deleteOthers(dir, keep: name);
     return file.path;
   }
 
@@ -85,11 +86,13 @@ class TimerAudioFile {
     Directory dir, {
     required String keep,
   }) async {
+    // Compare file names, not paths: on Windows dir.list() returns paths
+    // with backslashes, which never equal the one built with '/'.
     try {
       await for (final entity in dir.list()) {
         final name = entity.uri.pathSegments.last;
         if (entity is File &&
-            entity.path != keep &&
+            name != keep &&
             name.startsWith(_filePrefix)) {
           await entity.delete();
         }
