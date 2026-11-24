@@ -14,6 +14,7 @@ import 'package:medito/utils/launch_source_tracker.dart';
 import 'package:medito/utils/logger.dart';
 import 'package:medito/widgets/snackbar_widget.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:medito/utils/session_origin.dart';
 
 class DeepLinkService {
   final AppLinks _appLinks = AppLinks();
@@ -78,7 +79,13 @@ class DeepLinkService {
 
     if (!context.mounted) return;
 
-    handleNavigation(path, [id], context, ref: ref);
+    handleNavigation(
+      path,
+      [id],
+      context,
+      ref: ref,
+      sessionSource: SessionOrigin.deeplink,
+    );
   }
 
   void dispose() {

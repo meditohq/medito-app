@@ -18,8 +18,15 @@ Fires **once** when playback of a track actually begins.
 | `audioFileGuide` | string | `PlaybackRequest.guideName` (falls back to `'unknown'`) |
 | `audioFileDuration` | int (ms) | `PlaybackRequest.duration` (the file's total length in ms) |
 | `network_type` | string | `connectivity_plus` at start: `wifi` / `mobile` / `ethernet` / `none` / `other` / `unknown` (lookup failed or >500 ms). A VPN reports alongside its transport; the physical link wins. Added on develop after 2610.13.1 (unreleased). |
+| `start_source` | string | Where the session was started (`SessionOrigin`, `lib/utils/session_origin.dart`): `home_up_next` (Home hero), `home_shortcut`, `home_carousel`, `pack_button` (pack Start/Continue, also puts the pack on Home), `pack_track_row` (one track tapped in a pack list), `search`, `tag`, `favorites`, `downloads`, `history`, `deeplink`, `notification`, `timer`, or `other` (no entry point noted this track). Added 2026-11-23 (unreleased). |
+| `pack_id` | string | The pack the track was reached through. Only on `home_up_next`, `pack_button` and `pack_track_row`; absent otherwise. Added 2026-11-23 (unreleased). |
 
 The first three params match `audio_session_completed` so the two join cleanly.
+`start_source` / `pack_id` are only on the started event: join completions and
+abandons back to it on user + `audioFileId` + time. Entry points note the
+origin per track id just before opening it, so a track opened one way and
+played later from somewhere that does not note reads as `other`, not as the
+earlier screen. A replay of the same track keeps its origin.
 `network_type` is a permission-free "probably at home" proxy for AB_TEST_BACKLOG
 entry K. It never reads the SSID. Its baseline is `app_open` (same `network_type`
 plus `launch_type` = `cold` | `resume`), logged by `lib/utils/app_open_tracker.dart`

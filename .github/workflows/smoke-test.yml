@@ -29,10 +29,12 @@ jobs:
         with:
           persist-credentials: false
 
-      - uses: actions/setup-java@v6.2.0
+      - uses: actions/setup-java@v6.3.0
         with:
           distribution: temurin
           java-version: '17'
+          # v6.3.0 made the javac problem matcher opt-in; keep the PR annotations.
+          problem-matcher: true
 
       # Cache the Flutter SDK ourselves: flutter-action v2.12.0's built-in cache
       # keys on hashFiles('**/pubspec.lock'), which is re-evaluated after the

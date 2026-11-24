@@ -64,6 +64,9 @@ class LoadingButtonWidget extends StatelessWidget {
                     child: CircularProgressIndicator(
                       strokeWidth: 2,
                       color: textColor,
+                      // No theme track: it read as a solid ring on a
+                      // filled button.
+                      backgroundColor: Colors.transparent,
                       semanticsLabel: AppLocalizations.of(context)!.loading,
                     ),
                   ),

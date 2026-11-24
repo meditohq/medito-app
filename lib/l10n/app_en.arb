@@ -694,15 +694,6 @@
   "trackingPermissionBody": "Your privacy matters. We use anonymous data to understand how people use Medito, so we can make it better for everyone. We never collect personal information or sell your data.",
   "trackingPermissionPrivacyNote": "Your data stays anonymous and is never shared with third parties.",
   "trackingPermissionAllow": "Continue",
-  "onboardingFirstMeditationTitle": "Your first meditation",
-  "onboardingFirstMeditationHook": "Your first moment of calm.",
-  "onboardingFirstMeditationDuration": "Just over 2 minutes",
-  "onboardingFirstMeditationSubtitle": "Nothing to get right. Just sit back and listen.",
-  "onboardingFirstMeditationBegin": "Start",
-  "onboardingFirstMeditationSkip": "Maybe later",
-  "onboardingFirstMeditationSkipShort": "Skip",
-  "onboardingFirstMeditationDone": "That's it. You just meditated.",
-  "onboardingFirstMeditationContinue": "Continue",
   "splashHeadline": "Meditation Made Simple",
   "splashSubtitle": "Free forever. No ads. Not-for-profit.",
   "@splashSubtitle": {
@@ -1959,34 +1950,6 @@
   "@onboardingAttributionOtherHint": {
     "description": "Placeholder text inside the free-text attribution field"
   },
-  "onboardingResultLearnHeading": "You're in the right place.",
-  "@onboardingResultLearnHeading": {
-    "description": "Heading on the onboarding result screen for users who are new or want to learn (State A)"
-  },
-  "onboardingResultLearnBody": "We'll start you off with just 1 minute and build from there. No experience needed — just show up.",
-  "@onboardingResultLearnBody": {
-    "description": "Body text on the onboarding result screen for State A"
-  },
-  "onboardingResultEaseInHeading": "Good to have you here.",
-  "@onboardingResultEaseInHeading": {
-    "description": "Heading on the onboarding result screen for users with some experience (State B)"
-  },
-  "onboardingResultEaseInBody": "We'll ease you back in with short sessions that build on each other. Go at whatever pace suits you.",
-  "@onboardingResultEaseInBody": {
-    "description": "Body text on the onboarding result screen for State B"
-  },
-  "onboardingResultPracticeHeading": "Welcome to Medito.",
-  "@onboardingResultPracticeHeading": {
-    "description": "Heading on the onboarding result screen for users with a regular practice (State C)"
-  },
-  "onboardingResultPracticeBody": "Your Daily is a great place to keep your practice going. A fresh session is waiting for you every day.",
-  "@onboardingResultPracticeBody": {
-    "description": "Body text on the onboarding result screen for State C"
-  },
-  "onboardingResultCta": "Get started",
-  "@onboardingResultCta": {
-    "description": "CTA button label on the onboarding result screen"
-  },
   "addToFavorites": "Add to favorites",
   "@addToFavorites": {
     "description": "Accessibility label for the favorite button when the item is not yet favorited"
@@ -2057,8 +2020,6 @@
   },
   "donateAmountPerMonth": "Donate {amount}/month",
   "@donateAmountPerMonth": {"description": "Primary pay button on the inline end-screen donation card", "placeholders": {"amount": {"type": "String", "example": "$5"}}},
-  "donateWithApplePayPrefix": "Donate with",
-  "@donateWithApplePayPrefix": {"description": "Text before the Apple Pay mark on the Apple Pay button"},
   "donateOtherAmount": "Other amount",
   "@donateOtherAmount": {"description": "Link on the inline end-screen donation card that opens the full donation page"},
   "donateMostPopular": "Most popular",
@@ -2129,18 +2090,18 @@
   "@donationReceiptEmailTitle": {"description": "Title of the dialog shown after a successful Apple Pay donation when no email address reached us"},
   "donationReceiptEmailBody": "Thank you — your donation went through. Add your email to get your receipt and manage your donation.",
   "@donationReceiptEmailBody": {"description": "Body of the receipt email dialog shown after a successful donation"},
-  "donationCustomMonthly": "About {perDay} a day to keep Medito free for millions.",
-  "@donationCustomMonthly": {"description": "Under the amounts on the donation page, monthly gift. perDay is the monthly amount divided by 30.", "placeholders": {"perDay": {"type": "String", "example": "$0.33"}}},
-  "donationCustomYearly": "About {perMonth} a month to keep Medito free for millions.",
-  "@donationCustomYearly": {"description": "Under the amounts on the donation page, yearly gift. perMonth is the yearly amount divided by 12.", "placeholders": {"perMonth": {"type": "String", "example": "$5"}}},
+  "donationCustomMonthly": "{amount} every month, about {perDay} a day. Cancel any time.",
+  "@donationCustomMonthly": {"description": "Under the amounts on the donation page, monthly gift: states the recurring charge. perDay is the monthly amount divided by 30.", "placeholders": {"amount": {"type": "String", "example": "$10"}, "perDay": {"type": "String", "example": "$0.33"}}},
+  "donationCustomYearly": "{amount} every year, about {perMonth} a month. Cancel any time.",
+  "@donationCustomYearly": {"description": "Under the amounts on the donation page, yearly gift: states the recurring charge. perMonth is the yearly amount divided by 12.", "placeholders": {"amount": {"type": "String", "example": "$60"}, "perMonth": {"type": "String", "example": "$5"}}},
+  "donationRecurringMonthly": "{amount} every month. Cancel any time.",
+  "@donationRecurringMonthly": {"description": "Under the amounts on the donation page, monthly gift, when no per-day equivalent is shown (very large or very small amounts).", "placeholders": {"amount": {"type": "String", "example": "$200"}}},
+  "donationRecurringYearly": "{amount} every year. Cancel any time.",
+  "@donationRecurringYearly": {"description": "Under the amounts on the donation page, yearly gift, when no per-month equivalent is shown.", "placeholders": {"amount": {"type": "String", "example": "$500"}}},
   "donationCustomOneTime": "Helps keep Medito free for millions.",
   "@donationCustomOneTime": {"description": "Under the amounts on the donation page, one-time gift."},
   "donationCustomGenerous": "Thank you. That keeps Medito free for many people who can’t afford to give.",
   "@donationCustomGenerous": {"description": "Under the amounts on the donation page when the typed amount is above the largest preset."},
-  "donationDisclosure": "Your donation helps keep Medito free for everyone — no ads, no paywalls. You will receive an email confirmation shortly.",
-  "@donationDisclosure": {
-    "description": "Small print under the pay buttons on the donation page"
-  },
   "donationStripeTrust": "Secure payment powered by Stripe",
   "@donationStripeTrust": {
     "description": "Trust line under the donation page disclosure"

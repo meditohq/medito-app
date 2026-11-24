@@ -472,7 +472,7 @@ class _ParentWidgetState extends ConsumerState<ParentWidget>
   }
 
   void _onAppForegrounded() async {
-    ref.read(firebaseMessagingProvider).ref.read(reminderProvider).clearBadge();
+    unawaited(ref.read(reminderProvider).clearBadge());
     ref.read(statsProvider.notifier).refresh();
     // Notification permission can be revoked in system settings while away.
     unawaited(FirebaseAnalyticsService.applyRemindersOnProperty());

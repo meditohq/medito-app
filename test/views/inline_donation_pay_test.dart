@@ -121,7 +121,7 @@ void main() {
       }
       expect(find.text('Most popular'), findsOneWidget);
       // Button reflects the preselected \$10.
-      expect(find.text('Donate \$10/month'), findsOneWidget);
+      expect(find.text('Donate \$10'), findsOneWidget);
     },
   );
 
@@ -133,14 +133,14 @@ void main() {
       suggested: 1000,
     );
     expect(find.text('¥1,000'), findsOneWidget);
-    expect(find.text('Donate ¥1,000/month'), findsOneWidget);
+    expect(find.text('Donate ¥1,000'), findsOneWidget);
   });
 
   testWidgets('tapping a chip changes the charged amount', (tester) async {
     final calls = await pump(tester, knownEmail: 'donor@example.com');
     await tester.tap(find.text('\$5'));
     await tester.pumpAndSettle();
-    expect(find.text('Donate \$5/month'), findsOneWidget);
+    expect(find.text('Donate \$5'), findsOneWidget);
 
     await tester.tap(find.byKey(inlineDonationPayButtonKey));
     await tester.pumpAndSettle();
@@ -234,8 +234,7 @@ void main() {
       knownEmail: 'donor@example.com',
       applePay: true,
     );
-    expect(find.text('Donate with '), findsOneWidget);
-    expect(find.textContaining('Pay · \$10'), findsOneWidget);
+    expect(find.text('Donate with Apple Pay'), findsOneWidget);
     await tester.tap(find.byKey(inlineDonationPayButtonKey));
     await tester.pumpAndSettle();
     expect(calls.single.method, PaymentMethodType.applePay);
@@ -246,7 +245,7 @@ void main() {
     (tester) async {
       final calls = await pump(tester, applePay: true, knownEmail: '   ');
       // Wallet button straight away, no email field now or after the tap.
-      expect(find.textContaining('Pay · \$10'), findsOneWidget);
+      expect(find.text('Donate with Apple Pay'), findsOneWidget);
       expect(find.byKey(inlineDonationEmailFieldKey), findsNothing);
       await tester.tap(find.text('\$5'));
       await tester.tap(find.byKey(inlineDonationPayButtonKey));

@@ -14,6 +14,7 @@ import 'package:medito/providers/providers.dart';
 import 'package:medito/scaffold_messenger_key.dart';
 import 'package:medito/views/player/start_session.dart';
 import 'package:medito/widgets/snackbar_widget.dart';
+import 'package:medito/utils/session_origin.dart';
 
 /// The pack's header surface with its play button sitting on the lower edge,
 /// half over the header and half over the track list (Spotify-style). The
@@ -245,6 +246,11 @@ class _PackPlayButtonState extends ConsumerState<PackPlayButton> {
       _logTap(next);
       await _putOnHome(context);
       if (!context.mounted) return;
+      SessionOrigin.instance.note(
+        next.id,
+        SessionOrigin.packButton,
+        packId: pack.id,
+      );
       await widget.onStartSession(
         context,
         ref,

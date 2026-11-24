@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/semantics.dart';
 import 'package:medito/constants/colors/color_constants.dart';
 import 'package:medito/l10n/app_localizations.dart';
+import 'package:medito/widgets/buttons/apple_pay_donate_button.dart';
 import 'package:medito/widgets/inputs/medito_text_field.dart';
 import 'package:medito/models/stripe/payment_method_model.dart'
     as payment_models;
@@ -70,6 +71,7 @@ class InlineDonationPay extends StatefulWidget {
   final bool applePayAvailable;
 
   final bool isProcessing;
+
   final InlinePayCallback onPay;
   final VoidCallback onOtherAmount;
 
@@ -411,6 +413,9 @@ class _InlineDonationPayState extends State<InlineDonationPay> {
       child: CircularProgressIndicator(
         strokeWidth: 2,
         color: color,
+        // The theme's grey track made the spinner read as a solid ring on a
+        // filled button.
+        backgroundColor: Colors.transparent,
         // Otherwise the disabled button has no name while it spins.
         semanticsLabel: l10n.processingDonation,
       ),
@@ -418,51 +423,15 @@ class _InlineDonationPayState extends State<InlineDonationPay> {
   }
 
   Widget _buildApplePayButton(BuildContext context, AppLocalizations l10n) {
-    // White button per Apple Pay HIG on a coloured background; "Donate with
-    //  Pay" is Apple's official nonprofit variant. U+F8FF is the Apple logo
-    // glyph in the iOS system font, so this is only ever built on iOS.
-    return SizedBox(
+    return ApplePayDonateButton(
+      key: inlineDonationPayButtonKey,
+      onPressed: widget.isProcessing ? null : _submit,
+      isProcessing: widget.isProcessing,
+      onLightSurface: context.brandAccent.computeLuminance() > 0.5,
       height: 46,
-      child: ElevatedButton(
-        key: inlineDonationPayButtonKey,
-        onPressed: widget.isProcessing ? null : _submit,
-        style: ElevatedButton.styleFrom(
-          backgroundColor: Colors.white,
-          foregroundColor: Colors.black,
-          disabledBackgroundColor: Colors.white70,
-          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
-        ),
-        child: widget.isProcessing
-            ? _buildProcessingIndicator(Colors.black, l10n)
-            // Long localized amounts (R$ 1.000, ₹2,000) must never wrap or
-            // overflow the wallet button — shrink the whole label instead.
-            // Spoken as one phrase: the U+F8FF glyph is unspeakable (it read
-            // "Donate with Pay") and the visible label never says monthly.
-            : Semantics(
-                label: l10n.donateAmountPerMonthWithApplePay(
-                  _spokenAmountLabel,
-                ),
-                excludeSemantics: true,
-                child: FittedBox(
-                  fit: BoxFit.scaleDown,
-                  child: Row(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      Text(
-                        '${l10n.donateWithApplePayPrefix} ',
-                        style: context.text.inherited.subtitle,
-                      ),
-                      const Text('', style: TextStyle(fontSize: 18)),
-                      const SizedBox(width: 2),
-                      Text(
-                        'Pay · $_amountLabel',
-                        style: context.text.inherited.subtitle,
-                      ),
-                    ],
-                  ),
-                ),
-              ),
-      ),
+      // Spoken with the amount and the cadence, which the native button's
+      // own label ("Donate with Apple Pay") leaves out.
+      semanticLabel: l10n.donateAmountPerMonthWithApplePay(_spokenAmountLabel),
     );
   }
 
@@ -485,8 +454,9 @@ class _InlineDonationPayState extends State<InlineDonationPay> {
             : Text(
                 _needsTypedEmail && _emailRevealed
                     ? l10n.donationContinueToPayment
-                    : l10n.donateAmountPerMonth(_amountLabel),
-                // "/month" was read as "slash month".
+                    : l10n.donateAmountOnce(_amountLabel),
+                // The label leaves the cadence to the disclosure line below;
+                // spoken, the button still says the amount is monthly.
                 semanticsLabel: _needsTypedEmail && _emailRevealed
                     ? null
                     : l10n.donateAmountPerMonthSpoken(_spokenAmountLabel),

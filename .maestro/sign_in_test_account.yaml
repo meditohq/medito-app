@@ -130,7 +130,7 @@ name: Sign in to the prod test account from a fresh install and reach Home
       - tapOn: "Skip for Now"
 
       - extendedWaitUntil:
-          visible: "Update Setting|Help Us Improve Medito|Get started|Maybe later"
+          visible: "Update Setting|Help Us Improve Medito|.*day streak.*|Consistency Score: .*|Dismiss"
           timeout: 30000
       - runFlow:
           when:
@@ -149,14 +149,6 @@ name: Sign in to the prod test account from a fresh install and reach Home
                   visible: "Allow"
                 commands:
                   - tapOn: "Allow"
-
-      - scrollUntilVisible:
-          element:
-            text: "Get started|Maybe later"
-          direction: DOWN
-          timeout: 30000
-      - tapOn:
-          text: "Get started|Maybe later"
 
       # B ends with the donation ask; A goes straight to Home. Wait for
       # the actual next screen, as smoke.yaml does. Relaunching here interrupts

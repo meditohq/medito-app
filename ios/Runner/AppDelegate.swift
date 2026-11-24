@@ -9,6 +9,7 @@ import AdServices
 import FBSDKCoreKit
 import WatchConnectivity
 import HealthKit
+import UserNotifications
 
 @main
 class AppDelegate: FlutterAppDelegate {
@@ -28,6 +29,10 @@ class AppDelegate: FlutterAppDelegate {
 
         // Register Flutter plugins
         GeneratedPluginRegistrant.register(with: self)
+        // Background pushes can arrive before a scene connects.
+        if let registrar = registrar(forPlugin: "MeditoNotificationBadge") {
+            registerNotificationBadgeChannel(with: registrar.messenger())
+        }
 
         // Activate early so sessions finished on the watch are received even
         // when the app is launched in the background to deliver them.
@@ -150,6 +155,34 @@ class AppDelegate: FlutterAppDelegate {
 
         WatchPresence.shared.register(with: controller.binaryMessenger)
         MindfulnessHealthWriter.shared.register(with: controller.binaryMessenger)
+    }
+
+    private func registerNotificationBadgeChannel(with messenger: FlutterBinaryMessenger) {
+        let channel = FlutterMethodChannel(
+            name: "com.medito.app/notification_badge",
+            binaryMessenger: messenger
+        )
+        channel.setMethodCallHandler { call, result in
+            guard call.method == "clearBadge" else {
+                result(FlutterMethodNotImplemented)
+                return
+            }
+
+            if #available(iOS 16.0, *) {
+                UNUserNotificationCenter.current().setBadgeCount(0) { error in
+                    DispatchQueue.main.async {
+                        if let error = error {
+                            result(FlutterError(code: "BADGE_CLEAR_FAILED", message: error.localizedDescription, details: nil))
+                        } else {
+                            result(nil)
+                        }
+                    }
+                }
+            } else {
+                UIApplication.shared.applicationIconBadgeNumber = 0
+                result(nil)
+            }
+        }
     }
 
     private func presentAddVoiceShortcutUI(title: String, id: String, url: String) {

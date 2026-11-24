@@ -2392,60 +2392,6 @@ abstract class AppLocalizations {
   /// **'Continue'**
   String get trackingPermissionAllow;
 
-  /// No description provided for @onboardingFirstMeditationTitle.
-  ///
-  /// In en, this message translates to:
-  /// **'Your first meditation'**
-  String get onboardingFirstMeditationTitle;
-
-  /// No description provided for @onboardingFirstMeditationHook.
-  ///
-  /// In en, this message translates to:
-  /// **'Your first moment of calm.'**
-  String get onboardingFirstMeditationHook;
-
-  /// No description provided for @onboardingFirstMeditationDuration.
-  ///
-  /// In en, this message translates to:
-  /// **'Just over 2 minutes'**
-  String get onboardingFirstMeditationDuration;
-
-  /// No description provided for @onboardingFirstMeditationSubtitle.
-  ///
-  /// In en, this message translates to:
-  /// **'Nothing to get right. Just sit back and listen.'**
-  String get onboardingFirstMeditationSubtitle;
-
-  /// No description provided for @onboardingFirstMeditationBegin.
-  ///
-  /// In en, this message translates to:
-  /// **'Start'**
-  String get onboardingFirstMeditationBegin;
-
-  /// No description provided for @onboardingFirstMeditationSkip.
-  ///
-  /// In en, this message translates to:
-  /// **'Maybe later'**
-  String get onboardingFirstMeditationSkip;
-
-  /// No description provided for @onboardingFirstMeditationSkipShort.
-  ///
-  /// In en, this message translates to:
-  /// **'Skip'**
-  String get onboardingFirstMeditationSkipShort;
-
-  /// No description provided for @onboardingFirstMeditationDone.
-  ///
-  /// In en, this message translates to:
-  /// **'That\'s it. You just meditated.'**
-  String get onboardingFirstMeditationDone;
-
-  /// No description provided for @onboardingFirstMeditationContinue.
-  ///
-  /// In en, this message translates to:
-  /// **'Continue'**
-  String get onboardingFirstMeditationContinue;
-
   /// No description provided for @splashHeadline.
   ///
   /// In en, this message translates to:
@@ -4846,48 +4792,6 @@ abstract class AppLocalizations {
   /// **'Tell us where you heard about us'**
   String get onboardingAttributionOtherHint;
 
-  /// Heading on the onboarding result screen for users who are new or want to learn (State A)
-  ///
-  /// In en, this message translates to:
-  /// **'You\'re in the right place.'**
-  String get onboardingResultLearnHeading;
-
-  /// Body text on the onboarding result screen for State A
-  ///
-  /// In en, this message translates to:
-  /// **'We\'ll start you off with just 1 minute and build from there. No experience needed — just show up.'**
-  String get onboardingResultLearnBody;
-
-  /// Heading on the onboarding result screen for users with some experience (State B)
-  ///
-  /// In en, this message translates to:
-  /// **'Good to have you here.'**
-  String get onboardingResultEaseInHeading;
-
-  /// Body text on the onboarding result screen for State B
-  ///
-  /// In en, this message translates to:
-  /// **'We\'ll ease you back in with short sessions that build on each other. Go at whatever pace suits you.'**
-  String get onboardingResultEaseInBody;
-
-  /// Heading on the onboarding result screen for users with a regular practice (State C)
-  ///
-  /// In en, this message translates to:
-  /// **'Welcome to Medito.'**
-  String get onboardingResultPracticeHeading;
-
-  /// Body text on the onboarding result screen for State C
-  ///
-  /// In en, this message translates to:
-  /// **'Your Daily is a great place to keep your practice going. A fresh session is waiting for you every day.'**
-  String get onboardingResultPracticeBody;
-
-  /// CTA button label on the onboarding result screen
-  ///
-  /// In en, this message translates to:
-  /// **'Get started'**
-  String get onboardingResultCta;
-
   /// Accessibility label for the favorite button when the item is not yet favorited
   ///
   /// In en, this message translates to:
@@ -4996,12 +4900,6 @@ abstract class AppLocalizations {
   /// **'Donate {amount}/month'**
   String donateAmountPerMonth(String amount);
 
-  /// Text before the Apple Pay mark on the Apple Pay button
-  ///
-  /// In en, this message translates to:
-  /// **'Donate with'**
-  String get donateWithApplePayPrefix;
-
   /// Link on the inline end-screen donation card that opens the full donation page
   ///
   /// In en, this message translates to:
@@ -5092,17 +4990,29 @@ abstract class AppLocalizations {
   /// **'Thank you — your donation went through. Add your email to get your receipt and manage your donation.'**
   String get donationReceiptEmailBody;
 
-  /// Under the amounts on the donation page, monthly gift. perDay is the monthly amount divided by 30.
+  /// Under the amounts on the donation page, monthly gift: states the recurring charge. perDay is the monthly amount divided by 30.
   ///
   /// In en, this message translates to:
-  /// **'About {perDay} a day to keep Medito free for millions.'**
-  String donationCustomMonthly(String perDay);
+  /// **'{amount} every month, about {perDay} a day. Cancel any time.'**
+  String donationCustomMonthly(String amount, String perDay);
 
-  /// Under the amounts on the donation page, yearly gift. perMonth is the yearly amount divided by 12.
+  /// Under the amounts on the donation page, yearly gift: states the recurring charge. perMonth is the yearly amount divided by 12.
   ///
   /// In en, this message translates to:
-  /// **'About {perMonth} a month to keep Medito free for millions.'**
-  String donationCustomYearly(String perMonth);
+  /// **'{amount} every year, about {perMonth} a month. Cancel any time.'**
+  String donationCustomYearly(String amount, String perMonth);
+
+  /// Under the amounts on the donation page, monthly gift, when no per-day equivalent is shown (very large or very small amounts).
+  ///
+  /// In en, this message translates to:
+  /// **'{amount} every month. Cancel any time.'**
+  String donationRecurringMonthly(String amount);
+
+  /// Under the amounts on the donation page, yearly gift, when no per-month equivalent is shown.
+  ///
+  /// In en, this message translates to:
+  /// **'{amount} every year. Cancel any time.'**
+  String donationRecurringYearly(String amount);
 
   /// Under the amounts on the donation page, one-time gift.
   ///
@@ -5115,12 +5025,6 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Thank you. That keeps Medito free for many people who can’t afford to give.'**
   String get donationCustomGenerous;
-
-  /// Small print under the pay buttons on the donation page
-  ///
-  /// In en, this message translates to:
-  /// **'Your donation helps keep Medito free for everyone — no ads, no paywalls. You will receive an email confirmation shortly.'**
-  String get donationDisclosure;
 
   /// Trust line under the donation page disclosure
   ///

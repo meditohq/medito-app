@@ -29,6 +29,7 @@ import 'package:medito/providers/providers.dart';
 import '../../home_styles.dart';
 import '../home_gradient_border.dart';
 import 'package:medito/constants/theme/medito_text.dart';
+import 'package:medito/utils/session_origin.dart';
 
 const _kCardBorderRadius = kHomeHeroRadius;
 const _kPlayButtonSize = 52.0;
@@ -978,6 +979,11 @@ class _UpNextContentState extends ConsumerState<_UpNextContent>
       }
     });
     try {
+      SessionOrigin.instance.note(
+        nextSession.id,
+        SessionOrigin.homeUpNext,
+        packId: widget.data.pack.id,
+      );
       await startSession(
         context,
         ref,

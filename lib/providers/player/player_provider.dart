@@ -18,6 +18,7 @@ import 'ios_audio_handler.dart';
 import 'repeat_state_provider.dart';
 import '../../utils/audio_session_tracker.dart';
 import '../../utils/logger.dart';
+import 'package:medito/utils/session_origin.dart';
 
 final _api = pigeon.MeditoAudioServiceApi();
 final _androidServiceApi = pigeon.MeditoAndroidAudioServiceManager();
@@ -55,6 +56,7 @@ class PlayerProvider extends Notifier<PlaybackRequest?> {
     // Analytics: playback actually started. Fired after _playTrack so a failed
     // start (which rethrows above) does not count as a started session. Also
     // abandons any prior session that never completed (track switch).
+    final origin = SessionOrigin.instance.originFor(request.trackId);
     unawaited(
       AudioSessionTracker.instance.onStarted(
         fileId: request.fileId,
@@ -62,6 +64,8 @@ class PlayerProvider extends Notifier<PlaybackRequest?> {
             ? AnalyticsEventConstants.timerGuide
             : request.guideName,
         durationMs: request.duration,
+        startSource: request.isTimer ? SessionOrigin.timer : origin.source,
+        packId: request.isTimer ? null : origin.packId,
       ),
     );
   }

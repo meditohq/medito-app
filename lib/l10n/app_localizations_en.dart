@@ -1319,34 +1319,6 @@ class AppLocalizationsEn extends AppLocalizations {
   String get trackingPermissionAllow => 'Continue';
 
   @override
-  String get onboardingFirstMeditationTitle => 'Your first meditation';
-
-  @override
-  String get onboardingFirstMeditationHook => 'Your first moment of calm.';
-
-  @override
-  String get onboardingFirstMeditationDuration => 'Just over 2 minutes';
-
-  @override
-  String get onboardingFirstMeditationSubtitle =>
-      'Nothing to get right. Just sit back and listen.';
-
-  @override
-  String get onboardingFirstMeditationBegin => 'Start';
-
-  @override
-  String get onboardingFirstMeditationSkip => 'Maybe later';
-
-  @override
-  String get onboardingFirstMeditationSkipShort => 'Skip';
-
-  @override
-  String get onboardingFirstMeditationDone => 'That\'s it. You just meditated.';
-
-  @override
-  String get onboardingFirstMeditationContinue => 'Continue';
-
-  @override
   String get splashHeadline => 'Meditation Made Simple';
 
   @override
@@ -2699,30 +2671,6 @@ class AppLocalizationsEn extends AppLocalizations {
       'Tell us where you heard about us';
 
   @override
-  String get onboardingResultLearnHeading => 'You\'re in the right place.';
-
-  @override
-  String get onboardingResultLearnBody =>
-      'We\'ll start you off with just 1 minute and build from there. No experience needed — just show up.';
-
-  @override
-  String get onboardingResultEaseInHeading => 'Good to have you here.';
-
-  @override
-  String get onboardingResultEaseInBody =>
-      'We\'ll ease you back in with short sessions that build on each other. Go at whatever pace suits you.';
-
-  @override
-  String get onboardingResultPracticeHeading => 'Welcome to Medito.';
-
-  @override
-  String get onboardingResultPracticeBody =>
-      'Your Daily is a great place to keep your practice going. A fresh session is waiting for you every day.';
-
-  @override
-  String get onboardingResultCta => 'Get started';
-
-  @override
   String get addToFavorites => 'Add to favorites';
 
   @override
@@ -2779,9 +2727,6 @@ class AppLocalizationsEn extends AppLocalizations {
   String donateAmountPerMonth(String amount) {
     return 'Donate $amount/month';
   }
-
-  @override
-  String get donateWithApplePayPrefix => 'Donate with';
 
   @override
   String get donateOtherAmount => 'Other amount';
@@ -2843,13 +2788,23 @@ class AppLocalizationsEn extends AppLocalizations {
       'Thank you — your donation went through. Add your email to get your receipt and manage your donation.';
 
   @override
-  String donationCustomMonthly(String perDay) {
-    return 'About $perDay a day to keep Medito free for millions.';
+  String donationCustomMonthly(String amount, String perDay) {
+    return '$amount every month, about $perDay a day. Cancel any time.';
   }
 
   @override
-  String donationCustomYearly(String perMonth) {
-    return 'About $perMonth a month to keep Medito free for millions.';
+  String donationCustomYearly(String amount, String perMonth) {
+    return '$amount every year, about $perMonth a month. Cancel any time.';
+  }
+
+  @override
+  String donationRecurringMonthly(String amount) {
+    return '$amount every month. Cancel any time.';
+  }
+
+  @override
+  String donationRecurringYearly(String amount) {
+    return '$amount every year. Cancel any time.';
   }
 
   @override
@@ -2858,10 +2813,6 @@ class AppLocalizationsEn extends AppLocalizations {
   @override
   String get donationCustomGenerous =>
       'Thank you. That keeps Medito free for many people who can’t afford to give.';
-
-  @override
-  String get donationDisclosure =>
-      'Your donation helps keep Medito free for everyone — no ads, no paywalls. You will receive an email confirmation shortly.';
 
   @override
   String get donationStripeTrust => 'Secure payment powered by Stripe';

@@ -7,7 +7,6 @@ import 'package:medito/constants/constants.dart';
 import 'package:medito/constants/pack_sequence.dart';
 import 'package:medito/constants/strings/analytics_event_constants.dart';
 import 'package:medito/l10n/app_localizations.dart';
-import 'package:medito/providers/onboarding/onboarding_experienced_meditation_experiment.dart';
 import 'package:medito/providers/onboarding/onboarding_donation_timing_experiment.dart';
 import 'package:medito/providers/providers.dart';
 import 'package:medito/views/bottom_navigation/bottom_navigation_bar_view.dart';
@@ -15,7 +14,6 @@ import 'package:medito/views/onboarding/notifications_screen.dart';
 import 'package:medito/providers/home/up_next_provider.dart';
 import 'package:medito/views/onboarding/onboarding_donation_screen.dart';
 import 'package:medito/views/onboarding/onboarding_question_screen.dart';
-import 'package:medito/views/onboarding/onboarding_result_screen.dart';
 import 'package:medito/views/onboarding/battery_optimization_screen.dart';
 import 'package:medito/views/onboarding/tracking_permission_screen.dart';
 import 'package:medito/widgets/onboarding/onboarding_step_title.dart';
@@ -49,23 +47,6 @@ class OnboardingPagerScreenState extends ConsumerState<OnboardingPagerScreen> {
   int? _experienceIndex;
 
   bool _showBatteryScreen = false;
-
-  // onboarding_experienced_meditation arm; null unless `regular_practice`.
-  String? _experiencedMeditationVariant;
-
-  // The 3-min first-meditation step. never_tried/a_little retain best on a
-  // short first session (~63-68% at <=3min). experienceIndex: 0 = never_tried,
-  // 1 = a_little, 2 = regular_practice — regulars used to skip it
-  // unconditionally, now under test by
-  // OnboardingExperiencedMeditationExperiment.
-  bool get _showMeditationStep {
-    if (_experienceIndex == 0 || _experienceIndex == 1) return true;
-    if (_experienceIndex == 2) {
-      return _experiencedMeditationVariant ==
-          OnboardingExperiencedMeditationExperiment.variantOffered;
-    }
-    return false;
-  }
 
   final List<String> _images = [
     AssetConstants.onboardingImage1,
@@ -104,29 +85,7 @@ class OnboardingPagerScreenState extends ConsumerState<OnboardingPagerScreen> {
         value: answers[index],
       ),
     );
-    // Enrol only `regular_practice`; anyone else would dilute the denominator.
-    var experiencedVariant = _experiencedMeditationVariant;
-    if (index == 2) {
-      experiencedVariant =
-          OnboardingExperiencedMeditationExperiment.resolveVariant(
-            ref.read(sharedPreferencesProvider),
-          );
-      unawaited(
-        analytics.logEvent(
-          name: AnalyticsEventConstants.onboardingExperimentExposure,
-          parameters: {
-            AnalyticsEventConstants.paramExperimentName:
-                OnboardingExperiencedMeditationExperiment.experimentName,
-            AnalyticsEventConstants.paramVariantId: experiencedVariant,
-          },
-        ),
-      );
-    }
-
-    setState(() {
-      _experienceIndex = index;
-      _experiencedMeditationVariant = experiencedVariant;
-    });
+    setState(() => _experienceIndex = index);
     // Persist the answer so it outlives onboarding — used to segment the
     // first-session experience (and its A/B test) and later personalisation.
     unawaited(
@@ -155,29 +114,29 @@ class OnboardingPagerScreenState extends ConsumerState<OnboardingPagerScreen> {
   }
 
   void _logQuestionFlowCompleted() {
-    final state = deriveOnboardingState(experienceIndex: _experienceIndex ?? 0);
+    // 0 = never_tried, 1 = a_little, 2 = regular_practice.
+    const labels = ['state_a', 'state_b', 'state_c'];
+    final label = labels[(_experienceIndex ?? 0).clamp(0, 2)];
     unawaited(
       ref
           .read(analyticsServiceProvider)
           .logEvent(
             name: AnalyticsEventConstants.onboardingQuestionFlowCompleted,
-            parameters: {
-              AnalyticsEventConstants.paramResultState: state.analyticsLabel,
-            },
+            parameters: {AnalyticsEventConstants.paramResultState: label},
           ),
     );
   }
 
   List<Widget> _buildPages(AppLocalizations l10n) {
-    final resultState = deriveOnboardingState(
-      experienceIndex: _experienceIndex ?? 0,
-    );
-
     final steps = OnboardingDonationTimingExperiment.steps(
       variant: _donationTimingVariant,
       showBattery: _showBatteryScreen,
       showTracking: ref.watch(onboardingTrackingStepProvider),
     );
+    // There is no closing page: whichever step comes last goes straight to
+    // Home.
+    VoidCallback onNext(OnboardingStep step) =>
+        steps.last == step ? _finishOnboarding : _nextPage;
     return [
       for (final step in steps)
         switch (step) {
@@ -196,35 +155,28 @@ class OnboardingPagerScreenState extends ConsumerState<OnboardingPagerScreen> {
           OnboardingStep.donation => OnboardingDonationScreen(
             key: ValueKey(step),
             headerImage: _images[1],
-            onNext: steps.last == step ? _onGetStarted : _nextPage,
+            onNext: onNext(step),
           ),
           OnboardingStep.notifications => NotificationsScreen(
             key: ValueKey(step),
             headerImage: _images[2],
-            onNext: _nextPage,
+            onNext: onNext(step),
           ),
           OnboardingStep.battery => BatteryOptimizationScreen(
             key: ValueKey(step),
             headerImage: _images[2],
-            onNext: _nextPage,
+            onNext: onNext(step),
           ),
           OnboardingStep.tracking => TrackingPermissionScreen(
             key: ValueKey(step),
             headerImage: _images[2],
-            onNext: _nextPage,
-          ),
-          OnboardingStep.result => OnboardingResultScreen(
-            key: ValueKey(step),
-            headerImage: _images[2],
-            state: resultState,
-            onGetStarted: steps.last == step ? _onGetStarted : _nextPage,
-            showMeditation: _showMeditationStep,
+            onNext: onNext(step),
           ),
         },
     ];
   }
 
-  Future<void> _onGetStarted() async {
+  Future<void> _finishOnboarding() async {
     if (_completed) return;
     _completed = true;
     unawaited(
@@ -310,22 +262,12 @@ class OnboardingPagerScreenState extends ConsumerState<OnboardingPagerScreen> {
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
     final pages = _buildPages(l10n);
-    // The result is not a setup step, including when the experiment places
-    // the donation step after it.
     final steps = OnboardingDonationTimingExperiment.steps(
       variant: _donationTimingVariant,
       showBattery: _showBatteryScreen,
       showTracking: ref.watch(onboardingTrackingStepProvider),
     );
-    final totalSteps = steps
-        .where((step) => step != OnboardingStep.result)
-        .length;
-    final progressIndex =
-        steps
-            .take(_currentPage + 1)
-            .where((step) => step != OnboardingStep.result)
-            .length -
-        1;
+    final totalSteps = steps.length;
 
     return Scaffold(
       backgroundColor: Theme.of(context).scaffoldBackgroundColor,
@@ -346,24 +288,18 @@ class OnboardingPagerScreenState extends ConsumerState<OnboardingPagerScreen> {
                 itemBuilder: (context, index) => index == 0
                     ? pages[index]
                     : OnboardingStepAnnouncement(
-                        position: steps[index] == OnboardingStep.result
-                            ? null
-                            : l10n.onboardingStepIndicator(
-                                steps
-                                    .take(index + 1)
-                                    .where((s) => s != OnboardingStep.result)
-                                    .length,
-                                totalSteps,
-                              ),
+                        position: l10n.onboardingStepIndicator(
+                          index + 1,
+                          totalSteps,
+                        ),
                         child: pages[index],
                       ),
               ),
             ),
-            if (steps[_currentPage] != OnboardingStep.result)
-              OnboardingProgressIndicator(
-                currentIndex: progressIndex,
-                totalSteps: totalSteps,
-              ),
+            OnboardingProgressIndicator(
+              currentIndex: _currentPage,
+              totalSteps: totalSteps,
+            ),
           ],
         ),
       ),

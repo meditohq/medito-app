@@ -72,6 +72,10 @@ class AnalyticsEventConstants {
   /// Event logged when a payment fails
   static const String paymentFailed = 'payment_failed';
 
+  /// After a successful donation: where the donor's email came from. One per
+  /// donation on the surfaces that can pay without an address on the page.
+  static const String donationEmailOutcome = 'donation_email_outcome';
+
   /// Event logged when a payment is cancelled by the user
   static const String paymentCancelled = 'payment_cancelled';
 
@@ -131,24 +135,11 @@ class AnalyticsEventConstants {
   /// Event logged when user completes onboarding flow
   static const String onboardingCompleted = 'onboarding_completed';
 
-  // Onboarding "first meditation" experiment (onboarding_first_meditation).
   /// Fired once per install when onboarding assigns the user to an experiment
   /// arm. Carries paramExperimentName + paramVariantId so the test is queryable
   /// with the same BigQuery convention as the paywall experiments.
   static const String onboardingExperimentExposure =
       'onboarding_experiment_exposure';
-
-  /// The first-meditation screen (variant arm) was shown.
-  static const String onboardingFirstMeditationShown =
-      'onboarding_first_meditation_shown';
-
-  /// User tapped "Begin" to start the first meditation from onboarding.
-  static const String onboardingFirstMeditationBeginTap =
-      'onboarding_first_meditation_begin_tap';
-
-  /// User skipped the first meditation ("Maybe later").
-  static const String onboardingFirstMeditationSkipTap =
-      'onboarding_first_meditation_skip_tap';
 
   /// Parameter on onboardingReminderSetTap: which time-of-day chip the user
   /// picked — 'morning', 'evening', 'night', or 'custom'. (Chips shipped to
@@ -403,6 +394,13 @@ class AnalyticsEventConstants {
   /// one-tap confirm; everything else falls through to the full PaymentSheet.
   static const String paramPaymentMethod = 'payment_method';
 
+  /// 'known' (sent with the payment) | 'sheet' (Stripe had it after the
+  /// payment sheet) | 'prompt' (typed afterwards) | 'prompt_skipped' |
+  /// 'prompt_not_saved' | 'check_failed' (could not ask the donate API).
+  /// The last three leave the Stripe Customer without an address unless the
+  /// webhook backfill finds one.
+  static const String paramEmailSource = 'email_source';
+
   /// 'one_time' | 'monthly' | 'yearly'.
   static const String paramPaymentFrequency = 'payment_frequency';
 
@@ -541,6 +539,12 @@ class AnalyticsEventConstants {
   static const String paramSessionIndexInPack = 'session_index_in_pack';
 
   static const String paramPackTotalSessions = 'pack_total_sessions';
+
+  /// On audioSessionStarted: the screen the session was started from, one of
+  /// the `SessionOrigin` values ('home_up_next', 'pack_button',
+  /// 'pack_track_row', 'search', … or 'other'). [paramPackId] rides along
+  /// when the track was reached through a pack.
+  static const String paramStartSource = 'start_source';
 
   // Your Path (Up Next) pack selection from the pack screen
   /// The user set a pack as Your Path via the pack screen button.

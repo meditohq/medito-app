@@ -10,8 +10,12 @@ class TrackListSliver extends ConsumerWidget {
   const TrackListSliver({
     super.key,
     required this.tracks,
+    required this.sessionSource,
     this.onBeforeNavigate,
   });
+
+  /// The `SessionOrigin` value for sessions started from this list.
+  final String sessionSource;
 
   final List<TrackItem> tracks;
 
@@ -40,6 +44,7 @@ class TrackListSliver extends ConsumerWidget {
                   [item.id, item.path],
                   context,
                   ref: ref,
+                  sessionSource: sessionSource,
                 );
               },
             ),

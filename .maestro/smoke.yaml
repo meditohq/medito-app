@@ -93,10 +93,10 @@ name: Smoke Test – Onboarding, Navigate, Verify Content
 # ── Tracking permission (iOS only).                                 ──
 # Wait for the next screen to render before checking the conditionals.
 # Without this wait, `when: visible` races against the page transition
-# and falsely skips the block, then the later "Get started" assertion
-# times out on the still-visible previous screen.
+# and falsely skips the block. Onboarding has no closing page, so when
+# neither screen applies the next thing on screen is Home.
 - extendedWaitUntil:
-    visible: "Update Setting|Help Us Improve Medito|Get started|Maybe later"
+    visible: "Update Setting|Help Us Improve Medito|(?s).*(Start here|Continue): .*|Dismiss"
     timeout: 30000
 - runFlow:
     when:
@@ -116,22 +116,7 @@ name: Smoke Test – Onboarding, Navigate, Verify Content
           commands:
             - tapOn: "Allow"
 
-# ── Onboarding: Result screen — advance to Home. ──
-# Control arm shows a prominent "Get started". The first-meditation
-# experiment arm (beginners, 50/50) instead shows an inline meditation with a
-# quiet "Maybe later" skip — "Get started" there only appears AFTER the
-# session completes — so for the smoke run we skip the session via
-# "Maybe later". Tap whichever is present.
-# The scrolling hero image can leave the CTA below the fold on small
-# simulators — scroll it into view first.
-- scrollUntilVisible:
-    element:
-      text: "Get started|Maybe later"
-    direction: DOWN
-    timeout: 30000
-- tapOn:
-    text: "Get started|Maybe later"
-
+# The last onboarding step goes straight to Home.
 # B ends with the donation ask; A proceeds directly to Home.
 - extendedWaitUntil:
     visible: "See how to help|.*Donate.*|(?s).*(Start here|Continue): .*|Dismiss"

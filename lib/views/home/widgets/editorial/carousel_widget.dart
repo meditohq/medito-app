@@ -19,6 +19,7 @@ import '../../home_styles.dart';
 import '../home_gradient_border.dart';
 
 import 'package:medito/constants/theme/medito_text.dart';
+import 'package:medito/utils/session_origin.dart';
 
 const _kCardBorderRadius = kHomeCardRadius;
 const _kCarouselHeight = 180.0;
@@ -217,6 +218,7 @@ class _CarouselWidgetState extends ConsumerState<CarouselWidget> {
       [item.path.toString().getIdFromPath(), item.path],
       context,
       ref: ref,
+      sessionSource: SessionOrigin.homeCarousel,
     );
   }
 

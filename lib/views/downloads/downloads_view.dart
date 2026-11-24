@@ -26,6 +26,7 @@ import '../bottom_navigation/bottom_navigation_bar_view.dart';
 import '../empty_widget.dart';
 import '../player/player_view.dart';
 import 'package:medito/constants/theme/medito_text.dart';
+import 'package:medito/utils/session_origin.dart';
 
 class DownloadsView extends ConsumerStatefulWidget {
   const DownloadsView({super.key, this.isRoot = false});
@@ -740,6 +741,7 @@ class _DownloadsViewState extends ConsumerState<DownloadsView>
     final voice = track.voices.first;
     final file = voice.audioFiles.first;
     final request = PlaybackRequest.fromTrack(track, voice, file);
+    SessionOrigin.instance.note(track.id, SessionOrigin.downloads);
     // Prepare + open the player immediately; PlayerView starts playback and
     // shows its own loading state (no wait on this screen).
     ref.read(playerProvider.notifier).prepare(request);

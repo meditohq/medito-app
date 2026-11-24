@@ -155,11 +155,6 @@ class SharedPreferenceConstants {
   static const String onboardingNativePayVariant =
       'onboarding_native_pay_variant';
 
-  // First-meditation-for-experienced-users A/B test — sticky per-install
-  // variant. Only assigned for users who answer `regular_practice`.
-  static const String onboardingExperiencedMeditationVariant =
-      'onboarding_experienced_meditation_variant';
-
   // Home-announcement donation CTA A/B test (webview donate page vs native
   // fullscreen donate page) — sticky per-install variant, applies to every
   // announcement whose CTA is a donation.

@@ -19,9 +19,8 @@ name: Signed-in Stats – Pull, Complete a Session, Server Round-trip
 
 # ── Complete a session ──
 # Find a fixed track through Search rather than Home: what Home offers depends
-# on this account's progress. "What is mindfulness?" is the ~2 min onboarding
-# meditation (onboarding_result_screen.dart _meditationTrackId), so it exists
-# in prod content and keeps the skip-to-end loop short.
+# on this account's progress. "What is mindfulness?" (track yz7XKNm0iaM4kkeI)
+# is ~2 min and exists in prod content, so it keeps the skip-to-end loop short.
 #
 # Not a deep link: on iOS, org.meditofoundation:// raises a system "Open in
 # Medito?" alert, and after returning from it the app's accessibility tree
