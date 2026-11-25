@@ -30,7 +30,7 @@ end
 
 # Read the +NNNNNN build-number suffix from pubspec.yaml.
 def pubspec_version_code
-  pubspec_path = File.expand_path('../pubspec.yaml', __dir__)
+  pubspec_path = File.expand_path('../../pubspec.yaml', __dir__)
   content = File.read(pubspec_path)
   match = content.match(/^version:\s*\S+\+(\d+)/)
   UI.user_error!("Could not parse version code from #{pubspec_path}") unless match
