@@ -37,6 +37,10 @@ jobs:
     name: Attach build and submit
     runs-on: macos-latest
     environment: prod
+    permissions:
+      contents: read
+      # Reads the dSYM artifact the original build job kept.
+      actions: read
 
     steps:
       - uses: actions/checkout@v7.0.1
@@ -78,6 +82,26 @@ jobs:
           notes="${notes:0:500}"
           printf '%s\n' "$notes"
           { echo "RELEASE_NOTES<<EOF"; echo "$notes"; echo "EOF"; } >> "$GITHUB_ENV"
+
+      # The Watch release guard needs proof this build embeds the Watch app.
+      # There is no IPA here, so fetch the dSYMs release.yml kept for exactly
+      # this version+build. If none is found the guard blocks, as before.
+      - name: Fetch the build's dSYMs for the Watch guard
+        env:
+          GH_TOKEN: ${{ github.token }}
+          APP_VERSION: ${{ inputs.app_version }}
+          BUILD_NUMBER: ${{ inputs.build_number }}
+        run: |
+          name="ios-dsyms-$APP_VERSION-$BUILD_NUMBER"
+          run_id=$(gh api "repos/$GITHUB_REPOSITORY/actions/artifacts?name=$name" \
+            --jq '[.artifacts[] | select(.expired == false)][0].workflow_run.id // empty')
+          if [ -z "$run_id" ]; then
+            echo "::warning::No $name artifact found; the Watch guard will block."
+            exit 0
+          fi
+          gh run download "$run_id" --repo "$GITHUB_REPOSITORY" -n "$name" -D "$RUNNER_TEMP/watch-dsyms"
+          ls "$RUNNER_TEMP/watch-dsyms"
+          echo "WATCH_DSYMS_DIR=$RUNNER_TEMP/watch-dsyms" >> "$GITHUB_ENV"
 
       - name: Attach build and submit
         working-directory: current/ios

@@ -243,6 +243,9 @@ def verify_watch_release!(options, use_existing_build:)
     local_ipas = Dir.glob(File.expand_path("../*.ipa", __dir__)).sort_by { |f| File.mtime(f) }
     verified = local_ipas.last && WatchReleaseGuard.ipa_contains_watch_app?(local_ipas.last)
     verified ||= WatchReleaseGuard.build_contains_watch_app?(build, watch_bundle_id)
+    # Standalone submit (ios-submit-build.yml): no IPA in this job, so fall
+    # back to the dSYMs the original build job kept.
+    verified ||= WatchReleaseGuard.dsyms_contain_watch_app?(ENV["WATCH_DSYMS_DIR"])
   else
     verified = WatchReleaseGuard.ipa_contains_watch_app?(lane_context[SharedValues::IPA_OUTPUT_PATH])
   end

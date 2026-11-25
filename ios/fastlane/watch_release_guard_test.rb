@@ -44,6 +44,19 @@ class WatchReleaseGuardTest < Minitest::Test
     end
   end
 
+  def test_dsyms_without_a_watch_app_are_rejected
+    refute WatchReleaseGuard.dsyms_contain_watch_app?(nil)
+    refute WatchReleaseGuard.dsyms_contain_watch_app?("")
+    refute WatchReleaseGuard.dsyms_contain_watch_app?("/missing/dsyms")
+    Dir.mktmpdir do |dir|
+      refute WatchReleaseGuard.dsyms_contain_watch_app?(dir)
+      dwarf = File.join(dir, "MeditoWatch.app.dSYM", "Contents", "Resources", "DWARF")
+      FileUtils.mkdir_p(dwarf)
+      File.write(File.join(dwarf, "MeditoWatch"), "not a Mach-O")
+      refute WatchReleaseGuard.dsyms_contain_watch_app?(dir)
+    end
+  end
+
   def test_existing_build_must_be_processed_and_include_the_exact_watch_bundle
     watch = OpenStruct.new(bundle_id: "org.meditofoundation.watchkitapp")
     build = OpenStruct.new(processing_state: "VALID", build_bundles: [watch])
