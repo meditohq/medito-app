@@ -115,8 +115,9 @@ class _EndScreenViewState extends ConsumerState<EndScreenView>
   // re-consent). Below it, most of the card and its entrance sat under the
   // fold (iOS simulator, Nov 2026). Whether this is a milestone is only known
   // once the session reaches statsProvider, so in arm B the soft-ask slot is
-  // held invisible until then (or the cap), and the order is decided once —
-  // cards never swap places in view. Arm A is laid out exactly as before.
+  // not built until then (or the cap), and the order is decided once — cards
+  // never swap places in view. Arm A, donors and snoozed users are laid out
+  // exactly as before.
   final _softAskSlotKey = GlobalKey();
   final _donationSlotKey = GlobalKey();
   bool _milestoneArmB = false;
@@ -150,7 +151,11 @@ class _EndScreenViewState extends ConsumerState<EndScreenView>
     } catch (e) {
       AppLogger.w('END_SCREEN', 'Could not resolve milestone variant: $e');
     }
-    if (_milestoneArmB && widget.priorStats != null) {
+    // Donors and snoozed users never see the ask, so there is no order to
+    // decide and nothing to hold their soft-ask slot back for.
+    if (_milestoneArmB &&
+        widget.priorStats != null &&
+        !ref.read(donationSnoozeProvider).isSnoozed) {
       _orderCapTimer = Timer(EndScreenMilestoneExperiment.statsSettleCap, () {
         if (mounted) setState(() => _orderCapElapsed = true);
       });
@@ -332,10 +337,13 @@ class _EndScreenViewState extends ConsumerState<EndScreenView>
                       _buildCard(),
                     ),
                   ),
-                KeyedSubtree(
-                  key: _softAskSlotKey,
-                  child: _HeldUntil(
-                    ready: _orderDecided,
+                // Built only once the order is decided: the soft-asks log
+                // their "shown" events (and the re-consent card spends an
+                // impression) on first build, which must not happen while
+                // the slot is still waiting to learn where it goes.
+                if (_orderDecided)
+                  KeyedSubtree(
+                    key: _softAskSlotKey,
                     child: _buildEntrance(
                       _reminderAnimationController,
                       // The soft-asks are mutually exclusive (see
@@ -359,7 +367,6 @@ class _EndScreenViewState extends ConsumerState<EndScreenView>
                       ),
                     ),
                   ),
-                ),
                 if (!_donationFirst)
                   KeyedSubtree(
                     key: _donationSlotKey,
@@ -1166,25 +1173,5 @@ class _EndScreenViewState extends ConsumerState<EndScreenView>
         showSnackBar(context, AppLocalizations.of(context)!.anErrorOccurred);
       }
     }
-  }
-}
-
-/// Keeps [child] laid out but unseen and untouchable until [ready]. The
-/// wrapper never changes shape, so the child's state survives the reveal.
-class _HeldUntil extends StatelessWidget {
-  const _HeldUntil({required this.ready, required this.child});
-
-  final bool ready;
-  final Widget child;
-
-  @override
-  Widget build(BuildContext context) {
-    return ExcludeSemantics(
-      excluding: !ready,
-      child: IgnorePointer(
-        ignoring: !ready,
-        child: Opacity(opacity: ready ? 1 : 0, child: child),
-      ),
-    );
   }
 }

@@ -55,6 +55,8 @@ void main() {
     required String arm,
     required int from,
     required int to,
+    Map<String, Object> extraPrefs = const {},
+    bool settle = true,
   }) async {
     tester.view.physicalSize = const Size(390, 2400);
     tester.view.devicePixelRatio = 1;
@@ -64,6 +66,7 @@ void main() {
         locale: const Locale('en'),
         prefs: {
           SharedPreferenceConstants.endScreenMilestoneRefreshVariant: arm,
+          ...extraPrefs,
         },
         overrides: [
           fetchDonationPageProvider.overrideWith(
@@ -84,6 +87,7 @@ void main() {
       ),
     );
     await tester.pump();
+    if (!settle) return;
     await tester.pump(const Duration(seconds: 4));
     await tester.pump(const Duration(seconds: 2));
   }
@@ -113,5 +117,48 @@ void main() {
     await pump(tester, arm: 'A', from: 24, to: 25);
     expect(find.text('Server copy'), findsOneWidget);
     expect(top(tester, SoftAskCard), lessThan(top(tester, DonationWidget)));
+  });
+
+  // The soft-asks log "shown" on first build, so they must not be built
+  // while the screen is still waiting to learn the card order.
+  testWidgets('arm B does not build the soft-ask until the order is known', (
+    tester,
+  ) async {
+    await pump(tester, arm: 'B', from: 24, to: 24, settle: false);
+    await tester.pump(const Duration(milliseconds: 500));
+    expect(find.byType(SoftAskCard), findsNothing);
+    // Stats never arrive: the cap releases it in the usual place.
+    await tester.pump(const Duration(seconds: 2));
+    await tester.pump(const Duration(seconds: 4));
+    expect(find.byType(SoftAskCard), findsOneWidget);
+    expect(top(tester, SoftAskCard), lessThan(top(tester, DonationWidget)));
+  });
+
+  testWidgets('arm B donors get their soft-ask without any wait', (
+    tester,
+  ) async {
+    final now = DateTime.now();
+    await pump(
+      tester,
+      arm: 'B',
+      from: 24,
+      to: 24,
+      settle: false,
+      extraPrefs: {
+        SharedPreferenceConstants.lastSuccessfulDonationAtMs:
+            now.millisecondsSinceEpoch,
+        SharedPreferenceConstants.donationAskSnoozedUntilMs: now
+            .add(const Duration(days: 30))
+            .millisecondsSinceEpoch,
+      },
+    );
+    expect(find.byType(SoftAskCard), findsOneWidget);
+    await tester.pump(const Duration(seconds: 6));
+  });
+
+  testWidgets('arm A builds the soft-ask straight away', (tester) async {
+    await pump(tester, arm: 'A', from: 24, to: 24, settle: false);
+    expect(find.byType(SoftAskCard), findsOneWidget);
+    await tester.pump(const Duration(seconds: 6));
   });
 }

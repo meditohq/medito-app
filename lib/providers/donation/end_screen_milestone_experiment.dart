@@ -161,14 +161,17 @@ class EndScreenMilestoneExperiment {
   /// statsProvider a moment later (handleStats logs analytics before it
   /// refreshes), so a milestone read at first build sees the pre-session
   /// numbers and misses. True without a snapshot: nothing to wait for.
+  ///
+  /// Only the completed-session count says so. `updated` also moves on a
+  /// repeat play-through's minutes and on a background sync, either of which
+  /// can land first and would settle the screen on pre-completion numbers.
   static bool statsCaughtUp({
     required LocalAllStats? prior,
     required LocalAllStats? live,
   }) {
     if (prior == null) return true;
     return live != null &&
-        (live.updated > prior.updated ||
-            live.totalTracksCompleted > prior.totalTracksCompleted);
+        live.totalTracksCompleted > prior.totalTracksCompleted;
   }
 
   static int? _crossed(

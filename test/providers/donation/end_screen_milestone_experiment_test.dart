@@ -150,4 +150,41 @@ void main() {
       expect(crossed(fromStreak: 40, toStreak: 1), isNull);
     });
   });
+
+  group('statsCaughtUp', () {
+    test('nothing to wait for without a snapshot', () {
+      expect(Exp.statsCaughtUp(prior: null, live: null), isTrue);
+    });
+
+    test('waits for the completed-session count to move', () {
+      final prior = stats(sessions: 24);
+      expect(Exp.statsCaughtUp(prior: prior, live: null), isFalse);
+      expect(
+        Exp.statsCaughtUp(prior: prior, live: stats(sessions: 24)),
+        isFalse,
+      );
+      expect(
+        Exp.statsCaughtUp(prior: prior, live: stats(sessions: 25)),
+        isTrue,
+      );
+    });
+
+    // Repeat minutes and background syncs bump `updated` without a completion.
+    test('a newer timestamp alone does not count', () {
+      final live = LocalAllStats(
+        streakCurrent: 0,
+        streakLongest: 0,
+        totalTracksCompleted: 24,
+        totalTimeListened: 999,
+        tracksChecked: const [],
+        audioCompleted: const [],
+        updated: 5,
+        freezeUsageDates: const [],
+      );
+      expect(
+        Exp.statsCaughtUp(prior: stats(sessions: 24), live: live),
+        isFalse,
+      );
+    });
+  });
 }
