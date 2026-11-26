@@ -1,6 +1,7 @@
 import 'dart:io';
 
 import 'package:medito/providers/donation/announcement_donation_experiment.dart';
+import 'package:medito/providers/donation/end_screen_milestone_experiment.dart';
 import 'package:medito/providers/donation/supporter_appeal_experiment.dart';
 
 import 'package:firebase_analytics/firebase_analytics.dart';
@@ -520,6 +521,7 @@ class FirebaseAnalyticsService {
             if (isDonation) ...{
               ...SupporterAppealExperiment(prefs).paymentMetadata(),
               ...AnnouncementDonationExperiment.paymentMetadata(prefs),
+              ...EndScreenMilestoneExperiment.paymentMetadata(prefs),
             },
             ...?parameters,
           },

@@ -721,6 +721,20 @@ class AnalyticsEventConstants {
   /// designed" from "B degraded to A".
   static const String paramInlineRendered = 'inline_rendered';
 
+  /// `end_screen_milestone_refresh` A/B, on the end-screen donation card
+  /// events: this install's arm ('A' normal card, 'B' personal-stat card on
+  /// milestone sessions). Its own key because `variant_id` on these events
+  /// still belongs to `end_screen_inline_pay`.
+  static const String paramMilestoneRefresh = 'milestone_refresh';
+
+  /// Which milestone this end screen's session crossed ('sessions' or
+  /// 'streak'), logged in BOTH arms so milestone showings compare like with
+  /// like. Absent on ordinary showings.
+  static const String paramMilestoneKind = 'milestone_kind';
+
+  /// The threshold crossed, e.g. 25 sessions or a 30-day streak.
+  static const String paramMilestoneValue = 'milestone_value';
+
   /// paywall_id for the inline end-screen pay flow (variant B), so its
   /// donation_* / payment_failed events are distinguishable from the webview
   /// ('paywall_webview') and onboarding native page ('paywall_native').

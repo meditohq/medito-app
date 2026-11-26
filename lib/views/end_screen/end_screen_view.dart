@@ -15,6 +15,8 @@ import 'package:medito/models/local_all_stats.dart';
 import 'package:medito/models/models.dart';
 import 'package:medito/models/timer/timer_session.dart';
 import 'package:medito/providers/notification/reminder_provider.dart';
+import 'package:medito/providers/donation/donation_snooze_provider.dart';
+import 'package:medito/providers/donation/end_screen_milestone_experiment.dart';
 import 'package:medito/providers/providers.dart';
 import 'package:medito/providers/settings/account_prompt_provider.dart';
 import 'package:medito/providers/settings/analytics_reconsent_provider.dart';
@@ -108,6 +110,22 @@ class _EndScreenViewState extends ConsumerState<EndScreenView>
   /// offering a button that silently bounces the user out to settings.
   bool _notificationsBlocked = false;
 
+  // `end_screen_milestone_refresh`, arm B: on a milestone session the
+  // donation card goes ABOVE the soft-ask slot (reminders / account /
+  // re-consent). Below it, most of the card and its entrance sat under the
+  // fold (iOS simulator, Nov 2026). Whether this is a milestone is only known
+  // once the session reaches statsProvider, so in arm B the soft-ask slot is
+  // not built until then (or the cap), and the order is decided once — cards
+  // never swap places in view. Arm A, donors and snoozed users are laid out
+  // exactly as before.
+  final _softAskSlotKey = GlobalKey();
+  final _donationSlotKey = GlobalKey();
+  bool _milestoneArmB = false;
+  Timer? _orderCapTimer;
+  bool _orderCapElapsed = false;
+  bool _orderDecided = false;
+  bool _donationFirst = false;
+
   late AnimationController _statsAnimationController;
   late AnimationController _reminderAnimationController;
   late AnimationController _cardAnimationController;
@@ -123,6 +141,27 @@ class _EndScreenViewState extends ConsumerState<EndScreenView>
     // Start the ATT lookup now so the re-consent card is decided before the
     // soft-ask slot animates in, instead of swapping cards under the user.
     ref.read(attAuthorizedProvider);
+
+    try {
+      _milestoneArmB =
+          EndScreenMilestoneExperiment.resolveVariant(
+            ref.read(sharedPreferencesProvider),
+          ) ==
+          EndScreenMilestoneExperiment.variantRefresh;
+    } catch (e) {
+      AppLogger.w('END_SCREEN', 'Could not resolve milestone variant: $e');
+    }
+    // Donors and snoozed users never see the ask, so there is no order to
+    // decide and nothing to hold their soft-ask slot back for.
+    if (_milestoneArmB &&
+        widget.priorStats != null &&
+        !ref.read(donationSnoozeProvider).isSnoozed) {
+      _orderCapTimer = Timer(EndScreenMilestoneExperiment.statsSettleCap, () {
+        if (mounted) setState(() => _orderCapElapsed = true);
+      });
+    } else {
+      _orderDecided = true;
+    }
 
     _statsAnimationController = AnimationController(
       vsync: this,
@@ -226,6 +265,7 @@ class _EndScreenViewState extends ConsumerState<EndScreenView>
   @override
   void dispose() {
     PendingEndScreen.endScreenUnmounted();
+    _orderCapTimer?.cancel();
     _statsAnimationController.dispose();
     _reminderAnimationController.dispose();
     _cardAnimationController.dispose();
@@ -289,24 +329,52 @@ class _EndScreenViewState extends ConsumerState<EndScreenView>
                       ? const ZenModeAnimation()
                       : _buildStatsArea(),
                 ),
-                _buildEntrance(
-                  _reminderAnimationController,
-                  // The soft-asks are mutually exclusive (see
-                  // shouldShowAccountPromptProvider and _reconsentShown), so
-                  // they share this entrance; only one ever renders.
-                  Column(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      // First: it decides _reconsentShown for the two below.
-                      AnimatedEndScreenSection(
-                        child: _buildAnalyticsReconsent(),
-                      ),
-                      AnimatedEndScreenSection(child: _buildReminderPrompt()),
-                      AnimatedEndScreenSection(child: _buildAccountPrompt()),
-                    ],
+                if (_decideCardOrder())
+                  KeyedSubtree(
+                    key: _donationSlotKey,
+                    child: _buildEntrance(
+                      _cardAnimationController,
+                      _buildCard(),
+                    ),
                   ),
-                ),
-                _buildEntrance(_cardAnimationController, _buildCard()),
+                // Built only once the order is decided: the soft-asks log
+                // their "shown" events (and the re-consent card spends an
+                // impression) on first build, which must not happen while
+                // the slot is still waiting to learn where it goes.
+                if (_orderDecided)
+                  KeyedSubtree(
+                    key: _softAskSlotKey,
+                    child: _buildEntrance(
+                      _reminderAnimationController,
+                      // The soft-asks are mutually exclusive (see
+                      // shouldShowAccountPromptProvider and _reconsentShown),
+                      // so they share this entrance; only one ever renders.
+                      Column(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          // First: it decides _reconsentShown for the two
+                          // below.
+                          AnimatedEndScreenSection(
+                            child: _buildAnalyticsReconsent(),
+                          ),
+                          AnimatedEndScreenSection(
+                            child: _buildReminderPrompt(),
+                          ),
+                          AnimatedEndScreenSection(
+                            child: _buildAccountPrompt(),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
+                if (!_donationFirst)
+                  KeyedSubtree(
+                    key: _donationSlotKey,
+                    child: _buildEntrance(
+                      _cardAnimationController,
+                      _buildCard(),
+                    ),
+                  ),
                 // _buildFreezeRewardBanner(ref.watch(statsProvider).valueOrNull!),
               ],
             ),
@@ -404,10 +472,33 @@ class _EndScreenViewState extends ConsumerState<EndScreenView>
     );
   }
 
+  /// Returns whether the donation card leads the soft-ask slot, deciding it
+  /// (once) as soon as the session's stats are in. See [_donationFirst].
+  bool _decideCardOrder() {
+    if (_orderDecided) return _donationFirst;
+    final live = ref.watch(statsProvider).value;
+    final caughtUp = EndScreenMilestoneExperiment.statsCaughtUp(
+      prior: widget.priorStats,
+      live: live,
+    );
+    if (!caughtUp && !_orderCapElapsed) return false;
+    _orderDecided = true;
+    _orderCapTimer?.cancel();
+    _donationFirst =
+        caughtUp &&
+        !ref.read(donationSnoozeProvider).isSnoozed &&
+        EndScreenMilestoneExperiment.milestoneCrossed(
+              prior: widget.priorStats,
+              current: live,
+            ) !=
+            null;
+    return _donationFirst;
+  }
+
   Padding _buildCard() {
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: padding16),
-      child: DonationWidget(),
+      child: DonationWidget(priorStats: widget.priorStats),
     );
   }
 

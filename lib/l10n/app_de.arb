@@ -1903,5 +1903,8 @@
   "endScreenRestoredYesterday": "Willkommen zurück. Du hast „{title}“ gestern beendet.",
   "endScreenRestoredTimerLastNight": "Willkommen zurück. Du hast letzte Nacht einen {minutes}-Minuten-Timer beendet.",
   "endScreenRestoredTimerEarlierToday": "Willkommen zurück. Du hast heute einen {minutes}-Minuten-Timer beendet.",
-  "endScreenRestoredTimerYesterday": "Willkommen zurück. Du hast gestern einen {minutes}-Minuten-Timer beendet."
+  "endScreenRestoredTimerYesterday": "Willkommen zurück. Du hast gestern einen {minutes}-Minuten-Timer beendet.",
+  "endScreenMilestoneSessionsTitle": "Das sind {count} Meditationen mit Medito.",
+  "endScreenMilestoneStreakTitle": "{count} Tage in Folge.",
+  "endScreenMilestoneBody": "Medito ist kostenlos, weil Menschen, die es nutzen, etwas beitragen. Wenn es Teil deiner Routine geworden ist: Hilfst du mit, dass es so bleibt?"
 }

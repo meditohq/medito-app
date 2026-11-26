@@ -9,6 +9,7 @@ import 'package:medito/constants/strings/analytics_event_constants.dart';
 import 'package:medito/constants/strings/shared_preference_constants.dart';
 import 'package:medito/services/analytics/firebase_analytics_service.dart';
 import 'package:medito/providers/donation/end_screen_donation_experiment.dart';
+import 'package:medito/providers/donation/end_screen_milestone_experiment.dart';
 import 'package:medito/providers/donation/supporter_appeal_experiment.dart';
 import 'package:medito/providers/onboarding/onboarding_donation_timing_experiment.dart';
 import 'package:medito/providers/onboarding/onboarding_native_pay_experiment.dart';
@@ -566,6 +567,9 @@ class OneTimePaymentController extends _$OneTimePaymentController {
         ...EndScreenDonationExperiment.paymentMetadata(
           ref.read(sharedPreferencesProvider),
         ),
+        ...EndScreenMilestoneExperiment.paymentMetadata(
+          ref.read(sharedPreferencesProvider),
+        ),
         ...SupporterAppealExperiment(ref.read(sharedPreferencesProvider))
             .paymentMetadata(),
         if (campaignMetadata.isNotEmpty)
@@ -673,6 +677,9 @@ class MonthlySubscriptionController extends _$MonthlySubscriptionController {
           ref.read(sharedPreferencesProvider),
         ),
         ...EndScreenDonationExperiment.paymentMetadata(
+          ref.read(sharedPreferencesProvider),
+        ),
+        ...EndScreenMilestoneExperiment.paymentMetadata(
           ref.read(sharedPreferencesProvider),
         ),
         ...SupporterAppealExperiment(ref.read(sharedPreferencesProvider))
@@ -784,6 +791,9 @@ class YearlySubscriptionController extends _$YearlySubscriptionController {
           ref.read(sharedPreferencesProvider),
         ),
         ...EndScreenDonationExperiment.paymentMetadata(
+          ref.read(sharedPreferencesProvider),
+        ),
+        ...EndScreenMilestoneExperiment.paymentMetadata(
           ref.read(sharedPreferencesProvider),
         ),
         ...SupporterAppealExperiment(ref.read(sharedPreferencesProvider))

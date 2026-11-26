@@ -3614,4 +3614,18 @@ class AppLocalizationsEs extends AppLocalizations {
     );
     return 'Hola de nuevo. Terminaste un temporizador de $_temp0 ayer.';
   }
+
+  @override
+  String endScreenMilestoneSessionsTitle(int count) {
+    return 'Ya llevas $count meditaciones con Medito.';
+  }
+
+  @override
+  String endScreenMilestoneStreakTitle(int count) {
+    return '$count días seguidos.';
+  }
+
+  @override
+  String get endScreenMilestoneBody =>
+      'Medito es gratis porque quienes lo usan aportan un poco. Si ya forma parte de tu rutina, ¿nos ayudas a mantenerlo?';
 }

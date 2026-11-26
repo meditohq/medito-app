@@ -6285,6 +6285,24 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Welcome back. You finished a {minutes}-minute timer yesterday.'**
   String endScreenRestoredTimerYesterday(int minutes);
+
+  /// Title of the end-screen donation card on the session that takes the user past a round number of completed meditations (5, 10, 25, 50, 100, 200...). Count is always 5 or more.
+  ///
+  /// In en, this message translates to:
+  /// **'That\'s {count} meditations with Medito.'**
+  String endScreenMilestoneSessionsTitle(int count);
+
+  /// Title of the end-screen donation card on the day the user's streak reaches 7, 30, 100 or 365 days.
+  ///
+  /// In en, this message translates to:
+  /// **'{count} days in a row.'**
+  String endScreenMilestoneStreakTitle(int count);
+
+  /// Body of the end-screen donation card when it marks a milestone (see endScreenMilestoneSessionsTitle). Followed by monthly donation amounts.
+  ///
+  /// In en, this message translates to:
+  /// **'Medito is free because people who use it chip in. If it\'s become part of your routine, would you help keep it going?'**
+  String get endScreenMilestoneBody;
 }
 
 class _AppLocalizationsDelegate
