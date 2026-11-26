@@ -1530,5 +1530,8 @@
   "endScreenRestoredYesterday": "Hola de nuevo. Terminaste «{title}» ayer.",
   "endScreenRestoredTimerLastNight": "Hola de nuevo. Terminaste un temporizador de {minutes, plural, =1{1 minuto} other{{minutes} minutos}} anoche.",
   "endScreenRestoredTimerEarlierToday": "Hola de nuevo. Terminaste un temporizador de {minutes, plural, =1{1 minuto} other{{minutes} minutos}} hoy más temprano.",
-  "endScreenRestoredTimerYesterday": "Hola de nuevo. Terminaste un temporizador de {minutes, plural, =1{1 minuto} other{{minutes} minutos}} ayer."
+  "endScreenRestoredTimerYesterday": "Hola de nuevo. Terminaste un temporizador de {minutes, plural, =1{1 minuto} other{{minutes} minutos}} ayer.",
+  "endScreenMilestoneSessionsTitle": "Ya llevas {count} meditaciones con Medito.",
+  "endScreenMilestoneStreakTitle": "{count} días seguidos.",
+  "endScreenMilestoneBody": "Medito es gratis porque quienes lo usan aportan un poco. Si ya forma parte de tu rutina, ¿nos ayudas a mantenerlo?"
 }

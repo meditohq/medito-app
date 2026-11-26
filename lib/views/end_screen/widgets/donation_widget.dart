@@ -18,12 +18,15 @@ import '../../../widgets/dialogs/dialogs.dart';
 import '../../../widgets/snackbar_widget.dart';
 
 import '../../../models/events/donation/donation_page_model.dart';
+import '../../../models/local_all_stats.dart';
 import '../../../models/stripe/payment_intent_model.dart';
 import '../../../models/stripe/payment_method_model.dart' as payment_models;
 import '../../../models/stripe/paywall_config_model.dart';
 import '../../../providers/donation/donation_page_provider.dart';
 import '../../../providers/donation/donation_snooze_provider.dart';
 import '../../../providers/donation/end_screen_donation_experiment.dart';
+import '../../../providers/donation/end_screen_milestone_experiment.dart';
+import '../../../providers/stats_provider.dart';
 import '../../../providers/stripe/payment_providers.dart';
 import '../../../providers/stripe/payment_service_provider.dart';
 import '../../../providers/stripe/payment_ui_controller.dart';
@@ -38,7 +41,12 @@ import 'feedback_widget.dart';
 import 'inline_donation_pay.dart';
 
 class DonationWidget extends ConsumerStatefulWidget {
-  const DonationWidget({super.key});
+  const DonationWidget({super.key, this.priorStats});
+
+  /// Stats as they were before the session that just ended. Compared with
+  /// the live stats to tell whether this session crossed a milestone (see
+  /// [EndScreenMilestoneExperiment]). Null when there is no snapshot.
+  final LocalAllStats? priorStats;
 
   @override
   ConsumerState<DonationWidget> createState() => DonationWidgetState();
@@ -58,6 +66,39 @@ class DonationWidgetState extends ConsumerState<DonationWidget>
   String _variant = EndScreenDonationExperiment.variantControl;
   bool get _isInlineVariant =>
       _variant == EndScreenDonationExperiment.variantInline;
+
+  // `end_screen_milestone_refresh` A/B. Control on a storage hiccup, so the
+  // normal ask is what a failure degrades to.
+  String _milestoneVariant = EndScreenMilestoneExperiment.variantControl;
+  // The milestone this session crossed, in either arm. Tracks the live stats
+  // until the impression is logged, then stays put for the visit so the card
+  // on screen and the logged showing can never disagree.
+  EndScreenMilestone? _milestone;
+  bool get _showMilestoneCard =>
+      _milestone != null &&
+      _milestoneVariant == EndScreenMilestoneExperiment.variantRefresh;
+
+  // The finished session reaches statsProvider a moment after the end screen
+  // opens (see EndScreenMilestoneExperiment.statsCaughtUp; seen on the iOS
+  // simulator, Nov 2026, where every milestone was missed). So the impression
+  // — and in arm B the card itself — waits for it, up to the cap.
+  Timer? _statsSettleTimer;
+  bool _statsSettleCapElapsed = false;
+  LocalAllStats? _liveStats;
+  bool get _statsSettled {
+    if (_statsSettleCapElapsed) return true;
+    return EndScreenMilestoneExperiment.statsCaughtUp(
+      prior: widget.priorStats,
+      live: _liveStats,
+    );
+  }
+
+  // An impression held back for the stats; sent on dispose if the user leaves
+  // first, so the wait can never lose a showing.
+  ({bool isSnoozed, bool? inlineRendered})? _heldImpression;
+  // Mirrored from the snooze provider in build, for the dispose-time send.
+  String _snoozeReason = '';
+  late final _analytics = ref.read(analyticsServiceProvider);
 
   // Variant B needs the localized end_screen ladder from /paywall. It is
   // usually warm (the player prefetches it), but if it is not here within
@@ -90,8 +131,20 @@ class DonationWidgetState extends ConsumerState<DonationWidget>
       _variant = EndScreenDonationExperiment.resolveVariant(
         ref.read(sharedPreferencesProvider),
       );
+      _milestoneVariant = EndScreenMilestoneExperiment.resolveVariant(
+        ref.read(sharedPreferencesProvider),
+      );
     } catch (e) {
       AppLogger.w('DONATION', 'Could not resolve end-screen ask variant: $e');
+    }
+    _analytics; // Resolve now: ref is not usable in dispose.
+    if (widget.priorStats != null) {
+      _statsSettleTimer = Timer(
+        EndScreenMilestoneExperiment.statsSettleCap,
+        () {
+          if (mounted) setState(() => _statsSettleCapElapsed = true);
+        },
+      );
     }
     if (_isInlineVariant) {
       _inlineCapTimer = Timer(_inlineConfigCap, () {
@@ -104,6 +157,25 @@ class DonationWidgetState extends ConsumerState<DonationWidget>
   void dispose() {
     WidgetsBinding.instance.removeObserver(this);
     _inlineCapTimer?.cancel();
+    _statsSettleTimer?.cancel();
+    final held = _heldImpression;
+    if (!_impressionLogged && held != null) {
+      unawaited(
+        _analytics.logEvent(
+          name: held.isSnoozed
+              ? AnalyticsEventConstants.endScreenDonationCardSuppressed
+              : AnalyticsEventConstants.endScreenDonationCardShown,
+          parameters: _impressionParams(
+            isSnoozed: held.isSnoozed,
+            inlineRendered: held.inlineRendered,
+          ),
+        ),
+      );
+    }
+    if (_milestone != null &&
+        EndScreenMilestoneExperiment.activeMilestone == _milestone) {
+      EndScreenMilestoneExperiment.activeMilestone = null;
+    }
     super.dispose();
   }
 
@@ -113,6 +185,11 @@ class DonationWidgetState extends ConsumerState<DonationWidget>
         EndScreenDonationExperiment.experimentName,
     AnalyticsEventConstants.paramExperimentName:
         EndScreenDonationExperiment.experimentName,
+    AnalyticsEventConstants.paramMilestoneRefresh: _milestoneVariant,
+    if (_milestone != null) ...{
+      AnalyticsEventConstants.paramMilestoneKind: _milestone!.kind,
+      AnalyticsEventConstants.paramMilestoneValue: _milestone!.value,
+    },
   };
 
   @override
@@ -148,25 +225,38 @@ class DonationWidgetState extends ConsumerState<DonationWidget>
   /// build.
   void _logImpression({required bool isSnoozed, bool? inlineRendered}) {
     if (_impressionLogged) return;
+    if (!_statsSettled) {
+      // Build runs again when the stats arrive or the cap elapses.
+      _heldImpression = (isSnoozed: isSnoozed, inlineRendered: inlineRendered);
+      return;
+    }
     _impressionLogged = true;
+    _statsSettleTimer?.cancel();
+    if (!isSnoozed && _milestone != null) {
+      EndScreenMilestoneExperiment.activeMilestone = _milestone;
+    }
     _logOnce(
       isSnoozed
           ? AnalyticsEventConstants.endScreenDonationCardSuppressed
           : AnalyticsEventConstants.endScreenDonationCardShown,
-      parameters: {
-        AnalyticsEventConstants.paramPaywallSource:
-            FirebaseAnalyticsService.paywallSourceEndScreen,
-        if (isSnoozed)
-          AnalyticsEventConstants.paramSnoozeReason: ref
-              .read(donationSnoozeProvider)
-              .snoozeReason,
-        ..._experimentParams,
-        if (inlineRendered != null)
-          AnalyticsEventConstants.paramInlineRendered: inlineRendered
-              .toString(),
-      },
+      parameters: _impressionParams(
+        isSnoozed: isSnoozed,
+        inlineRendered: inlineRendered,
+      ),
     );
   }
+
+  Map<String, Object> _impressionParams({
+    required bool isSnoozed,
+    bool? inlineRendered,
+  }) => {
+    AnalyticsEventConstants.paramPaywallSource:
+        FirebaseAnalyticsService.paywallSourceEndScreen,
+    if (isSnoozed) AnalyticsEventConstants.paramSnoozeReason: _snoozeReason,
+    ..._experimentParams,
+    if (inlineRendered != null)
+      AnalyticsEventConstants.paramInlineRendered: inlineRendered.toString(),
+  };
 
   void _logDonateTap({
     required int buttonIndex,
@@ -312,6 +402,16 @@ class DonationWidgetState extends ConsumerState<DonationWidget>
   Widget build(BuildContext context) {
     final donationPage = ref.watch(fetchDonationPageProvider);
     final snoozeState = ref.watch(donationSnoozeProvider);
+    // Only sessions with a pre-session snapshot can cross a milestone, so the
+    // stats are not watched (or loaded) for anything else.
+    _snoozeReason = snoozeState.snoozeReason;
+    if (!_impressionLogged && widget.priorStats != null) {
+      _liveStats = ref.watch(statsProvider).value;
+      _milestone = EndScreenMilestoneExperiment.milestoneCrossed(
+        prior: widget.priorStats,
+        current: _liveStats,
+      );
+    }
 
     // Feedback and locally stored donor/snooze state do not depend on the
     // remote donation copy. Keep them usable while that request is unavailable.
@@ -348,13 +448,22 @@ class DonationWidgetState extends ConsumerState<DonationWidget>
                   children: [
                     showLocalState
                         ? const DonationThankYouCard()
-                        : _buildDonationWidget(
-                            context,
-                            page ??
-                                const DonationPageModel(
-                                  buttons: [ButtonModel()],
-                                ),
-                            isSnoozed: false,
+                        : _MilestoneEntrance(
+                            // Arm B only: control shows the card exactly as
+                            // it always has.
+                            ready:
+                                _statsSettled ||
+                                _milestoneVariant !=
+                                    EndScreenMilestoneExperiment.variantRefresh,
+                            enabled: _showMilestoneCard,
+                            child: _buildDonationWidget(
+                              context,
+                              page ??
+                                  const DonationPageModel(
+                                    buttons: [ButtonModel()],
+                                  ),
+                              isSnoozed: false,
+                            ),
                           ),
                     height20,
                   ],
@@ -375,14 +484,19 @@ class DonationWidgetState extends ConsumerState<DonationWidget>
     // colour is theme-driven now, so the foreground must follow the theme too.
     final footerColor = context.onBrandAccent.withValues(alpha: 0.85);
 
+    final l10n = AppLocalizations.of(context)!;
+    final milestone = _showMilestoneCard ? _milestone : null;
+
     return EndScreenCard(
       inverted: true,
-      title:
-          donationPageModel.title ??
-          AppLocalizations.of(context)!.supportMedito,
-      body:
-          donationPageModel.text ??
-          AppLocalizations.of(context)!.meditoReliesOnYourDonationsToSurvive,
+      title: milestone == null
+          ? donationPageModel.title ?? l10n.supportMedito
+          : milestone.kind == EndScreenMilestone.kindStreak
+          ? l10n.endScreenMilestoneStreakTitle(milestone.value)
+          : l10n.endScreenMilestoneSessionsTitle(milestone.value),
+      body: milestone == null
+          ? donationPageModel.text ?? l10n.meditoReliesOnYourDonationsToSurvive
+          : l10n.endScreenMilestoneBody,
       corner: EndScreenCardCorner(
         icon: MeditoIcons.help,
         tooltip: AppLocalizations.of(context)!.donationInfo,
@@ -644,5 +758,100 @@ class DonationWidgetState extends ConsumerState<DonationWidget>
         children: buttonWidgets,
       );
     }
+  }
+}
+
+/// Entrance for the milestone card (`end_screen_milestone_refresh`, arm B):
+/// it holds back until the streak number above has finished its own change,
+/// then fades and settles into place, so the two movements don't compete and
+/// the card reads as a response to the number. Opacity and scale only — the
+/// card keeps its space, so nothing below it shifts. With [enabled] false (or
+/// reduced motion) the child is shown as is.
+///
+/// Until [ready] (the session's stats have caught up, so it is known whether
+/// this is a milestone) the card is held invisible, so it never shows the
+/// normal copy and then swaps.
+class _MilestoneEntrance extends StatefulWidget {
+  const _MilestoneEntrance({
+    required this.ready,
+    required this.enabled,
+    required this.child,
+  });
+
+  final bool ready;
+  final bool enabled;
+  final Widget child;
+
+  @override
+  State<_MilestoneEntrance> createState() => _MilestoneEntranceState();
+}
+
+class _MilestoneEntranceState extends State<_MilestoneEntrance>
+    with SingleTickerProviderStateMixin {
+  // The end screen swaps the streak number 700ms in; its switcher then runs.
+  static const _settleAt = Duration(milliseconds: 1200);
+  final _mounted = Stopwatch()..start();
+
+  late final AnimationController _controller = AnimationController(
+    vsync: this,
+    duration: const Duration(milliseconds: 600),
+  );
+  Timer? _timer;
+  // Decided once, as soon as the card is [ready]; it then stays decided, so
+  // a card the user can already see is never hidden to replay an entrance.
+  bool _decided = false;
+  bool _armed = false;
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    _decide();
+  }
+
+  @override
+  void didUpdateWidget(_MilestoneEntrance oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    _decide();
+  }
+
+  void _decide() {
+    if (_decided || !widget.ready) return;
+    _decided = true;
+    if (!widget.enabled || MediaQuery.disableAnimationsOf(context)) return;
+    _armed = true;
+    final wait = _settleAt - _mounted.elapsed;
+    _timer = Timer(wait.isNegative ? Duration.zero : wait, () {
+      if (mounted) _controller.forward();
+    });
+  }
+
+  @override
+  void dispose() {
+    _timer?.cancel();
+    _controller.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    if (!_decided) {
+      return Visibility(
+        visible: false,
+        maintainSize: true,
+        maintainAnimation: true,
+        maintainState: true,
+        child: widget.child,
+      );
+    }
+    if (!_armed) return widget.child;
+    return FadeTransition(
+      opacity: CurvedAnimation(parent: _controller, curve: Curves.easeOut),
+      child: ScaleTransition(
+        scale: Tween<double>(begin: 0.94, end: 1).animate(
+          CurvedAnimation(parent: _controller, curve: Curves.easeOutBack),
+        ),
+        child: widget.child,
+      ),
+    );
   }
 }

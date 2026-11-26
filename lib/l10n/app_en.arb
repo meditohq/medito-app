@@ -2744,5 +2744,11 @@
   "endScreenRestoredTimerEarlierToday": "Welcome back. You finished a {minutes}-minute timer earlier today.",
   "@endScreenRestoredTimerEarlierToday": {"description": "As endScreenRestoredEarlierToday, for a Timer session", "placeholders": {"minutes": {"type": "int"}}},
   "endScreenRestoredTimerYesterday": "Welcome back. You finished a {minutes}-minute timer yesterday.",
-  "@endScreenRestoredTimerYesterday": {"description": "As endScreenRestoredYesterday, for a Timer session", "placeholders": {"minutes": {"type": "int"}}}
+  "@endScreenRestoredTimerYesterday": {"description": "As endScreenRestoredYesterday, for a Timer session", "placeholders": {"minutes": {"type": "int"}}},
+  "endScreenMilestoneSessionsTitle": "That's {count} meditations with Medito.",
+  "@endScreenMilestoneSessionsTitle": {"description": "Title of the end-screen donation card on the session that takes the user past a round number of completed meditations (5, 10, 25, 50, 100, 200...). Count is always 5 or more.", "placeholders": {"count": {"type": "int"}}},
+  "endScreenMilestoneStreakTitle": "{count} days in a row.",
+  "@endScreenMilestoneStreakTitle": {"description": "Title of the end-screen donation card on the day the user's streak reaches 7, 30, 100 or 365 days.", "placeholders": {"count": {"type": "int"}}},
+  "endScreenMilestoneBody": "Medito is free because people who use it chip in. If it's become part of your routine, would you help keep it going?",
+  "@endScreenMilestoneBody": {"description": "Body of the end-screen donation card when it marks a milestone (see endScreenMilestoneSessionsTitle). Followed by monthly donation amounts."}
 }

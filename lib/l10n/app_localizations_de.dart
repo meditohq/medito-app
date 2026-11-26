@@ -3619,4 +3619,18 @@ class AppLocalizationsDe extends AppLocalizations {
   String endScreenRestoredTimerYesterday(int minutes) {
     return 'Willkommen zurück. Du hast gestern einen $minutes-Minuten-Timer beendet.';
   }
+
+  @override
+  String endScreenMilestoneSessionsTitle(int count) {
+    return 'Das sind $count Meditationen mit Medito.';
+  }
+
+  @override
+  String endScreenMilestoneStreakTitle(int count) {
+    return '$count Tage in Folge.';
+  }
+
+  @override
+  String get endScreenMilestoneBody =>
+      'Medito ist kostenlos, weil Menschen, die es nutzen, etwas beitragen. Wenn es Teil deiner Routine geworden ist: Hilfst du mit, dass es so bleibt?';
 }

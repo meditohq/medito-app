@@ -150,6 +150,11 @@ class SharedPreferenceConstants {
   static const String endScreenDonationAskVariant =
       'end_screen_donation_ask_variant';
 
+  // End-screen donation card A/B test (normal card vs a personal-stat card on
+  // milestone sessions) — sticky per-install variant.
+  static const String endScreenMilestoneRefreshVariant =
+      'end_screen_milestone_refresh_variant';
+
   // Onboarding donation A/B test (intro CTA opens the webview vs a native
   // amount page) — sticky per-install variant.
   static const String onboardingNativePayVariant =

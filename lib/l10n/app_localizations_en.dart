@@ -3555,4 +3555,18 @@ class AppLocalizationsEn extends AppLocalizations {
   String endScreenRestoredTimerYesterday(int minutes) {
     return 'Welcome back. You finished a $minutes-minute timer yesterday.';
   }
+
+  @override
+  String endScreenMilestoneSessionsTitle(int count) {
+    return 'That\'s $count meditations with Medito.';
+  }
+
+  @override
+  String endScreenMilestoneStreakTitle(int count) {
+    return '$count days in a row.';
+  }
+
+  @override
+  String get endScreenMilestoneBody =>
+      'Medito is free because people who use it chip in. If it\'s become part of your routine, would you help keep it going?';
 }
