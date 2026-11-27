@@ -14,6 +14,7 @@ import 'package:medito/utils/utils.dart';
 import '../../../../widgets/medito_icon.dart';
 import '../../home_styles.dart';
 import '../home_gradient_border.dart';
+
 import 'package:medito/utils/session_origin.dart';
 
 class ShortcutsItemsWidget extends ConsumerWidget {
@@ -22,6 +23,9 @@ class ShortcutsItemsWidget extends ConsumerWidget {
   static const _kItemBorderWidth = 0.5;
   static const _kItemBorderRadius = kHomeTileRadius;
   static const _kItemMinHeight = 48.0;
+  static const _kItemHorizontalPadding = 14.0;
+  static const _kIconSize = 24.0;
+  static const _kIconGap = 12.0;
 
   final List<ShortcutsModel> data;
 
@@ -63,6 +67,19 @@ class ShortcutsItemsWidget extends ConsumerWidget {
     // neighbours the way captions under four narrow squares did.
     final columns = MediaQuery.sizeOf(context).width > 600 ? 4 : 2;
     const spacing = 10.0;
+    // Width left for a label inside its tile. Worked out from the screen
+    // rather than a LayoutBuilder, which can't sit inside IntrinsicHeight.
+    final tileWidth =
+        (MediaQuery.sizeOf(context).width -
+            padding16 * 2 -
+            spacing * (columns - 1)) /
+        columns;
+    final labelWidth =
+        tileWidth -
+        _kItemBorderWidth * 2 -
+        _kItemHorizontalPadding * 2 -
+        _kIconSize -
+        _kIconGap;
 
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: padding16),
@@ -80,7 +97,12 @@ class ShortcutsItemsWidget extends ConsumerWidget {
                     if (i > start) const SizedBox(width: spacing),
                     Expanded(
                       child: i < data.length
-                          ? _buildShortcutItem(context, ref, data[i])
+                          ? _buildShortcutItem(
+                              context,
+                              ref,
+                              data[i],
+                              labelWidth,
+                            )
                           : const SizedBox.shrink(),
                     ),
                   ],
@@ -97,6 +119,7 @@ class ShortcutsItemsWidget extends ConsumerWidget {
     BuildContext context,
     WidgetRef ref,
     ShortcutsModel e,
+    double labelWidth,
   ) {
     final theme = Theme.of(context);
     final onSurface = theme.colorScheme.onSurface;
@@ -120,23 +143,22 @@ class ShortcutsItemsWidget extends ConsumerWidget {
               constraints: const BoxConstraints(minHeight: _kItemMinHeight),
               child: Padding(
                 padding: const EdgeInsets.symmetric(
-                  horizontal: 14,
+                  horizontal: _kItemHorizontalPadding,
                   vertical: 8,
                 ),
                 child: Row(
                   children: [
                     MeditoRemoteIcon(
                       icon: e.icon ?? '',
-                      size: 24,
+                      size: _kIconSize,
                       color: onSurface,
                     ),
-                    const SizedBox(width: 12),
+                    const SizedBox(width: _kIconGap),
                     Expanded(
-                      child: Text(
-                        e.title ?? '',
+                      child: _ShortcutTitle(
+                        title: e.title ?? '',
                         style: context.text.label,
-                        maxLines: 2,
-                        overflow: TextOverflow.ellipsis,
+                        maxWidth: labelWidth,
                       ),
                     ),
                   ],
@@ -146,6 +168,52 @@ class ShortcutsItemsWidget extends ConsumerWidget {
           ),
         ),
       ),
+    );
+  }
+}
+
+/// A shortcut's label. Wraps between words onto two lines at large text
+/// sizes; only when a single word is wider than the tile is the label scaled
+/// down to fit, so "Downloads" never breaks into "Download" and "s".
+class _ShortcutTitle extends StatelessWidget {
+  const _ShortcutTitle({
+    required this.title,
+    required this.style,
+    required this.maxWidth,
+  });
+
+  final String title;
+  final TextStyle? style;
+  final double maxWidth;
+
+  @override
+  Widget build(BuildContext context) {
+    final textScaler = MediaQuery.textScalerOf(context);
+    final direction = Directionality.of(context);
+    final wordTooWide = title.split(RegExp(r'\s+')).any((word) {
+      final painter = TextPainter(
+        text: TextSpan(text: word, style: style),
+        textDirection: direction,
+        textScaler: textScaler,
+        maxLines: 1,
+      )..layout();
+      final width = painter.width;
+      painter.dispose();
+      return width > maxWidth;
+    });
+
+    if (wordTooWide) {
+      return FittedBox(
+        fit: BoxFit.scaleDown,
+        alignment: AlignmentDirectional.centerStart,
+        child: Text(title, style: style, maxLines: 1),
+      );
+    }
+    return Text(
+      title,
+      style: style,
+      maxLines: 2,
+      overflow: TextOverflow.ellipsis,
     );
   }
 }
