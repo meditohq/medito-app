@@ -13,7 +13,7 @@ class AppLocalizationsEs extends AppLocalizations {
   String get appName => 'Medito';
 
   @override
-  String get privacyPolicyTitle => 'Política de Privacidad';
+  String get privacyPolicyTitle => 'Política de privacidad';
 
   @override
   String get unableToOpenPrivacyPolicy =>
@@ -82,7 +82,7 @@ class AppLocalizationsEs extends AppLocalizations {
   String get meditationProducts => 'Tienda para Apoyar';
 
   @override
-  String get blackFridayTitle => 'Apoya Meditación Gratuita';
+  String get blackFridayTitle => 'Apoya meditación gratuita';
 
   @override
   String get blackFridaySubtitle =>
@@ -118,7 +118,7 @@ class AppLocalizationsEs extends AppLocalizations {
       '¡Descubre la calma GRATIS con #Medito! He encontrado mi paz interior; ¡ahora es tu turno! Únete a mí en este viaje consciente y comienza a explorar hoy 💜 Descarga https://medito.app #Calma #Meditación #Headspace';
 
   @override
-  String get backgroundSounds => 'Sonido de Fondo';
+  String get backgroundSounds => 'Sonido de fondo';
 
   @override
   String get changeBackgroundSoundsHint =>
@@ -150,7 +150,7 @@ class AppLocalizationsEs extends AppLocalizations {
 
   @override
   String get searchEmptyHint =>
-      'Encuentra un pack o una sesión. Prueba con dormir, ansiedad o concentración.';
+      'Encuentra un paquete o una sesión. Prueba con dormir, ansiedad o concentración.';
 
   @override
   String get share => 'Compartir';
@@ -218,7 +218,7 @@ class AppLocalizationsEs extends AppLocalizations {
   String get explore => 'Explorar';
 
   @override
-  String get explorePacksEmpty => 'No hay packs disponibles';
+  String get explorePacksEmpty => 'No hay paquetes disponibles';
 
   @override
   String get welcome => '👋 Bienvenido';
@@ -376,7 +376,7 @@ class AppLocalizationsEs extends AppLocalizations {
       'Notificación de recordatorio programada a las';
 
   @override
-  String get dailyReminderTitle => 'Recordatorio Diario';
+  String get dailyReminderTitle => 'Recordatorio diario';
 
   @override
   String get setFor => 'Configurado para';
@@ -403,10 +403,10 @@ class AppLocalizationsEs extends AppLocalizations {
   String get areYouSure => '¿Estás seguro?';
 
   @override
-  String get requestPermission => 'Solicitar Permiso';
+  String get requestPermission => 'Solicitar permiso';
 
   @override
-  String get reminderPermissions => 'Permisos de Recordatorio';
+  String get reminderPermissions => 'Permisos de recordatorio';
 
   @override
   String get weNeedYourPermissionReminder =>
@@ -431,10 +431,10 @@ class AppLocalizationsEs extends AppLocalizations {
       'Health Connect es necesario para sincronizar. ¿Instalarlo desde Play Store?';
 
   @override
-  String get confirmDeletionTitle => 'Confirmar Eliminación';
+  String get confirmDeletionTitle => 'Confirmar eliminación';
 
   @override
-  String get confirmDeletionFromPlayerTitle => 'Ya Descargado';
+  String get confirmDeletionFromPlayerTitle => 'Ya descargado';
 
   @override
   String get confirmDeletionFromPlayerMessage =>
@@ -484,19 +484,19 @@ class AppLocalizationsEs extends AppLocalizations {
   String get statsErrorRetry => 'Reintentar';
 
   @override
-  String get currentStreak => 'Racha Actual';
+  String get currentStreak => 'Racha actual';
 
   @override
-  String get longestStreak => 'Racha Más Larga';
+  String get longestStreak => 'Racha más larga';
 
   @override
-  String get consistencyScore => 'Puntuación de Consistencia';
+  String get consistencyScore => 'Puntuación de consistencia';
 
   @override
-  String get totalTracksCompleted => 'Total de Pistas Completadas';
+  String get totalTracksCompleted => 'Total de pistas completadas';
 
   @override
-  String get totalTimeListened => 'Tiempo Total Escuchado';
+  String get totalTimeListened => 'Tiempo total escuchado';
 
   @override
   String get days => 'días';
@@ -517,10 +517,10 @@ class AppLocalizationsEs extends AppLocalizations {
   String get minute => 'minuto';
 
   @override
-  String get showConsistencyScore => 'Mostrar Puntuación de Consistencia';
+  String get showConsistencyScore => 'Mostrar puntuación de consistencia';
 
   @override
-  String get showCurrentStreak => 'Mostrar Racha Actual';
+  String get showCurrentStreak => 'Mostrar racha actual';
 
   @override
   String get alwaysShowStreakOnHomepage =>
@@ -545,7 +545,7 @@ class AppLocalizationsEs extends AppLocalizations {
   String get emailLabel => 'Correo electrónico';
 
   @override
-  String get createAccountButtonText => 'Crear Cuenta';
+  String get createAccountButtonText => 'Crear cuenta';
 
   @override
   String get createAccountLogInButtonText => 'Iniciar sesión o Registrarse';
@@ -560,7 +560,7 @@ class AppLocalizationsEs extends AppLocalizations {
   String get sendMeMyPasswordText => 'Continuar';
 
   @override
-  String get logInButtonText => 'Iniciar Sesión';
+  String get logInButtonText => 'Iniciar sesión';
 
   @override
   String get authenticationFailed => 'Autenticación fallida';
@@ -638,7 +638,7 @@ class AppLocalizationsEs extends AppLocalizations {
       'Si ya tienes una cuenta de Medito:\n• Tus datos de meditación anteriores se descargarán\n• Tu progreso actual no guardado se perderá\n\nSi eres nuevo en Medito:\n• Se creará una nueva cuenta\n• Tu progreso actual se guardará en esta cuenta';
 
   @override
-  String get createNewAccount => 'Crear Nueva Cuenta';
+  String get createNewAccount => 'Crear nueva cuenta';
 
   @override
   String get continueLogin => 'Sí, continuar';
@@ -650,13 +650,13 @@ class AppLocalizationsEs extends AppLocalizations {
   String get goBack => 'Regresar';
 
   @override
-  String get userProfileTitle => 'Perfil de Usuario';
+  String get userProfileTitle => 'Perfil de usuario';
 
   @override
   String get userProfileEmailLabel => 'Correo electrónico:';
 
   @override
-  String get signOutButtonText => 'Cerrar Sesión';
+  String get signOutButtonText => 'Cerrar sesión';
 
   @override
   String get signOutSuccessMessage => 'Has cerrado sesión exitosamente';
@@ -666,14 +666,14 @@ class AppLocalizationsEs extends AppLocalizations {
       'Error al cerrar sesión. Por favor inténtalo de nuevo.';
 
   @override
-  String get deleteAccountTitle => 'Eliminar Cuenta';
+  String get deleteAccountTitle => 'Eliminar cuenta';
 
   @override
   String get deleteAccountConfirmation =>
       'Esto elimina tu cuenta de forma permanente, incluidas tus estadísticas y favoritos. No se puede deshacer.';
 
   @override
-  String get deleteAccountButtonText => 'Eliminar Cuenta';
+  String get deleteAccountButtonText => 'Eliminar cuenta';
 
   @override
   String get accountMarkedForDeletion =>
@@ -742,7 +742,7 @@ class AppLocalizationsEs extends AppLocalizations {
       'Esta cuenta ha sido marcada para eliminación y no se puede acceder.';
 
   @override
-  String get faqTitle => 'Preguntas Frecuentes';
+  String get faqTitle => 'Preguntas frecuentes';
 
   @override
   String get editStatsTitle => 'Editar estadísticas';
@@ -791,7 +791,7 @@ class AppLocalizationsEs extends AppLocalizations {
 
   @override
   String get enterMeditationDuration =>
-      'Por favor ingresa la duración de tu meditación fuera de la aplicación';
+      'Por favor, escribe la duración de tu meditación fuera de la aplicación';
 
   @override
   String get meditationMarkingError =>
@@ -806,13 +806,13 @@ class AppLocalizationsEs extends AppLocalizations {
 
   @override
   String get invalidDuration =>
-      'Duración inválida. Por favor ingresa un número positivo.';
+      'Duración no válida. Por favor, escribe un número positivo.';
 
   @override
   String get submit => 'Enviar';
 
   @override
-  String get journalEntry => 'Entrada de Diario';
+  String get journalEntry => 'Entrada de diario';
 
   @override
   String get writeYourJournalEntryHere =>
@@ -880,13 +880,13 @@ class AppLocalizationsEs extends AppLocalizations {
   }
 
   @override
-  String get dailyQuote => 'Cita Diaria';
+  String get dailyQuote => 'Cita diaria';
 
   @override
-  String get termsOfService => 'Términos de Servicio';
+  String get termsOfService => 'Términos de servicio';
 
   @override
-  String get privacyPolicy => 'Política de Privacidad';
+  String get privacyPolicy => 'Política de privacidad';
 
   @override
   String get offlineMode =>
@@ -896,7 +896,7 @@ class AppLocalizationsEs extends AppLocalizations {
   String get addToSiri => 'Agregar a Siri';
 
   @override
-  String get shareTrack => 'Compartir Pista';
+  String get shareTrack => 'Compartir pista';
 
   @override
   String get open => 'Abrir';
@@ -938,18 +938,18 @@ class AppLocalizationsEs extends AppLocalizations {
   String get isMonthlyDonor => 'd';
 
   @override
-  String get otpLabel => 'Ingresa el código de verificación';
+  String get otpLabel => 'Escribe el código de verificación';
 
   @override
   String get invalidOtpError =>
-      'Por favor ingresa un código válido de 6 dígitos';
+      'Por favor, escribe un código válido de 6 dígitos';
 
   @override
   String get otpSentSuccess =>
       'Revisa tu correo electrónico para el código de verificación';
 
   @override
-  String get otpInstructions => 'Ingresa el código que acabamos de enviar a';
+  String get otpInstructions => 'Escribe el código que acabamos de enviar a';
 
   @override
   String get resendCode => '¿No recibiste el código? Reenvíalo';
@@ -975,35 +975,35 @@ class AppLocalizationsEs extends AppLocalizations {
       'Solicita primero un código OTP antes de usar un enlace profundo';
 
   @override
-  String get shortcutsTitle => 'Accesos Directos';
+  String get shortcutsTitle => 'Accesos directos';
 
   @override
   String get carouselTitle => 'Destacados';
 
   @override
-  String get quoteTitle => 'Cita Diaria';
+  String get quoteTitle => 'Cita diaria';
 
   @override
   String get customization => 'Personalización';
 
   @override
-  String get customiseHomeLayout => 'Organizar Diseño de Inicio';
+  String get customiseHomeLayout => 'Organizar diseño de Inicio';
 
   @override
   String get customiseHomeLayoutHint =>
-      'Mantén pulsado un elemento y arrástralo para cambiar el orden. Con un lector de pantalla, usa el menú de acciones para mover los elementos.';
+      'Mantén presionado un elemento y arrástralo para cambiar el orden. Con un lector de pantalla, usa el menú de acciones para mover los elementos.';
 
   @override
-  String get featuresIntegrations => 'Características e Integraciones';
+  String get featuresIntegrations => 'Características e integraciones';
 
   @override
   String get account => 'Cuenta';
 
   @override
-  String get supportCommunity => 'Apoyo y Comunidad';
+  String get supportCommunity => 'Apoyo y comunidad';
 
   @override
-  String get helpLegal => 'Ayuda y Legal';
+  String get helpLegal => 'Ayuda y legal';
 
   @override
   String get advanced => 'Avanzado';
@@ -1180,7 +1180,7 @@ class AppLocalizationsEs extends AppLocalizations {
       'Solo unos minutos al día bastan para empezar a notar la diferencia.';
 
   @override
-  String get enableNotificationsCta => 'Habilitar Notificaciones';
+  String get enableNotificationsCta => 'Habilitar notificaciones';
 
   @override
   String get notificationPreviewTimestamp => 'ahora';
@@ -1271,7 +1271,7 @@ class AppLocalizationsEs extends AppLocalizations {
       'Algunos dispositivos Android detienen apps en segundo plano, lo que puede interrumpir tus sesiones. Desactiva la optimización de batería para meditar sin interrupciones.';
 
   @override
-  String get onboardingBatteryOptimize => 'Desactivar Optimización de Batería';
+  String get onboardingBatteryOptimize => 'Desactivar optimización de batería';
 
   @override
   String get onboardingBatteryAutoStartTitle => 'Activar inicio automático';
@@ -1315,16 +1315,16 @@ class AppLocalizationsEs extends AppLocalizations {
   String get next => 'Siguiente';
 
   @override
-  String get remindLater => 'Recordármelo Más Tarde';
+  String get remindLater => 'Recordármelo más tarde';
 
   @override
   String get allSetTitle => '¡Todo Listo!';
 
   @override
-  String get startMeditating => 'Comenzar a Meditar';
+  String get startMeditating => 'Comenzar a meditar';
 
   @override
-  String get trackingPermissionTitle => 'Ayúdanos a Mejorar Medito';
+  String get trackingPermissionTitle => 'Ayúdanos a mejorar Medito';
 
   @override
   String get trackingPermissionBody =>
@@ -1338,7 +1338,7 @@ class AppLocalizationsEs extends AppLocalizations {
   String get trackingPermissionAllow => 'Continuar';
 
   @override
-  String get splashHeadline => 'Meditación Hecha Simple';
+  String get splashHeadline => 'Meditación hecha simple';
 
   @override
   String get splashSubtitle =>
@@ -1360,7 +1360,7 @@ class AppLocalizationsEs extends AppLocalizations {
   String get continueText => 'Continuar';
 
   @override
-  String get setReminderB => 'Recuérdamelo Cada Día';
+  String get setReminderB => 'Recuérdamelo cada día';
 
   @override
   String get donationContinueToPayment => 'Continuar al pago';
@@ -1413,7 +1413,7 @@ class AppLocalizationsEs extends AppLocalizations {
   String get donationContinue => 'Continuar';
 
   @override
-  String get streakFreezesAvailable => 'Congelaciones de Racha Disponibles';
+  String get streakFreezesAvailable => 'Congelaciones de racha disponibles';
 
   @override
   String get freezeUsedMessage =>
@@ -1432,17 +1432,17 @@ class AppLocalizationsEs extends AppLocalizations {
   }
 
   @override
-  String get useStreakFreeze => 'Usar Congelación de Racha';
+  String get useStreakFreeze => 'Usar congelación de racha';
 
   @override
-  String get streakFreezesBeta => 'Congelaciones de Racha (Beta)';
+  String get streakFreezesBeta => 'Congelaciones de racha (Beta)';
 
   @override
   String get streakFreezesBetaDescription =>
       'Habilita la capacidad de usar congelaciones de racha para mantener tu racha de meditación cuando te pierdas un día';
 
   @override
-  String get notNow => 'Ahora No';
+  String get notNow => 'Ahora no';
 
   @override
   String get helpTitle => 'Ayuda';
@@ -1497,10 +1497,10 @@ class AppLocalizationsEs extends AppLocalizations {
   String get dontKillMyAppUrl => 'https://dontkillmyapp.com';
 
   @override
-  String get goToDonationPortalText => 'Ir al Portal de Donaciones';
+  String get goToDonationPortalText => 'Ir al portal de donaciones';
 
   @override
-  String get editStatsActionText => 'Editar Estadísticas';
+  String get editStatsActionText => 'Editar estadísticas';
 
   @override
   String get donateViaDonationFormText => 'Donar vía Formulario de Donación';
@@ -1536,7 +1536,7 @@ class AppLocalizationsEs extends AppLocalizations {
       'Sigue los pasos y deshabilita las optimizaciones para permitir el funcionamiento suave de esta aplicación';
 
   @override
-  String get autoStartTitle => 'Habilitar Inicio Automático';
+  String get autoStartTitle => 'Habilitar inicio automático';
 
   @override
   String get autoStartDescription =>
@@ -1547,7 +1547,7 @@ class AppLocalizationsEs extends AppLocalizations {
       'La optimización de batería ya está deshabilitada para Medito';
 
   @override
-  String get donationRetentionTitle => 'Por Favor Reconsidera';
+  String get donationRetentionTitle => 'Por favor, reconsidéralo';
 
   @override
   String get donationRetentionMainMessage =>
@@ -1627,7 +1627,7 @@ class AppLocalizationsEs extends AppLocalizations {
       'Silenciar teléfono durante la meditación';
 
   @override
-  String get zenMode => 'Modo Zen';
+  String get zenMode => 'Modo zen';
 
   @override
   String get zenModeEnabledMessage =>
@@ -1676,25 +1676,25 @@ class AppLocalizationsEs extends AppLocalizations {
       'Para silenciar tu teléfono durante la meditación, Android debe dar a Medito acceso a No molestar. En la siguiente pantalla, busca Medito en la lista y actívalo; después vuelve a la app.';
 
   @override
-  String get mindClear => 'Mente Clara';
+  String get mindClear => 'Mente clara';
 
   @override
-  String get donateToMedito => 'Donar Ahora';
+  String get donateToMedito => 'Donar ahora';
 
   @override
   String get currency => 'Moneda';
 
   @override
-  String get custom => 'Cantidad Personalizada';
+  String get custom => 'Cantidad personalizada';
 
   @override
   String get payWithPaypal => 'Donar con PayPal';
 
   @override
-  String get bankTransfer => 'Transferencia Bancaria';
+  String get bankTransfer => 'Transferencia bancaria';
 
   @override
-  String get changeCurrency => 'Cambiar Moneda';
+  String get changeCurrency => 'Cambiar moneda';
 
   @override
   String get chooseAmount => 'Elige una cantidad';
@@ -1805,7 +1805,7 @@ class AppLocalizationsEs extends AppLocalizations {
   String get shopTitle => 'Tienda';
 
   @override
-  String get emailExistsDialogTitle => 'Cuenta Existente Encontrada';
+  String get emailExistsDialogTitle => 'Cuenta existente encontrada';
 
   @override
   String get emailExistsDialogMessage =>
@@ -1832,17 +1832,17 @@ class AppLocalizationsEs extends AppLocalizations {
   String get emailMismatchGoBack => 'Volver';
 
   @override
-  String get analyticsTrackingTitle => 'Recolección de Datos';
+  String get analyticsTrackingTitle => 'Recolección de datos';
 
   @override
   String get analyticsTrackingContent =>
       'Recopilamos datos de uso anónimos para ayudarnos a mejorar la aplicación. No se recopila información personal.';
 
   @override
-  String get turnOffAnalyticsText => 'Desactivar Análisis';
+  String get turnOffAnalyticsText => 'Desactivar análisis';
 
   @override
-  String get turnOnAnalyticsText => 'Activar Análisis';
+  String get turnOnAnalyticsText => 'Activar análisis';
 
   @override
   String get analyticsDisabledMessage =>
@@ -1853,7 +1853,7 @@ class AppLocalizationsEs extends AppLocalizations {
       'El seguimiento de análisis ha sido habilitado';
 
   @override
-  String get iosTrackingDialogTitle => 'Recolección de Datos';
+  String get iosTrackingDialogTitle => 'Recolección de datos';
 
   @override
   String get iosTrackingDialogContent =>
@@ -1867,7 +1867,7 @@ class AppLocalizationsEs extends AppLocalizations {
   String get iosTrackingDialogCancel => 'Cancelar';
 
   @override
-  String get iosTrackingDialogDisable => 'Deshabilitar Seguimiento';
+  String get iosTrackingDialogDisable => 'Deshabilitar seguimiento';
 
   @override
   String get newProductLabel => 'NUEVO';
@@ -1882,7 +1882,7 @@ class AppLocalizationsEs extends AppLocalizations {
   String get noResultsFound => 'No se encontraron resultados para tu búsqueda';
 
   @override
-  String get consistencyScoreInfoTitle => 'Puntuación de Consistencia';
+  String get consistencyScoreInfoTitle => 'Puntuación de consistencia';
 
   @override
   String get consistencyScoreInfoMessage =>
@@ -1893,7 +1893,7 @@ class AppLocalizationsEs extends AppLocalizations {
       'Proceso de eliminación de cuenta iniciado. Por favor completa los pasos en tu navegador.';
 
   @override
-  String get reportError => 'Reportar Error';
+  String get reportError => 'Reportar error';
 
   @override
   String get errorReportedMessage => 'Gracias, tu reporte ha sido enviado.';
@@ -1920,10 +1920,10 @@ class AppLocalizationsEs extends AppLocalizations {
   String get spanish => 'Español (beta)';
 
   @override
-  String get reportTrack => 'Reportar Track';
+  String get reportTrack => 'Reportar pista';
 
   @override
-  String get reportForThisTrack => 'Reportar para este track';
+  String get reportForThisTrack => 'Reportar esta pista';
 
   @override
   String get reportAtCurrentPosition => 'Reportar en';
@@ -1956,7 +1956,7 @@ class AppLocalizationsEs extends AppLocalizations {
   String get backgroundSoundNone => 'Ninguno';
 
   @override
-  String get customAmount => 'Cantidad Personalizada';
+  String get customAmount => 'Cantidad personalizada';
 
   @override
   String get debugInfoLabel => 'Información de depuración';
@@ -1986,7 +1986,7 @@ class AppLocalizationsEs extends AppLocalizations {
       'Ocurrió un error desconocido. O tenemos problemas o estás sin conexión.';
 
   @override
-  String get reminderNotificationTitle => 'Recordatorio de Meditación Diaria';
+  String get reminderNotificationTitle => 'Recordatorio de meditación diaria';
 
   @override
   String get reminderNotificationBody =>
@@ -1996,7 +1996,7 @@ class AppLocalizationsEs extends AppLocalizations {
   String get helpLegalSection => 'Ayuda';
 
   @override
-  String get supportCommunitySection => 'Apoyo y Comunidad';
+  String get supportCommunitySection => 'Apoyo y comunidad';
 
   @override
   String get customizationSection => 'Personalización';
@@ -2009,7 +2009,7 @@ class AppLocalizationsEs extends AppLocalizations {
 
   @override
   String get addWidgetStepHold =>
-      'Mantén pulsado un espacio vacío de la pantalla de inicio hasta que las apps empiecen a moverse.';
+      'Mantén presionado un espacio vacío de la pantalla de inicio hasta que las apps empiecen a moverse.';
 
   @override
   String get addWidgetStepEdit =>
@@ -2024,7 +2024,7 @@ class AppLocalizationsEs extends AppLocalizations {
 
   @override
   String get addWidgetFootnote =>
-      'Tu widget se actualiza después de cada meditación. Para la pantalla bloqueada, mantenla pulsada y toca Personalizar y luego Añadir widgets.';
+      'Tu widget se actualiza después de cada meditación. Para la pantalla bloqueada, mantenla presionada y toca Personalizar y luego Añadir widgets.';
 
   @override
   String get themeTitle => 'Tema';
@@ -2076,7 +2076,7 @@ class AppLocalizationsEs extends AppLocalizations {
   String get darkTheme => 'Oscuro';
 
   @override
-  String get selectTheme => 'Seleccionar Tema';
+  String get selectTheme => 'Seleccionar tema';
 
   @override
   String get processing => 'Procesando...';
@@ -2124,21 +2124,21 @@ class AppLocalizationsEs extends AppLocalizations {
       'Dependemos de donantes como tú para seguir proporcionando mindfulness a todos.';
 
   @override
-  String get donationInfoTitle => 'Por Qué Puedes Ver Esto';
+  String get donationInfoTitle => 'Por qué puedes ver esto';
 
   @override
   String get donationInfoMessage =>
       'A veces no sabemos cuándo alguien ha donado. Estamos buscando formas de mejorar esto. Puedes ocultar este mensaje por un tiempo si ya has donado.';
 
   @override
-  String get hideForNow => 'Ya He Donado';
+  String get hideForNow => 'Ya he donado';
 
   @override
   String get donationAskHiddenMessage =>
       'Solicitud de donación oculta por 30 días';
 
   @override
-  String get dailyReminders => 'Recordatorios Diarios';
+  String get dailyReminders => 'Recordatorios diarios';
 
   @override
   String get turnOnReminders => 'Activar recordatorios';
@@ -2233,7 +2233,7 @@ class AppLocalizationsEs extends AppLocalizations {
   String get reminderDay3BodyVar1 => 'El impulso importa. Tú puedes.';
 
   @override
-  String get reminderDay3TitleVar2 => ' Chispa de tres días ✴️';
+  String get reminderDay3TitleVar2 => 'Chispa de tres días ✴️';
 
   @override
   String get reminderDay3BodyVar2 => 'Tu práctica está tomando forma.';
@@ -2476,7 +2476,7 @@ class AppLocalizationsEs extends AppLocalizations {
 
   @override
   String upNextPackCompletedTitle(String packTitle) {
-    return 'You finished $packTitle';
+    return 'Has terminado $packTitle';
   }
 
   @override
@@ -2484,18 +2484,18 @@ class AppLocalizationsEs extends AppLocalizations {
     String _temp0 = intl.Intl.pluralLogic(
       count,
       locale: localeName,
-      other: '$count sessions complete',
-      one: '1 session complete',
+      other: '$count sesiones completadas',
+      one: '1 sesión completada',
     );
     return '$_temp0';
   }
 
   @override
-  String get upNextPackCompletedCta => 'Start the next pack';
+  String get upNextPackCompletedCta => 'Empezar el siguiente paquete';
 
   @override
   String upNextPackCompletedCtaNamed(String packTitle) {
-    return 'Start $packTitle';
+    return 'Empezar $packTitle';
   }
 
   @override
@@ -2517,16 +2517,16 @@ class AppLocalizationsEs extends AppLocalizations {
   }
 
   @override
-  String get manageDefaults => 'Gestionar Predeterminados';
+  String get manageDefaults => 'Gestionar predeterminados';
 
   @override
   String get defaults => 'Predeterminados';
 
   @override
-  String get defaultGuideName => 'Guía Predeterminado';
+  String get defaultGuideName => 'Guía predeterminado';
 
   @override
-  String get defaultDuration => 'Duración Predeterminada';
+  String get defaultDuration => 'Duración predeterminada';
 
   @override
   String get defaultGuideNameCleared => 'Guía predeterminado eliminado';
@@ -2709,10 +2709,10 @@ class AppLocalizationsEs extends AppLocalizations {
   String get addToFavorites => 'Agregar a favoritos';
 
   @override
-  String get addedToFavorites => 'Añadido a Favoritos';
+  String get addedToFavorites => 'Añadido a favoritos';
 
   @override
-  String get removedFromFavorites => 'Quitado de Favoritos';
+  String get removedFromFavorites => 'Quitado de favoritos';
 
   @override
   String get removeFromFavorites => 'Quitar de favoritos';
@@ -3283,7 +3283,7 @@ class AppLocalizationsEs extends AppLocalizations {
 
   @override
   String get timerStopwatchCaption =>
-      'El tiempo cuenta desde cero. Pulsa detener cuando termines y la sesión se guarda.';
+      'El tiempo cuenta desde cero. Toca Detener cuando termines y la sesión se guarda.';
 
   @override
   String get timerStart => 'Empezar';

@@ -36,8 +36,8 @@ class LaunchSplash extends StatelessWidget {
     systemNavigationBarContrastEnforced: false,
   );
 
-  /// main.dart shows this before the app's localizations are set up, so fall
-  /// back to the device language there.
+  /// main.dart gives the startup app root the resolved locale and delegates;
+  /// fall back to the device language if a caller shows this without them.
   static AppLocalizations _l10n(BuildContext context) {
     final l10n = AppLocalizations.of(context);
     if (l10n != null) return l10n;

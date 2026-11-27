@@ -9,9 +9,11 @@ import 'shared_preference/shared_preference_provider.dart';
 
 /// The device's preferred languages, in the user's order of preference
 /// (Settings > Language & Region on iOS, Languages on Android). This is
-/// independent of [localeProvider], which is the in-app language and is
-/// currently pinned to English; use this to tailor content to what the
-/// phone says the user reads. Overridable in tests.
+/// independent of [localeProvider], which is the in-app UI language (only
+/// languages with a translation); use this to tailor content to what the
+/// phone says the user reads. The app root invalidates it when the device
+/// languages change, so dependants re-resolve without a restart. Overridable
+/// in tests.
 final deviceLocalesProvider = Provider<List<Locale>>(
   (_) => PlatformDispatcher.instance.locales,
 );
@@ -23,18 +25,15 @@ final localeProvider = NotifierProvider<LocaleNotifier, Locale?>(() {
 class LocaleNotifier extends Notifier<Locale?> {
   @override
   Locale? build() {
+    // Watched so a "system" preference follows device language changes made
+    // while the app is running (see [deviceLocalesProvider]).
+    ref.watch(deviceLocalesProvider);
     final prefs = ref.read(sharedPreferencesProvider);
     final savedLocale = prefs.getString(
       SharedPreferenceConstants.localePreference,
     );
 
-    if (savedLocale == null || savedLocale == LocaleConstants.system) {
-      // Force English until backend is ready for Spanish and German
-      return const Locale(LocaleConstants.english);
-    } else {
-      // Force English even if Spanish or German was previously selected
-      return const Locale(LocaleConstants.english);
-    }
+    return _resolve(savedLocale);
   }
 
   Future<void> setLocale(String localeCode) async {
@@ -44,8 +43,30 @@ class LocaleNotifier extends Notifier<Locale?> {
       localeCode,
     );
 
-    // Force English until backend is ready for Spanish and German
-    state = const Locale(LocaleConstants.english);
+    state = _resolve(localeCode);
+  }
+
+  /// Resolves a saved preference to a supported UI locale. "System" (or no
+  /// preference) follows the device's languages in order. Anything without a
+  /// translation falls back to English rather than to the first entry of
+  /// [AppLocalizations.supportedLocales], which is what [MaterialApp] would
+  /// otherwise pick for an unsupported device language.
+  Locale _resolve(String? localeCode) {
+    if (localeCode != null && localeCode != LocaleConstants.system) {
+      return _supported(localeCode) ?? const Locale(LocaleConstants.english);
+    }
+    for (final deviceLocale in ref.read(deviceLocalesProvider)) {
+      final match = _supported(deviceLocale.languageCode);
+      if (match != null) return match;
+    }
+    return const Locale(LocaleConstants.english);
+  }
+
+  static Locale? _supported(String languageCode) {
+    for (final locale in AppLocalizations.supportedLocales) {
+      if (locale.languageCode == languageCode) return locale;
+    }
+    return null;
   }
 
   String getCurrentLocaleSetting() {
